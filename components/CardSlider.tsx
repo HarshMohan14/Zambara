@@ -227,51 +227,78 @@ export function CardSlider() {
               revealContextRef.current = null
             }
             
+            // Set currentIndex to Meteor immediately BEFORE revealing slider
+            setCurrentIndex(initialSliderIndex)
+            setIsInitialMount(true)
+            
             // Small delay to ensure everything is hidden before showing slider
             setTimeout(() => {
-              // Set currentIndex to Meteor immediately
-              setCurrentIndex(initialSliderIndex)
-              setIsInitialMount(true)
-              
-              // Calculate translateX for Meteor position before revealing slider
-              if (sliderRef.current) {
-                const sliderWidth = sliderRef.current.offsetWidth
-                const slideWidth = sliderWidth * 0.75
-                const gap = sliderWidth * 0.05
-                const totalSlideWidth = slideWidth + gap
-                const meteorTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (initialSliderIndex * totalSlideWidth)
-                setTranslateX(meteorTranslateX)
-              }
-              
               // Set slider to be revealed but start with opacity 0 for fade-in
               setIsRevealed(true)
               setIsPaused(false)
               
-              // Trigger fade-in animation for slider after a brief moment
+              // Wait for slider to render, then calculate position and fade in
               requestAnimationFrame(() => {
-                if (sliderRef.current) {
-                  gsap.fromTo(
-                    sliderRef.current,
-                    { opacity: 0 },
-                    {
-                      opacity: 1,
-                      duration: 0.8,
-                      ease: 'power2.out',
-                      onComplete: () => {
-                        setIsAnimating(false)
-                        // Disable initial mount after slider fade-in completes
-                        requestAnimationFrame(() => {
-                          setIsInitialMount(false)
-                        })
+                // Calculate translateX for Meteor position once slider is rendered
+                if (sliderRef.current && containerRef.current) {
+                  const sliderWidth = sliderRef.current.offsetWidth
+                  const slideWidth = sliderWidth * 0.75
+                  const gap = sliderWidth * 0.05
+                  const totalSlideWidth = slideWidth + gap
+                  const meteorTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (initialSliderIndex * totalSlideWidth)
+                  
+                  // Set translateX immediately without transition
+                  setTranslateX(meteorTranslateX)
+                  
+                  // Also set it directly on the container to ensure it's positioned correctly from the start
+                  containerRef.current.style.transform = `translateX(${meteorTranslateX}px)`
+                  containerRef.current.style.transitionDuration = '0ms'
+                  
+                  // Trigger fade-in animation for slider
+                  if (sliderRef.current) {
+                    gsap.fromTo(
+                      sliderRef.current,
+                      { opacity: 0 },
+                      {
+                        opacity: 1,
+                        duration: 0.6,
+                        ease: 'power2.out',
+                        onComplete: () => {
+                          // Re-enable transitions after fade-in completes
+                          if (containerRef.current) {
+                            containerRef.current.style.transitionDuration = ''
+                          }
+                          setIsAnimating(false)
+                          // Disable initial mount after slider fade-in completes
+                          requestAnimationFrame(() => {
+                            setIsInitialMount(false)
+                          })
+                        }
                       }
-                    }
-                  )
+                    )
+                  } else {
+                    setIsAnimating(false)
+                    setIsInitialMount(false)
+                  }
                 } else {
-                  setIsAnimating(false)
-                  setIsInitialMount(false)
+                  // Retry if slider not ready
+                  setTimeout(() => {
+                    if (sliderRef.current && containerRef.current) {
+                      const sliderWidth = sliderRef.current.offsetWidth
+                      const slideWidth = sliderWidth * 0.75
+                      const gap = sliderWidth * 0.05
+                      const totalSlideWidth = slideWidth + gap
+                      const meteorTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (initialSliderIndex * totalSlideWidth)
+                      setTranslateX(meteorTranslateX)
+                      containerRef.current.style.transform = `translateX(${meteorTranslateX}px)`
+                      containerRef.current.style.transitionDuration = '0ms'
+                    }
+                    setIsAnimating(false)
+                    setIsInitialMount(false)
+                  }, 100)
                 }
               })
-            }, 100) // Small delay to ensure back card is hidden
+            }, 50) // Small delay for smoother transition
           },
         },
         finalTime + 0.4 // Start after cards start fading out
@@ -679,6 +706,7 @@ export function CardSlider() {
                 transform: `translateX(${translateX}px)`,
                 transitionDuration: isInitialMount ? '0ms' : '300ms',
                 transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                willChange: 'transform',
               }}
             >
               {cards.map((card, index) => {
