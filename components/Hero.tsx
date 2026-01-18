@@ -10,7 +10,7 @@ export function Hero() {
   const meteorImageRef = useRef<HTMLDivElement>(null)
   const natureImageRef = useRef<HTMLDivElement>(null)
   const welcomeTextRef = useRef<HTMLHeadingElement>(null)
-  const titleTextRef = useRef<HTMLHeadingElement>(null)
+  const titleTextRef = useRef<HTMLDivElement>(null)
   const taglineRef = useRef<HTMLParagraphElement>(null)
   const [isMuted, setIsMuted] = useState(true)
 
@@ -217,17 +217,20 @@ export function Hero() {
           </h2>
 
           {/* Main Title */}
-          <h1
+          <div
             ref={titleTextRef}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight opacity-0 mb-12"
-            style={{
-              fontFamily: "'TheWalkyrDemo', serif",
-              color: '#d1a058',
-              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
-            }}
+            className="mb-12 flex justify-center"
+            style={{ opacity: 0 }}
           >
-            ZAMBAARA
-          </h1>
+            <Image
+              src="/Zambaara.png"
+              alt="ZAMBAARA"
+              width={600}
+              height={240}
+              className="w-full max-w-[500px] md:max-w-[700px] lg:max-w-[900px] h-auto object-contain"
+              priority
+            />
+          </div>
 
           {/* Taglines */}
           <div 

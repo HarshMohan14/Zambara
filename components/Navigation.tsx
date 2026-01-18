@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
 export function Navigation() {
@@ -134,16 +135,14 @@ export function Navigation() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <h1
-              className="text-2xl md:text-3xl font-bold uppercase tracking-tight"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
-              }}
-            >
-              ZAMBAARA
-            </h1>
+            <Image
+              src="/Zambaara.png"
+              alt="ZAMBAARA"
+              width={200}
+              height={80}
+              className="h-8 md:h-12 w-auto object-contain"
+              priority
+            />
           </div>
 
           {/* Hamburger Menu Button */}
@@ -208,36 +207,6 @@ export function Navigation() {
         }}
       >
         <div className="p-8">
-          {/* Close Button */}
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            className="absolute top-4 right-4 p-2 rounded-lg transition-all duration-300"
-            style={{
-              border: '2px solid #d1a058',
-              color: '#d1a058',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.2)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
-            }}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-
           {/* Navigation Links */}
           <nav className="mt-12 space-y-6">
             <a

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
@@ -42,6 +43,7 @@ export function CardSlider() {
   const [isAnimating, setIsAnimating] = useState(false)
   const revealContextRef = useRef<gsap.Context | null>(null)
   const shuffleSoundRef = useRef<HTMLAudioElement | null>(null)
+  const [mounted, setMounted] = useState(false)
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50
@@ -292,13 +294,19 @@ export function CardSlider() {
     setTimeout(() => setIsPaused(false), autoPlayInterval)
   }
 
-  const handleCardClick = (index: number) => {
+  const handleCardClick = (index: number, e?: React.MouseEvent | React.TouchEvent) => {
     if (!isRevealed) return
-    // Card click no longer opens details
+    e?.preventDefault()
+    e?.stopPropagation()
+    setSelectedCardIndex(index)
+    setShowDetail(true)
+    setIsPaused(true)
   }
 
-  const handleDetailsClick = (index: number) => {
+  const handleDetailsClick = (index: number, e?: React.MouseEvent | React.TouchEvent) => {
     if (!isRevealed) return
+    e?.preventDefault()
+    e?.stopPropagation()
     setSelectedCardIndex(index)
     setShowDetail(true)
     setIsPaused(true)
@@ -436,6 +444,11 @@ export function CardSlider() {
       ctx.revert()
     }
   }, [isRevealed, isAnimating])
+
+  // Set mounted state for portal
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Cleanup animation context on unmount
   useEffect(() => {
@@ -648,7 +661,13 @@ export function CardSlider() {
                     }}
                   >
                     <div
-                      onClick={() => handleDetailsClick(index)}
+                      onClick={(e) => handleCardClick(index, e)}
+                      onTouchEnd={(e) => {
+                        // Only trigger on tap, not swipe
+                        if (touchStart && touchEnd && Math.abs(touchStart - touchEnd) < 10) {
+                          handleCardClick(index, e)
+                        }
+                      }}
                       className="cursor-pointer"
                     >
                       <Image
@@ -669,7 +688,7 @@ export function CardSlider() {
                       <div className="absolute top-full mt-4 w-full flex flex-col items-center z-10">
                         <div className="w-24 border-t border-[#d1a058] mb-4" style={{ opacity: 0.6 }}></div>
                         <button
-                          onClick={() => handleDetailsClick(index)}
+                          onClick={(e) => handleDetailsClick(index, e)}
                           className="px-4 py-2 rounded-lg border-2 border-[#d1a058] cursor-pointer transition-all duration-300 hover:scale-105"
                           style={{
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -765,12 +784,16 @@ export function CardSlider() {
         )}
       </div>
 
-      {/* Card Detail View */}
-      {showDetail && selectedCardIndex !== null && (
+      {/* Card Detail Modal - Rendered as Portal */}
+      {mounted && showDetail && selectedCardIndex !== null && createPortal(
         <div
           ref={detailRef}
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4"
           onClick={handleCloseDetail}
+          style={{ 
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
         >
           <div
             className="relative bg-black border-2 border-[#d1a058] rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
@@ -866,7 +889,8 @@ export function CardSlider() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   )
