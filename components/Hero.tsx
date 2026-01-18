@@ -234,26 +234,26 @@ export function Hero() {
             ref={taglineRef} 
             className="space-y-4"
             style={{
-              fontFamily: "'BalginRegular', sans-serif",
+              fontFamily: "'BlinkerRegular', sans-serif",
             }}
           >
             {/* Line above first tagline */}
             <div className="w-full border-t border-yellow-400 mb-4" style={{ borderColor: '#d1a058' }}></div>
             
             <div className="opacity-0">
-              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BalginRegular', sans-serif" }}>
+              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
                 MASTER THE ELEMENTS
               </p>
               <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BalginRegular', sans-serif" }}>
+              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
                 WIN THE BRACELETS
               </p>
               <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BalginRegular', sans-serif" }}>
+              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
                 BECOME THE ZAMPION
               </p>
               <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>

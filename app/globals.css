@@ -11,29 +11,20 @@
   font-display: swap;
 }
 
-/* Custom Font - Balgin Light Expanded Regular (for body copy) */
+/* Custom Font - Blinker Regular (for body copy) */
 @font-face {
-  font-family: 'BalginLightExpanded';
-  src: url('/Demo_Fonts/Fontspring-DEMO-balgin-lightexpanded.otf') format('opentype');
+  font-family: 'BlinkerRegular';
+  src: url('/Blinker/Blinker-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-/* Custom Font - Balgin Light Expanded Semibold (for buttons) */
+/* Custom Font - Blinker SemiBold (for buttons) */
 @font-face {
-  font-family: 'BalginLightExpandedSemibold';
-  src: url('/Demo_Fonts/Fontspring-DEMO-balgin-semiboldexpanded.otf') format('opentype');
+  font-family: 'BlinkerSemiBold';
+  src: url('/Blinker/Blinker-SemiBold.ttf') format('truetype');
   font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Custom Font - Balgin Regular (for hero tagline) */
-@font-face {
-  font-family: 'BalginRegular';
-  src: url('/Demo_Fonts/Fontspring-DEMO-balgin-regular.otf') format('opentype');
-  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }

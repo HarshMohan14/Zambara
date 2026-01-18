@@ -570,7 +570,7 @@ export function CardSlider() {
               <p 
                 className="text-lg md:text-xl uppercase tracking-wider font-semibold"
                 style={{
-                  fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                  fontFamily: "'BlinkerSemiBold', sans-serif",
                   color: '#d1a058',
                   textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(209, 160, 88, 0.2)',
                   letterSpacing: '2px',
@@ -689,7 +689,7 @@ export function CardSlider() {
                             className="text-sm md:text-base uppercase tracking-wider font-semibold" 
                             style={{ 
                               color: '#d1a058',
-                              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                              fontFamily: "'BlinkerSemiBold', sans-serif",
                               textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(209, 160, 88, 0.2)',
                               letterSpacing: '1px',
                             }}
@@ -857,7 +857,7 @@ export function CardSlider() {
                 <p
                   className="text-lg md:text-xl text-white/90 leading-relaxed"
             style={{
-              fontFamily: "'BalginLightExpanded', sans-serif",
+              fontFamily: "'BlinkerRegular', sans-serif",
               textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
             }}
                 >

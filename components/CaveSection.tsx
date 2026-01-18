@@ -166,7 +166,7 @@ export function CaveSection() {
             onClick={() => setActiveTab('2-4')}
             className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
             style={{
-              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+              fontFamily: "'BlinkerSemiBold', sans-serif",
               backgroundColor: activeTab === '2-4' ? '#d1a058' : 'transparent',
               border: activeTab === '2-4' ? 'none' : '2px solid #d1a058',
               color: activeTab === '2-4' ? '#000' : '#d1a058',
@@ -190,7 +190,7 @@ export function CaveSection() {
             onClick={() => setActiveTab('5-8')}
             className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
             style={{
-              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+              fontFamily: "'BlinkerSemiBold', sans-serif",
               backgroundColor: activeTab === '5-8' ? '#FFFFFF' : 'transparent',
               border: '2px solid #d1a058',
               color: activeTab === '5-8' ? '#000' : '#d1a058',
@@ -217,7 +217,7 @@ export function CaveSection() {
           ref={descriptionRef}
           className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 opacity-0 leading-relaxed"
           style={{
-            fontFamily: "'BalginLightExpanded', sans-serif",
+            fontFamily: "'BlinkerRegular', sans-serif",
             textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
           }}
         >
@@ -255,7 +255,7 @@ export function CaveSection() {
             rel="noopener noreferrer"
             className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide inline-block text-center"
             style={{
-              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+              fontFamily: "'BlinkerSemiBold', sans-serif",
               backgroundColor: '#000000',
               border: '2px solid #d1a058',
               color: '#FFFFFF',
@@ -282,7 +282,7 @@ export function CaveSection() {
             }}
             className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide"
             style={{
-              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+              fontFamily: "'BlinkerSemiBold', sans-serif",
               background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
               border: 'none',
               color: '#000000',
@@ -374,7 +374,7 @@ export function CaveSection() {
                 <label
                   className="block mb-2 uppercase tracking-wide"
                   style={{
-                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    fontFamily: "'BlinkerSemiBold', sans-serif",
                     color: '#d1a058',
                   }}
                 >
@@ -387,7 +387,7 @@ export function CaveSection() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 rounded-lg bg-black border-2 border-[#d1a058] text-white focus:outline-none focus:ring-2 focus:ring-[#d1a058]"
                   style={{
-                    fontFamily: "'BalginLightExpanded', sans-serif",
+                    fontFamily: "'BlinkerRegular', sans-serif",
                   }}
                 />
               </div>
@@ -396,7 +396,7 @@ export function CaveSection() {
                 <label
                   className="block mb-2 uppercase tracking-wide"
                   style={{
-                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    fontFamily: "'BlinkerSemiBold', sans-serif",
                     color: '#d1a058',
                   }}
                 >
@@ -409,7 +409,7 @@ export function CaveSection() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-4 py-3 rounded-lg bg-black border-2 border-[#d1a058] text-white focus:outline-none focus:ring-2 focus:ring-[#d1a058]"
                   style={{
-                    fontFamily: "'BalginLightExpanded', sans-serif",
+                    fontFamily: "'BlinkerRegular', sans-serif",
                   }}
                 />
               </div>
@@ -418,7 +418,7 @@ export function CaveSection() {
                 <label
                   className="block mb-2 uppercase tracking-wide"
                   style={{
-                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    fontFamily: "'BlinkerSemiBold', sans-serif",
                     color: '#d1a058',
                   }}
                 >
@@ -431,7 +431,7 @@ export function CaveSection() {
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-4 py-3 rounded-lg bg-black border-2 border-[#d1a058] text-white focus:outline-none focus:ring-2 focus:ring-[#d1a058]"
                   style={{
-                    fontFamily: "'BalginLightExpanded', sans-serif",
+                    fontFamily: "'BlinkerRegular', sans-serif",
                   }}
                 />
               </div>
@@ -440,7 +440,7 @@ export function CaveSection() {
                 <label
                   className="block mb-2 uppercase tracking-wide"
                   style={{
-                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    fontFamily: "'BlinkerSemiBold', sans-serif",
                     color: '#d1a058',
                   }}
                 >
@@ -452,7 +452,7 @@ export function CaveSection() {
                     onClick={() => setFormData({ ...formData, pack: '2-4' })}
                     className="flex-1 px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
                     style={{
-                      fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                      fontFamily: "'BlinkerSemiBold', sans-serif",
                       backgroundColor: formData.pack === '2-4' ? '#d1a058' : 'transparent',
                       border: '2px solid #d1a058',
                       color: formData.pack === '2-4' ? '#000' : '#d1a058',
@@ -465,7 +465,7 @@ export function CaveSection() {
                     onClick={() => setFormData({ ...formData, pack: '5-8' })}
                     className="flex-1 px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
                     style={{
-                      fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                      fontFamily: "'BlinkerSemiBold', sans-serif",
                       backgroundColor: formData.pack === '5-8' ? '#d1a058' : 'transparent',
                       border: '2px solid #d1a058',
                       color: formData.pack === '5-8' ? '#000' : '#d1a058',
@@ -480,7 +480,7 @@ export function CaveSection() {
                 type="submit"
                 className="w-full px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide"
                 style={{
-                  fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                  fontFamily: "'BlinkerSemiBold', sans-serif",
                   background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
                   border: 'none',
                   color: '#000000',

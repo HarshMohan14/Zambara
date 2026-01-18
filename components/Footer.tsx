@@ -95,7 +95,7 @@ export function Footer() {
           ref={buttonRef}
           className="px-12 py-4 md:px-16 md:py-5 font-semibold uppercase tracking-wide rounded-lg transition-all duration-300 opacity-0"
           style={{
-            fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+            fontFamily: "'BlinkerSemiBold', sans-serif",
             background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
             color: '#000000',
             fontSize: '18px',
