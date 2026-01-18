@@ -225,7 +225,7 @@ export function ImageSlider() {
         <div
           ref={sliderRef}
           className="relative w-full overflow-visible"
-          style={{ aspectRatio: '9/16', minHeight: '60vh' }}
+          style={{ height: '45vh', maxHeight: '500px' }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
