@@ -205,7 +205,7 @@ export function ImageSlider() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-black py-12 overflow-hidden"
+      className="relative w-full bg-black py-6 overflow-hidden"
     >
       <div className="container mx-auto px-4">
         {/* Header Text */}
@@ -214,8 +214,8 @@ export function ImageSlider() {
           className="text-3xl md:text-4xl lg:text-5xl font-bold uppercase text-center mb-8 opacity-0"
           style={{
             fontFamily: "'TheWalkyrDemo', serif",
-            color: '#D4AF37',
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3)',
+            color: '#d1a058',
+            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
           }}
         >
           Hear From the Zampions

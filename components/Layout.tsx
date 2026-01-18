@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { createTimeline } from '@/lib/gsap'
 import { Footer } from '@/components/Footer'
+import { Navigation } from '@/components/Navigation'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -31,6 +32,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div ref={layoutRef} className="min-h-screen relative z-10">
+      <Navigation />
       <main className="relative z-10">{children}</main>
       <Footer />
     </div>

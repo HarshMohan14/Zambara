@@ -10,8 +10,21 @@ interface CardData {
   description: string
 }
 
+const cards: CardData[] = [
+  { src: '/Cards Png/Lava.png', name: 'Lava', description: 'Pure force in motion. Lava advances without hesitation, reshaping the arena through pressure and heat.' },
+  { src: '/Cards Png/Rain.png', name: 'Rain', description: 'Measured and deliberate. Rain cools excess, restoring control where chaos once ruled.' },
+  { src: '/Cards Png/Wind.png', name: 'Wind', description: 'Swift and unseen. Wind alters the course of battle, carrying power where it is least expected.' },
+  { src: '/Cards Png/Mountain.png', name: 'Mountain', description: 'Enduring and immovable. Mountain holds the ground, absorbing impact and standing against the flow.' },
+  { src: '/Cards Png/METEOR.png', name: 'Meteor', description: 'An intrusion from beyond the Cycle. Meteor overwhelms the arena, answerable only to a force equally absolute.' },
+  { src: '/Cards Png/Reverse.png', name: 'Reverse', description: 'A command over direction itself. Reverse turns the arena around, dissolving momentum and resetting order.' },
+  { src: '/Cards Png/FREEZE.png', name: 'Freeze', description: 'A pause imposed upon time. Freeze halts a Seeker\'s advance, forcing stillness and reflection.' },
+  { src: '/Cards Png/Lightning.png', name: 'Lightning', description: 'Instant and indiscriminate. Lightning fractures the moment, striking all others in a single flash.' },
+]
+
 export function CardSlider() {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  // Find Meteor card index for initial position
+  const meteorIndex = cards.findIndex((card) => card.src.includes('METEOR'))
+  const [currentIndex, setCurrentIndex] = useState(meteorIndex >= 0 ? meteorIndex : 0)
   const [isRevealed, setIsRevealed] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null)
@@ -29,17 +42,6 @@ export function CardSlider() {
   const [isAnimating, setIsAnimating] = useState(false)
   const revealContextRef = useRef<gsap.Context | null>(null)
   const shuffleSoundRef = useRef<HTMLAudioElement | null>(null)
-
-  const cards: CardData[] = [
-    { src: '/Cards Png/Lava.png', name: 'Lava', description: 'Pure force in motion. Lava advances without hesitation, reshaping the arena through pressure and heat.' },
-    { src: '/Cards Png/Rain.png', name: 'Rain', description: 'Measured and deliberate. Rain cools excess, restoring control where chaos once ruled.' },
-    { src: '/Cards Png/Wind.png', name: 'Wind', description: 'Swift and unseen. Wind alters the course of battle, carrying power where it is least expected.' },
-    { src: '/Cards Png/Mountain.png', name: 'Mountain', description: 'Enduring and immovable. Mountain holds the ground, absorbing impact and standing against the flow.' },
-    { src: '/Cards Png/METEOR.png', name: 'Meteor', description: 'An intrusion from beyond the Cycle. Meteor overwhelms the arena, answerable only to a force equally absolute.' },
-    { src: '/Cards Png/Reverse.png', name: 'Reverse', description: 'A command over direction itself. Reverse turns the arena around, dissolving momentum and resetting order.' },
-    { src: '/Cards Png/FREEZE.png', name: 'Freeze', description: 'A pause imposed upon time. Freeze halts a Seeker\'s advance, forcing stillness and reflection.' },
-    { src: '/Cards Png/Lightning.png', name: 'Lightning', description: 'Instant and indiscriminate. Lightning fractures the moment, striking all others in a single flash.' },
-  ]
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50
@@ -169,14 +171,28 @@ export function CardSlider() {
         )
       })
 
-      // Step 4: Fade out reveal container and show slider
+      // Step 4: Fade out reveal container smoothly
       const finalTime = startTime + cardElements.length * 0.1 + 1.5 // Updated for slower timing
 
+      // Fade out all cards in the reveal container first
+      cardElements.forEach((card, index) => {
+        masterTl.to(
+          card,
+          {
+            opacity: 0,
+            duration: 0.4,
+            ease: 'power2.in',
+          },
+          finalTime + (index * 0.02) // Slight stagger for smooth fade-out
+        )
+      })
+
+      // Then fade out the reveal container itself
       masterTl.to(
         revealContainerRef.current,
         {
           opacity: 0,
-          duration: 0.6,
+          duration: 0.5,
           ease: 'power2.in',
           onComplete: () => {
             if (revealContextRef.current) {
@@ -197,19 +213,37 @@ export function CardSlider() {
               setTranslateX(meteorTranslateX)
             }
             
-            // Use a small delay to ensure state is updated, then reveal slider with fade-in
-            setTimeout(() => {
-              setIsRevealed(true)
-              setIsPaused(false)
-              setIsAnimating(false)
-              // Disable initial mount after slider is revealed so transitions work for future interactions
-              requestAnimationFrame(() => {
+            // Set slider to be revealed but start with opacity 0 for fade-in
+            setIsRevealed(true)
+            setIsPaused(false)
+            
+            // Trigger fade-in animation for slider after a brief moment
+            requestAnimationFrame(() => {
+              if (sliderRef.current) {
+                gsap.fromTo(
+                  sliderRef.current,
+                  { opacity: 0 },
+                  {
+                    opacity: 1,
+                    duration: 0.8,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                      setIsAnimating(false)
+                      // Disable initial mount after slider fade-in completes
+                      requestAnimationFrame(() => {
+                        setIsInitialMount(false)
+                      })
+                    }
+                  }
+                )
+              } else {
+                setIsAnimating(false)
                 setIsInitialMount(false)
-              })
-            }, 50)
+              }
+            })
           },
         },
-        finalTime
+        finalTime + 0.4 // Start after cards start fading out
       )
     }, revealContainerRef)
 
@@ -379,19 +413,19 @@ export function CardSlider() {
     }
   }, [isPaused, isRevealed, cards.length, autoPlayInterval])
 
-  // Animate slider entrance after reveal
+  // Animate slider entrance after reveal (handled in handleReveal now, but keep as fallback)
   useEffect(() => {
-    if (!isRevealed || !sliderRef.current) return
+    if (!isRevealed || !sliderRef.current || isAnimating) return
 
     const ctx = gsap.context(() => {
-      // Reveal slider with smooth fade-in animation for continuity
-      if (sliderRef.current) {
+      // Only animate if slider is visible but not already animated
+      if (sliderRef.current && sliderRef.current.style.opacity !== '1') {
         gsap.fromTo(
           sliderRef.current,
           { opacity: 0 },
           {
             opacity: 1,
-            duration: 1.0,
+            duration: 0.8,
             ease: 'power2.out',
           }
         )
@@ -401,7 +435,7 @@ export function CardSlider() {
     return () => {
       ctx.revert()
     }
-  }, [isRevealed])
+  }, [isRevealed, isAnimating])
 
   // Cleanup animation context on unmount
   useEffect(() => {
@@ -476,7 +510,7 @@ export function CardSlider() {
   return (
     <section
       ref={sectionRef}
-      className={`relative w-full bg-black py-16 md:py-24 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
+      className={`relative w-full bg-black py-8 md:py-12 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
       style={{ transformStyle: 'preserve-3d' }}
     >
       {/* Hidden audio element for shuffle sound */}
@@ -491,8 +525,8 @@ export function CardSlider() {
           className="text-3xl md:text-4xl lg:text-5xl font-bold uppercase text-center mb-12"
           style={{
             fontFamily: "'TheWalkyrDemo', serif",
-            color: '#D4AF37',
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3)',
+            color: '#d1a058',
+            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
           }}
         >
           Game Cards
@@ -523,7 +557,7 @@ export function CardSlider() {
                 height={438}
                 className="w-full h-full object-contain"
                 style={{
-                  filter: 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.3))',
+                    filter: 'drop-shadow(0 10px 30px rgba(209, 160, 88, 0.2))',
                   transformStyle: 'preserve-3d',
                 }}
                 priority
@@ -532,13 +566,13 @@ export function CardSlider() {
             
             {/* Click hint - Positioned below the back card */}
             <div className="absolute top-full mt-4 w-full flex flex-col items-center pointer-events-none">
-              <div className="w-24 border-t border-[#D4AF37] mb-4" style={{ opacity: 0.6 }}></div>
+              <div className="w-24 border-t border-[#d1a058] mb-4" style={{ opacity: 0.6 }}></div>
               <p 
                 className="text-lg md:text-xl uppercase tracking-wider font-semibold"
                 style={{
-                  fontFamily: "'TheWalkyrDemo', serif",
-                  color: '#D4AF37',
-                  textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.4)',
+                  fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                  color: '#d1a058',
+                  textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(209, 160, 88, 0.2)',
                   letterSpacing: '2px',
                 }}
               >
@@ -571,7 +605,7 @@ export function CardSlider() {
                     height={438}
                     className="w-full h-full object-contain"
                     style={{
-                      filter: 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.5))',
+                      filter: 'drop-shadow(0 10px 30px rgba(209, 160, 88, 0.3))',
                       transformStyle: 'preserve-3d',
                     }}
                   />
@@ -586,7 +620,7 @@ export function CardSlider() {
           <div
             ref={sliderRef}
             className="relative w-full overflow-visible"
-            style={{ minHeight: '500px' }}
+            style={{ minHeight: '500px', opacity: 0 }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -613,7 +647,10 @@ export function CardSlider() {
                       height: '438px', // Maintain aspect ratio
                     }}
                   >
-                    <div>
+                    <div
+                      onClick={() => handleDetailsClick(index)}
+                      className="cursor-pointer"
+                    >
                       <Image
                         src={card.src}
                         alt={card.name}
@@ -622,7 +659,7 @@ export function CardSlider() {
                         className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
                         style={{
                           filter: isActive 
-                            ? 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.5))' 
+                            ? 'drop-shadow(0 10px 30px rgba(209, 160, 88, 0.3))' 
                             : 'drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3))',
                         }}
                       />
@@ -630,34 +667,34 @@ export function CardSlider() {
                     {/* Details button - Positioned below the card, separate from card */}
                     {isActive && (
                       <div className="absolute top-full mt-4 w-full flex flex-col items-center z-10">
-                        <div className="w-24 border-t border-[#D4AF37] mb-4" style={{ opacity: 0.6 }}></div>
+                        <div className="w-24 border-t border-[#d1a058] mb-4" style={{ opacity: 0.6 }}></div>
                         <button
                           onClick={() => handleDetailsClick(index)}
-                          className="px-4 py-2 rounded-lg border-2 border-[#D4AF37] cursor-pointer transition-all duration-300 hover:scale-105"
+                          className="px-4 py-2 rounded-lg border-2 border-[#d1a058] cursor-pointer transition-all duration-300 hover:scale-105"
                           style={{
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             backdropFilter: 'blur(4px)',
-                            boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.1)',
+                            boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 0 10px rgba(209, 160, 88, 0.1)',
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.2)'
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6), inset 0 0 15px rgba(212, 175, 55, 0.2)'
+                            e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.2)'
+                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 0 15px rgba(209, 160, 88, 0.15)'
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.1)'
+                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 0 10px rgba(209, 160, 88, 0.1)'
                           }}
                         >
                           <p 
                             className="text-sm md:text-base uppercase tracking-wider font-semibold" 
                             style={{ 
-                              color: '#D4AF37',
-                              fontFamily: "'TheWalkyrDemo', serif",
-                              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3)',
+                              color: '#d1a058',
+                              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(209, 160, 88, 0.2)',
                               letterSpacing: '1px',
                             }}
                           >
-                            CLICK FOR DETAILS
+                            Click to reveal power
                           </p>
                         </button>
                       </div>
@@ -736,10 +773,10 @@ export function CardSlider() {
           onClick={handleCloseDetail}
         >
           <div
-            className="relative bg-black border-2 border-[#D4AF37] rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="relative bg-black border-2 border-[#d1a058] rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             style={{
-              boxShadow: '0 0 40px rgba(212, 175, 55, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.1)',
+              boxShadow: '0 0 40px rgba(209, 160, 88, 0.3), inset 0 0 20px rgba(209, 160, 88, 0.1)',
             }}
           >
             {/* Close Button */}
@@ -750,25 +787,25 @@ export function CardSlider() {
                 width: '40px',
                 height: '40px',
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                border: '2px solid #D4AF37',
-                color: '#D4AF37',
+                border: '2px solid #d1a058',
+                color: '#d1a058',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.1)',
+                boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 0 10px rgba(209, 160, 88, 0.1)',
                 zIndex: 60,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#D4AF37'
+                e.currentTarget.style.backgroundColor = '#d1a058'
                 e.currentTarget.style.color = '#000000'
                 e.currentTarget.style.transform = 'scale(1.1)'
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
-                e.currentTarget.style.color = '#D4AF37'
+                e.currentTarget.style.color = '#d1a058'
                 e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.1)'
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 0 10px rgba(209, 160, 88, 0.1)'
               }}
               aria-label="Close detail view"
             >
@@ -797,7 +834,7 @@ export function CardSlider() {
                   height={438}
                   className="w-full max-w-[300px] h-auto object-contain"
                   style={{
-                    filter: 'drop-shadow(0 15px 40px rgba(212, 175, 55, 0.6))',
+                    filter: 'drop-shadow(0 15px 40px rgba(209, 160, 88, 0.3))',
                   }}
                 />
               </div>
@@ -808,21 +845,21 @@ export function CardSlider() {
                   className="text-4xl md:text-5xl font-bold uppercase mb-6"
                   style={{
                     fontFamily: "'TheWalkyrDemo', serif",
-                    color: '#D4AF37',
-                    textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3)',
+                    color: '#d1a058',
+                    textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
                   }}
                 >
                   {cards[selectedCardIndex].name}
                 </h3>
 
-                <div className="w-full md:w-32 border-t border-[#D4AF37] mb-6 mx-auto md:mx-0"></div>
+                <div className="w-full md:w-32 border-t border-[#d1a058] mb-6 mx-auto md:mx-0"></div>
 
                 <p
                   className="text-lg md:text-xl text-white/90 leading-relaxed"
-                  style={{
-                    fontFamily: "'BalginLightExpanded', sans-serif",
-                    textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
-                  }}
+            style={{
+              fontFamily: "'BalginLightExpanded', sans-serif",
+              textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
+            }}
                 >
                   {cards[selectedCardIndex].description}
                 </p>

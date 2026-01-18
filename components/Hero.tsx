@@ -123,10 +123,10 @@ export function Hero() {
       {/* Audio Control Button */}
       <button
         onClick={toggleMute}
-        className="fixed top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-sm border-2 border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 group"
+        className="fixed top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-sm border-2 border-[#d1a058] hover:bg-[#d1a058]/20 transition-all duration-300 group"
         aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
         style={{
-          boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+          boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2)',
         }}
       >
         {isMuted ? (
@@ -135,7 +135,7 @@ export function Hero() {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#D4AF37"
+            stroke="#d1a058"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -151,7 +151,7 @@ export function Hero() {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#D4AF37"
+            stroke="#d1a058"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -209,8 +209,8 @@ export function Hero() {
             ref={welcomeTextRef}
             className="text-lg md:text-xl uppercase tracking-wider opacity-0 mb-2"
             style={{
-              fontFamily: "'BalginLightExpanded', sans-serif",
-              color: '#D4AF37',
+              fontFamily: "'TheWalkyrDemo', serif",
+              color: '#d1a058',
             }}
           >
             WELCOME TO
@@ -222,8 +222,8 @@ export function Hero() {
             className="text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight opacity-0 mb-12"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
-              color: '#D4AF37',
-              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3)',
+              color: '#d1a058',
+              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
             }}
           >
             ZAMBAARA
@@ -234,29 +234,29 @@ export function Hero() {
             ref={taglineRef} 
             className="space-y-4"
             style={{
-              fontFamily: "'BalginLightExpanded', sans-serif",
+              fontFamily: "'BalginRegular', sans-serif",
             }}
           >
             {/* Line above first tagline */}
-            <div className="w-full border-t border-yellow-400 mb-4" style={{ borderColor: '#D4AF37' }}></div>
+            <div className="w-full border-t border-yellow-400 mb-4" style={{ borderColor: '#d1a058' }}></div>
             
             <div className="opacity-0">
-              <p className="text-base md:text-lg uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
+              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BalginRegular', sans-serif" }}>
                 MASTER THE ELEMENTS
               </p>
-              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#D4AF37' }}></div>
+              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-base md:text-lg uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
+              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BalginRegular', sans-serif" }}>
                 WIN THE BRACELETS
               </p>
-              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#D4AF37' }}></div>
+              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-base md:text-lg uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
+              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BalginRegular', sans-serif" }}>
                 BECOME THE ZAMPION
               </p>
-              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#D4AF37' }}></div>
+              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
           </div>
         </div>

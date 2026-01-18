@@ -93,22 +93,23 @@ export function Footer() {
         {/* Buy Now Button */}
         <button
           ref={buttonRef}
-          className="px-12 py-4 md:px-16 md:py-5 font-bold uppercase tracking-wide rounded-lg transition-all duration-300 opacity-0"
+          className="px-12 py-4 md:px-16 md:py-5 font-semibold uppercase tracking-wide rounded-lg transition-all duration-300 opacity-0"
           style={{
-            background: 'linear-gradient(180deg, #f4d03f 0%, #d4af37 100%)',
+            fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+            background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
             color: '#000000',
             fontSize: '18px',
-            boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+            boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
             border: 'none',
             cursor: 'pointer',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'scale(1.05)'
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'scale(1)'
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
           }}
         >
           BUY NOW

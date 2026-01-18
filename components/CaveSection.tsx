@@ -6,12 +6,20 @@ import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
 export function CaveSection() {
   const [activeTab, setActiveTab] = useState<'2-4' | '5-8'>('2-4')
+  const [showPreBookForm, setShowPreBookForm] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    pack: '2-4' as '2-4' | '5-8'
+  })
   const sectionRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const tabsRef = useRef<HTMLDivElement>(null)
   const descriptionRef = useRef<HTMLParagraphElement>(null)
   const priceRef = useRef<HTMLDivElement>(null)
   const buttonsRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current) return
@@ -147,7 +155,7 @@ export function CaveSection() {
       {/* Content */}
       <div
         ref={contentRef}
-        className="relative z-10 container mx-auto px-4 py-24 text-center mt-[50vh]"
+        className="relative z-10 container mx-auto px-4 py-12 text-center mt-[40vh]"
       >
         {/* Player Count Tabs */}
         <div
@@ -156,18 +164,18 @@ export function CaveSection() {
         >
           <button
             onClick={() => setActiveTab('2-4')}
-            className="px-6 py-3 rounded-lg font-bold uppercase tracking-wide transition-all"
+            className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
             style={{
-              fontFamily: "'TheWalkyrDemo', serif",
-              backgroundColor: activeTab === '2-4' ? '#D4AF37' : 'transparent',
-              border: activeTab === '2-4' ? 'none' : '2px solid #D4AF37',
-              color: activeTab === '2-4' ? '#000' : '#D4AF37',
+              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+              backgroundColor: activeTab === '2-4' ? '#d1a058' : 'transparent',
+              border: activeTab === '2-4' ? 'none' : '2px solid #d1a058',
+              color: activeTab === '2-4' ? '#000' : '#d1a058',
               textShadow: activeTab === '2-4' ? 'none' : '1px 1px 4px rgba(0, 0, 0, 0.8)',
-              boxShadow: activeTab === '2-4' ? '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)' : 'none',
+              boxShadow: activeTab === '2-4' ? '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)' : 'none',
             }}
             onMouseEnter={(e) => {
               if (activeTab !== '2-4') {
-                e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.1)'
+                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
               }
             }}
             onMouseLeave={(e) => {
@@ -180,18 +188,18 @@ export function CaveSection() {
           </button>
           <button
             onClick={() => setActiveTab('5-8')}
-            className="px-6 py-3 rounded-lg font-bold uppercase tracking-wide transition-all"
+            className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
             style={{
-              fontFamily: "'TheWalkyrDemo', serif",
+              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
               backgroundColor: activeTab === '5-8' ? '#FFFFFF' : 'transparent',
-              border: '2px solid #D4AF37',
-              color: activeTab === '5-8' ? '#000' : '#D4AF37',
+              border: '2px solid #d1a058',
+              color: activeTab === '5-8' ? '#000' : '#d1a058',
               textShadow: activeTab === '5-8' ? 'none' : '1px 1px 4px rgba(0, 0, 0, 0.8)',
               boxShadow: activeTab === '5-8' ? '0 4px 15px rgba(255, 255, 255, 0.3)' : 'none',
             }}
             onMouseEnter={(e) => {
               if (activeTab !== '5-8') {
-                e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.1)'
+                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
               }
             }}
             onMouseLeave={(e) => {
@@ -224,14 +232,15 @@ export function CaveSection() {
           className="mb-8 opacity-0"
         >
           <p
-            className="text-5xl md:text-6xl font-bold"
+            className="text-6xl md:text-7xl lg:text-8xl font-bold"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
-              color: '#D4AF37',
-              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3)',
+              color: '#d1a058',
+              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
+              textTransform: 'lowercase',
             }}
           >
-            ₹799
+            {activeTab === '2-4' ? '₹499' : '₹799'}
           </p>
         </div>
 
@@ -240,51 +249,259 @@ export function CaveSection() {
           ref={buttonsRef}
           className="flex flex-col sm:flex-row justify-center gap-4 opacity-0"
         >
-          <button 
-            className="px-8 py-4 font-bold rounded-lg transition-all uppercase tracking-wide"
+          <a
+            href="https://zambaara.com/howtoplay"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide inline-block text-center"
             style={{
-              fontFamily: "'TheWalkyrDemo', serif",
+              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
               backgroundColor: '#000000',
-              border: '2px solid #D4AF37',
+              border: '2px solid #d1a058',
               color: '#FFFFFF',
               textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
-              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+              boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2)',
               letterSpacing: '1px',
+              textDecoration: 'none',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)'
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.5)'
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)'
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2)'
             }}
           >
             HOW TO PLAY
-          </button>
+          </a>
           <button 
-            className="px-8 py-4 font-bold rounded-lg transition-all uppercase tracking-wide"
+            onClick={() => {
+              setFormData({ ...formData, pack: activeTab })
+              setShowPreBookForm(true)
+            }}
+            className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide"
             style={{
-              fontFamily: "'TheWalkyrDemo', serif",
-              background: 'linear-gradient(180deg, #f4d03f 0%, #d4af37 100%)',
+              fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+              background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
               border: 'none',
               color: '#000000',
-              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
               letterSpacing: '1px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)'
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)'
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
             }}
           >
-            BUY NOW
+            PRE BOOK NOW
           </button>
         </div>
       </div>
+
+      {/* Pre-Book Form Modal */}
+      {showPreBookForm && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setShowPreBookForm(false)}
+        >
+          <div
+            ref={formRef}
+            className="relative bg-black border-2 border-[#d1a058] rounded-lg p-8 max-w-2xl w-full"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              boxShadow: '0 0 40px rgba(209, 160, 88, 0.3), inset 0 0 20px rgba(209, 160, 88, 0.1)',
+            }}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowPreBookForm(false)}
+              className="absolute top-4 right-4 transition-all duration-300 rounded-full z-50"
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                border: '2px solid #d1a058',
+                color: '#d1a058',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 0 10px rgba(209, 160, 88, 0.1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#d1a058'
+                e.currentTarget.style.color = '#000000'
+                e.currentTarget.style.transform = 'scale(1.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+                e.currentTarget.style.color = '#d1a058'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h2
+              className="text-3xl md:text-4xl font-bold uppercase mb-6 text-center"
+              style={{
+                fontFamily: "'TheWalkyrDemo', serif",
+                color: '#d1a058',
+                textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
+              }}
+            >
+              PRE BOOK NOW
+            </h2>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                // Handle form submission here
+                console.log('Form submitted:', formData)
+                alert('Thank you for your pre-booking! We will contact you soon.')
+                setShowPreBookForm(false)
+                setFormData({ name: '', email: '', phone: '', pack: '2-4' })
+              }}
+              className="space-y-6"
+            >
+              <div>
+                <label
+                  className="block mb-2 uppercase tracking-wide"
+                  style={{
+                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    color: '#d1a058',
+                  }}
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black border-2 border-[#d1a058] text-white focus:outline-none focus:ring-2 focus:ring-[#d1a058]"
+                  style={{
+                    fontFamily: "'BalginLightExpanded', sans-serif",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block mb-2 uppercase tracking-wide"
+                  style={{
+                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    color: '#d1a058',
+                  }}
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black border-2 border-[#d1a058] text-white focus:outline-none focus:ring-2 focus:ring-[#d1a058]"
+                  style={{
+                    fontFamily: "'BalginLightExpanded', sans-serif",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block mb-2 uppercase tracking-wide"
+                  style={{
+                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    color: '#d1a058',
+                  }}
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black border-2 border-[#d1a058] text-white focus:outline-none focus:ring-2 focus:ring-[#d1a058]"
+                  style={{
+                    fontFamily: "'BalginLightExpanded', sans-serif",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block mb-2 uppercase tracking-wide"
+                  style={{
+                    fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                    color: '#d1a058',
+                  }}
+                >
+                  Pack Choice
+                </label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, pack: '2-4' })}
+                    className="flex-1 px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
+                    style={{
+                      fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                      backgroundColor: formData.pack === '2-4' ? '#d1a058' : 'transparent',
+                      border: '2px solid #d1a058',
+                      color: formData.pack === '2-4' ? '#000' : '#d1a058',
+                    }}
+                  >
+                    2-4 PLAYERS (₹499)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, pack: '5-8' })}
+                    className="flex-1 px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
+                    style={{
+                      fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                      backgroundColor: formData.pack === '5-8' ? '#d1a058' : 'transparent',
+                      border: '2px solid #d1a058',
+                      color: formData.pack === '5-8' ? '#000' : '#d1a058',
+                    }}
+                  >
+                    5-8 PLAYERS (₹799)
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide"
+                style={{
+                  fontFamily: "'BalginLightExpandedSemibold', sans-serif",
+                  background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
+                  border: 'none',
+                  color: '#000000',
+                  boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                  letterSpacing: '1px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+                }}
+              >
+                SUBMIT PRE-BOOKING
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -2,19 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Font - TheWalkyrDemo */
+/* Custom Font - TheWalkyrDemo (for headlines and prices) */
 @font-face {
   font-family: 'TheWalkyrDemo';
-  src: url('/TheWalkyrDemo.ttf') format('truetype');
+  src: url('/Demo_Fonts/thewalkyrdemo.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-/* Custom Font - Balgin Light Expanded */
+/* Custom Font - Balgin Light Expanded Regular (for body copy) */
 @font-face {
   font-family: 'BalginLightExpanded';
   src: url('/Demo_Fonts/Fontspring-DEMO-balgin-lightexpanded.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Custom Font - Balgin Light Expanded Semibold (for buttons) */
+@font-face {
+  font-family: 'BalginLightExpandedSemibold';
+  src: url('/Demo_Fonts/Fontspring-DEMO-balgin-semiboldexpanded.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Custom Font - Balgin Regular (for hero tagline) */
+@font-face {
+  font-family: 'BalginRegular';
+  src: url('/Demo_Fonts/Fontspring-DEMO-balgin-regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

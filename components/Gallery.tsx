@@ -78,7 +78,7 @@ export function Gallery() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-black py-16 md:py-24 overflow-hidden"
+      className="relative w-full bg-black py-8 md:py-12 overflow-hidden"
     >
       <div className="w-full">
         {/* Section Title */}
@@ -87,8 +87,8 @@ export function Gallery() {
           className="text-2xl md:text-3xl lg:text-4xl font-bold uppercase text-center mb-8 opacity-0"
           style={{
             fontFamily: "'TheWalkyrDemo', serif",
-            color: '#D4AF37',
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3)',
+            color: '#d1a058',
+            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
           }}
         >
           Gallery
