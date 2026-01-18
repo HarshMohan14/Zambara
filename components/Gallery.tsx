@@ -81,10 +81,11 @@ export function Gallery() {
 
   // Individual scroll-triggered animations for each gallery item
   useEffect(() => {
-    if (!galleryRef.current) return
+    const galleryElement = galleryRef.current
+    if (!galleryElement) return
 
     const ctx = gsap.context(() => {
-      const items = Array.from(galleryRef.current.children) as HTMLElement[]
+      const items = Array.from(galleryElement.children) as HTMLElement[]
 
       items.forEach((item, index) => {
         const imageData = images[index]
@@ -141,7 +142,7 @@ export function Gallery() {
           },
         })
       })
-    }, galleryRef)
+    }, galleryElement)
 
     return () => {
       ctx.revert()
