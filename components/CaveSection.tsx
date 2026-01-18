@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
 export function CaveSection() {
@@ -132,11 +133,14 @@ export function CaveSection() {
       className="relative w-full min-h-screen flex flex-col items-center overflow-hidden bg-black"
     >
       {/* Cave Image */}
-      <div className="w-full overflow-hidden" style={{ height: '80vh' }}>
-        <img
+      <div className="w-full overflow-hidden relative" style={{ height: '80vh' }}>
+        <Image
           src="/Cave.png"
           alt="Cave"
-          className="w-full h-full object-cover object-top"
+          fill
+          className="object-cover object-top"
+          sizes="100vw"
+          priority
         />
       </div>
 

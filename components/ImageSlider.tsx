@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
 export function ImageSlider() {
@@ -242,16 +243,18 @@ export function ImageSlider() {
               return (
                 <div
                   key={index}
-                  className="flex-shrink-0 h-full transition-transform duration-300"
+                  className="relative flex-shrink-0 h-full transition-transform duration-300"
                   style={{ 
                     transform: isActive ? 'scale(1)' : 'scale(0.9)',
                     opacity: isActive ? 1 : 0.7,
                   }}
                 >
-                  <img
+                  <Image
                     src={src}
                     alt={`Slide ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 768px) 100vw, 75vw"
                   />
                 </div>
               )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
 interface CardData {
@@ -318,13 +319,16 @@ export function CardSlider() {
                 perspective: '1000px',
               }}
             >
-              <img
+              <Image
                 src="/Cards Png/Back Card.png"
                 alt="Card Back"
+                width={300}
+                height={438}
                 className="w-full h-full object-contain"
                 style={{
                   filter: 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.3))',
                 }}
+                priority
               />
               {/* Click hint */}
               <div className="absolute inset-0 flex flex-col items-center justify-end pointer-events-none pb-8">
@@ -376,9 +380,11 @@ export function CardSlider() {
                       height: '438px', // Maintain aspect ratio
                     }}
                   >
-                    <img
+                    <Image
                       src={card.src}
                       alt={card.name}
+                      width={300}
+                      height={438}
                       className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
                       style={{
                         filter: isActive 
@@ -539,9 +545,11 @@ export function CardSlider() {
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               {/* Card Image */}
               <div className="flex-shrink-0">
-                <img
+                <Image
                   src={cards[selectedCardIndex].src}
                   alt={cards[selectedCardIndex].name}
+                  width={300}
+                  height={438}
                   className="w-full max-w-[300px] h-auto object-contain"
                   style={{
                     filter: 'drop-shadow(0 15px 40px rgba(212, 175, 55, 0.6))',
