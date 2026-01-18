@@ -90,26 +90,34 @@ export function Navigation() {
     }
   }, [])
 
-  // Animate side navigation
+  // Set initial state and animate side navigation
   useEffect(() => {
     if (!sideNavRef.current) return
 
+    // Set initial hidden state immediately (before any animation)
+    gsap.set(sideNavRef.current, {
+      x: '100%',
+      opacity: 0,
+      visibility: 'hidden',
+      pointerEvents: 'none',
+    })
+
     const ctx = gsap.context(() => {
       if (isMenuOpen) {
-        gsap.fromTo(
-          sideNavRef.current,
-          { x: '100%', opacity: 0 },
-          {
-            x: 0,
-            opacity: 1,
-            duration: 0.4,
-            ease: 'power2.out',
-          }
-        )
+        gsap.to(sideNavRef.current, {
+          x: 0,
+          opacity: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+          duration: 0.4,
+          ease: 'power2.out',
+        })
       } else {
         gsap.to(sideNavRef.current, {
           x: '100%',
           opacity: 0,
+          visibility: 'hidden',
+          pointerEvents: 'none',
           duration: 0.3,
           ease: 'power2.in',
         })
@@ -204,6 +212,10 @@ export function Navigation() {
         style={{
           top: '73px', // Below navigation bar
           boxShadow: '-4px 0 20px rgba(209, 160, 88, 0.2)',
+          transform: 'translateX(100%)',
+          opacity: 0,
+          visibility: 'hidden',
+          pointerEvents: 'none',
         }}
       >
         <div className="p-8">
