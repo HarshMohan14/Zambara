@@ -18,7 +18,6 @@ export function CardSlider() {
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [isPaused, setIsPaused] = useState(false)
-  const [isFocused, setIsFocused] = useState(false) // Track if user is interacting
   const sectionRef = useRef<HTMLElement>(null)
   const sliderRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -29,16 +28,17 @@ export function CardSlider() {
   const cardRevealRefs = useRef<(HTMLDivElement | null)[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
   const revealContextRef = useRef<gsap.Context | null>(null)
+  const shuffleSoundRef = useRef<HTMLAudioElement | null>(null)
 
   const cards: CardData[] = [
-    { src: '/Cards Png/Wind.png', name: 'Wind', description: 'Harness the power of the air element. Control the winds and guide your strategy with the swiftness of the breeze.' },
-    { src: '/Cards Png/Reverse.png', name: 'Reverse', description: 'Turn the tides of battle. Reverse the flow of elements and catch your opponents off guard.' },
-    { src: '/Cards Png/Rain.png', name: 'Rain', description: 'Summon the cleansing waters from above. Rain brings renewal and washes away obstacles in your path.' },
-    { src: '/Cards Png/Mountain.png', name: 'Mountain', description: 'Stand firm like the earth itself. The Mountain card provides unwavering defense and unshakeable resolve.' },
-    { src: '/Cards Png/METEOR.png', name: 'Meteor', description: 'Call upon the fury of the cosmos. The Meteor card delivers devastating power from the heavens above.' },
-    { src: '/Cards Png/Lightning.png', name: 'Lightning', description: 'Strike with the speed of lightning. Channel raw electrical energy for swift and decisive action.' },
-    { src: '/Cards Png/Lava.png', name: 'Lava', description: 'Unleash the molten power of the earth\'s core. Lava flows with unstoppable force and destructive heat.' },
-    { src: '/Cards Png/FREEZE.png', name: 'Freeze', description: 'Lock your enemies in ice. The Freeze card immobilizes targets with the absolute cold of winter.' },
+    { src: '/Cards Png/Lava.png', name: 'Lava', description: 'Pure force in motion. Lava advances without hesitation, reshaping the arena through pressure and heat.' },
+    { src: '/Cards Png/Rain.png', name: 'Rain', description: 'Measured and deliberate. Rain cools excess, restoring control where chaos once ruled.' },
+    { src: '/Cards Png/Wind.png', name: 'Wind', description: 'Swift and unseen. Wind alters the course of battle, carrying power where it is least expected.' },
+    { src: '/Cards Png/Mountain.png', name: 'Mountain', description: 'Enduring and immovable. Mountain holds the ground, absorbing impact and standing against the flow.' },
+    { src: '/Cards Png/METEOR.png', name: 'Meteor', description: 'An intrusion from beyond the Cycle. Meteor overwhelms the arena, answerable only to a force equally absolute.' },
+    { src: '/Cards Png/Reverse.png', name: 'Reverse', description: 'A command over direction itself. Reverse turns the arena around, dissolving momentum and resetting order.' },
+    { src: '/Cards Png/FREEZE.png', name: 'Freeze', description: 'A pause imposed upon time. Freeze halts a Seeker\'s advance, forcing stillness and reflection.' },
+    { src: '/Cards Png/Lightning.png', name: 'Lightning', description: 'Instant and indiscriminate. Lightning fractures the moment, striking all others in a single flash.' },
   ]
 
   // Minimum swipe distance (in px)
@@ -48,6 +48,14 @@ export function CardSlider() {
   const handleReveal = () => {
     if (isAnimating) return
     setIsAnimating(true)
+
+    // Play shuffle sound
+    if (shuffleSoundRef.current) {
+      shuffleSoundRef.current.currentTime = 0 // Reset to start
+      shuffleSoundRef.current.play().catch((error) => {
+        console.warn('Failed to play shuffle sound:', error)
+      })
+    }
 
     // Clean up any existing context
     if (revealContextRef.current) {
@@ -252,13 +260,11 @@ export function CardSlider() {
 
   const handleCardClick = (index: number) => {
     if (!isRevealed) return
-    handleFocus() // Switch to slider mode on click
-    // Card click no longer opens details - just focuses
+    // Card click no longer opens details
   }
 
   const handleDetailsClick = (index: number) => {
     if (!isRevealed) return
-    handleFocus() // Switch to slider mode
     setSelectedCardIndex(index)
     setShowDetail(true)
     setIsPaused(true)
@@ -267,12 +273,10 @@ export function CardSlider() {
   const handleCloseDetail = () => {
     setShowDetail(false)
     setSelectedCardIndex(null)
-    handleBlur() // Return to train mode after closing detail
   }
 
   const goToPrevious = () => {
     if (!isRevealed) return
-    handleFocus() // Switch to slider mode
     setIsPaused(true)
     setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length)
     setTimeout(() => setIsPaused(false), autoPlayInterval)
@@ -280,7 +284,6 @@ export function CardSlider() {
 
   const goToNext = () => {
     if (!isRevealed) return
-    handleFocus() // Switch to slider mode
     setIsPaused(true)
     setCurrentIndex((prev) => (prev + 1) % cards.length)
     setTimeout(() => setIsPaused(false), autoPlayInterval)
@@ -288,9 +291,8 @@ export function CardSlider() {
 
   const [translateX, setTranslateX] = useState(0)
   const [isInitialMount, setIsInitialMount] = useState(true)
-  const trainAnimationRef = useRef<gsap.core.Tween | null>(null)
 
-  // Calculate translateX for simple CSS transition or train animation
+  // Calculate translateX for slider positioning
   useEffect(() => {
     if (!isRevealed || !sliderRef.current || !containerRef.current) {
       setTranslateX(0)
@@ -309,81 +311,14 @@ export function CardSlider() {
       // Re-enable transitions after a frame
       requestAnimationFrame(() => {
         setIsInitialMount(false)
-        // Start train animation if not focused
-        if (!isFocused) {
-          startTrainAnimation(sliderWidth, slideWidth, gap, totalSlideWidth)
-        }
       })
       return
     }
     
-    // If focused, use slider behavior
-    if (isFocused) {
-      // Stop train animation
-      if (trainAnimationRef.current) {
-        trainAnimationRef.current.kill()
-        trainAnimationRef.current = null
-      }
-      // Center the current slide
-      const newTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (currentIndex * totalSlideWidth)
-      setTranslateX(newTranslateX)
-    } else {
-      // If not focused, use train animation (continuous scrolling)
-      if (!trainAnimationRef.current) {
-        startTrainAnimation(sliderWidth, slideWidth, gap, totalSlideWidth)
-      }
-    }
-  }, [currentIndex, isRevealed, isInitialMount, isFocused])
-
-  // Train animation function - continuous scrolling like a train
-  const startTrainAnimation = (sliderWidth: number, slideWidth: number, gap: number, totalSlideWidth: number) => {
-    if (!containerRef.current || trainAnimationRef.current) return
-    
-    const totalWidth = cards.length * totalSlideWidth
-    const startX = translateX
-    
-    // Create smooth infinite train animation by animating the translateX value
-    const obj = { x: startX }
-    trainAnimationRef.current = gsap.to(obj, {
-      x: startX - totalWidth,
-      duration: totalWidth / 40, // Adjust speed (pixels per second) - smooth train movement
-      ease: 'none',
-      repeat: -1,
-      onUpdate: () => {
-        setTranslateX(obj.x)
-        // Reset to start for seamless loop
-        if (obj.x <= startX - totalWidth) {
-          obj.x = startX
-        }
-      },
-    })
-  }
-
-  // Handle focus events - switch to slider mode
-  const handleFocus = () => {
-    setIsFocused(true)
-    setIsPaused(true)
-    // Stop train animation
-    if (trainAnimationRef.current) {
-      trainAnimationRef.current.kill()
-      trainAnimationRef.current = null
-    }
-  }
-
-  // Handle blur - return to train mode after delay
-  const handleBlur = () => {
-    setIsFocused(false)
-    // Resume train animation after a delay
-    setTimeout(() => {
-      if (!isFocused && isRevealed && sliderRef.current && containerRef.current) {
-        const sliderWidth = sliderRef.current.offsetWidth
-        const slideWidth = sliderWidth * 0.75
-        const gap = sliderWidth * 0.05
-        const totalSlideWidth = slideWidth + gap
-        startTrainAnimation(sliderWidth, slideWidth, gap, totalSlideWidth)
-      }
-    }, 2000) // Resume train after 2 seconds of no interaction
-  }
+    // Center the current slide
+    const newTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (currentIndex * totalSlideWidth)
+    setTranslateX(newTranslateX)
+  }, [currentIndex, isRevealed, isInitialMount])
 
   // Set initial slide widths and gap on mount and resize
   useEffect(() => {
@@ -544,6 +479,12 @@ export function CardSlider() {
       className={`relative w-full bg-black py-16 md:py-24 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
       style={{ transformStyle: 'preserve-3d' }}
     >
+      {/* Hidden audio element for shuffle sound */}
+      <audio
+        ref={shuffleSoundRef}
+        src="/shuffle.mp3"
+        preload="auto"
+      />
       <div className="container mx-auto px-4">
         {/* Section Title */}
         <h2
@@ -646,14 +587,9 @@ export function CardSlider() {
             ref={sliderRef}
             className="relative w-full overflow-visible"
             style={{ minHeight: '500px' }}
-            onTouchStart={(e) => {
-              handleFocus()
-              handleTouchStart(e)
-            }}
+            onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            onMouseEnter={handleFocus}
-            onMouseLeave={handleBlur}
           >
             {/* Cards Container */}
             <div
@@ -662,7 +598,7 @@ export function CardSlider() {
               style={{ 
                 width: 'max-content',
                 transform: `translateX(${translateX}px)`,
-                transitionDuration: isInitialMount || !isFocused ? '0ms' : '300ms', // No transition for train animation
+                transitionDuration: isInitialMount ? '0ms' : '300ms',
                 transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
@@ -676,7 +612,6 @@ export function CardSlider() {
                       width: '300px',
                       height: '438px', // Maintain aspect ratio
                     }}
-                    onMouseEnter={handleFocus}
                   >
                     <div>
                       <Image

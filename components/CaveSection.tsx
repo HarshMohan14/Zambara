@@ -132,13 +132,13 @@ export function CaveSection() {
       ref={sectionRef}
       className="relative w-full min-h-screen flex flex-col items-center overflow-hidden bg-black"
     >
-      {/* Cave Image */}
-      <div className="w-full overflow-hidden relative" style={{ height: '80vh' }}>
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
         <Image
-          src="/Cave.png"
-          alt="Cave"
+          src="/Cave.jpg"
+          alt="Cave background"
           fill
-          className="object-cover object-top"
+          className="object-cover object-center"
           sizes="100vw"
           priority
         />
@@ -147,7 +147,7 @@ export function CaveSection() {
       {/* Content */}
       <div
         ref={contentRef}
-        className="relative z-10 container mx-auto px-4 py-24 text-center"
+        className="relative z-10 container mx-auto px-4 py-24 text-center mt-[50vh]"
       >
         {/* Player Count Tabs */}
         <div

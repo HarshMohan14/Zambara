@@ -1,16 +1,38 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { gsap, createTimeline } from '@/lib/gsap'
 
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const meteorImageRef = useRef<HTMLDivElement>(null)
   const natureImageRef = useRef<HTMLDivElement>(null)
   const welcomeTextRef = useRef<HTMLHeadingElement>(null)
   const titleTextRef = useRef<HTMLHeadingElement>(null)
   const taglineRef = useRef<HTMLParagraphElement>(null)
+  const [isMuted, setIsMuted] = useState(true)
+
+  const toggleMute = async () => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (isMuted) {
+      // Unmute and play
+      video.muted = false
+      setIsMuted(false)
+      try {
+        await video.play()
+      } catch (error) {
+        console.error('Error playing video:', error)
+      }
+    } else {
+      // Mute
+      video.muted = true
+      setIsMuted(true)
+    }
+  }
 
   useEffect(() => {
     if (!heroRef.current) return
@@ -98,6 +120,49 @@ export function Hero() {
         height: '100vh',
       }}
     >
+      {/* Audio Control Button */}
+      <button
+        onClick={toggleMute}
+        className="fixed top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-sm border-2 border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 group"
+        aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+        style={{
+          boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+        }}
+      >
+        {isMuted ? (
+          // Muted icon (speaker with slash)
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#D4AF37"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-6 h-6 group-hover:scale-110 transition-transform"
+          >
+            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+        ) : (
+          // Unmuted icon (speaker)
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#D4AF37"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-6 h-6 group-hover:scale-110 transition-transform"
+          >
+            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+          </svg>
+        )}
+      </button>
+
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center justify-center w-full h-full">
         {/* Images Container - Positioned to overlap */}
         <div className="relative mb-8 w-full max-w-4xl flex justify-center items-center">
@@ -107,6 +172,7 @@ export function Hero() {
             className="absolute inset-0 flex items-center justify-center z-20"
           >
             <video
+              ref={videoRef}
               src="/hero.mp4"
               autoPlay
               loop
