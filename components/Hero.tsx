@@ -13,49 +13,58 @@ export function Hero() {
   const taglineRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
-    if (!heroRef.current || !natureImageRef.current) return
+    if (!heroRef.current) return
+
+    // Video will loop automatically via HTML video loop attribute
+    // No additional animation needed for video
 
     // Create a master timeline for the hero animations
     const tl = createTimeline()
 
-    // Sequence 1: Nature image fades in
-    tl.fromTo(
-      natureImageRef.current,
-      { opacity: 0, scale: 0.95 },
-      { 
-        opacity: 1, 
-        scale: 1, 
-        duration: 1.2, 
-        ease: 'power2.out' 
-      }
-    )
+    // Sequence 1: Nature image fades in (if available)
+    if (natureImageRef.current) {
+      tl.fromTo(
+        natureImageRef.current,
+        { opacity: 0, scale: 0.95 },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 1.2, 
+          ease: 'power2.out' 
+        }
+      )
+    }
 
     // Sequence 2: "WELCOME TO" text fades in
-    tl.fromTo(
-      welcomeTextRef.current,
-      { opacity: 0, y: 20 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.8, 
-        ease: 'power2.out' 
-      },
-      '-=0.4'
-    )
+    if (welcomeTextRef.current) {
+      tl.fromTo(
+        welcomeTextRef.current,
+        { opacity: 0, y: 20 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.8, 
+          ease: 'power2.out' 
+        },
+        natureImageRef.current ? '-=0.4' : '0'
+      )
+    }
 
     // Sequence 3: "ZAMBAARA" title fades in
-    tl.fromTo(
-      titleTextRef.current,
-      { opacity: 0, y: 30, scale: 0.9 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1, 
-        duration: 1, 
-        ease: 'back.out(1.7)' 
-      },
-      '-=0.5'
-    )
+    if (titleTextRef.current) {
+      tl.fromTo(
+        titleTextRef.current,
+        { opacity: 0, y: 30, scale: 0.9 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1, 
+          duration: 1, 
+          ease: 'back.out(1.7)' 
+        },
+        welcomeTextRef.current ? '-=0.5' : '0'
+      )
+    }
 
     // Sequence 4: Taglines fade in with stagger
     const taglines = taglineRef.current?.children
@@ -70,7 +79,7 @@ export function Hero() {
           ease: 'power2.out',
           stagger: 0.15,
         },
-        '-=0.3'
+        titleTextRef.current ? '-=0.3' : '0'
       )
     }
 
@@ -92,18 +101,22 @@ export function Hero() {
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center justify-center w-full h-full">
         {/* Images Container - Positioned to overlap */}
         <div className="relative mb-8 w-full max-w-4xl flex justify-center items-center">
-          {/* Meteor Image (image.png) - Lower z-index, behind Nature.png */}
+          {/* Hero Video (hero.mp4) - Infinite loop */}
           <div
             ref={meteorImageRef}
             className="absolute inset-0 flex items-center justify-center z-20"
           >
-            <Image
-              src="/image.png"
-              alt="Meteor"
-              width={300}
-              height={300}
+            <video
+              src="/hero.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
               className="object-contain"
-              priority
+              style={{
+                width: '480px',
+                height: '848px',
+              }}
             />
           </div>
 
@@ -124,7 +137,7 @@ export function Hero() {
         </div>
 
         {/* Text Content */}
-        <div className="text-center w-full max-w-5xl">
+        <div className="text-center w-full max-w-5xl relative z-40">
           {/* Welcome Text */}
           <h2
             ref={welcomeTextRef}
@@ -162,19 +175,19 @@ export function Hero() {
             <div className="w-full border-t border-yellow-400 mb-4" style={{ borderColor: '#D4AF37' }}></div>
             
             <div className="opacity-0">
-              <p className="text-xl md:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
+              <p className="text-base md:text-lg uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
                 MASTER THE ELEMENTS
               </p>
               <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#D4AF37' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-xl md:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
+              <p className="text-base md:text-lg uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
                 WIN THE BRACELETS
               </p>
               <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#D4AF37' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-xl md:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
+              <p className="text-base md:text-lg uppercase font-semibold inline-block" style={{ color: '#FFFFFF' }}>
                 BECOME THE ZAMPION
               </p>
               <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#D4AF37' }}></div>

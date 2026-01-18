@@ -18,12 +18,17 @@ export function CardSlider() {
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [isPaused, setIsPaused] = useState(false)
+  const [isFocused, setIsFocused] = useState(false) // Track if user is interacting
   const sectionRef = useRef<HTMLElement>(null)
   const sliderRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const backCardRef = useRef<HTMLDivElement>(null)
   const detailRef = useRef<HTMLDivElement>(null)
   const autoPlayTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const revealContainerRef = useRef<HTMLDivElement>(null)
+  const cardRevealRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [isAnimating, setIsAnimating] = useState(false)
+  const revealContextRef = useRef<gsap.Context | null>(null)
 
   const cards: CardData[] = [
     { src: '/Cards Png/Wind.png', name: 'Wind', description: 'Harness the power of the air element. Control the winds and guide your strategy with the swiftness of the breeze.' },
@@ -41,8 +46,166 @@ export function CardSlider() {
   const autoPlayInterval = 3000 // 3 seconds
 
   const handleReveal = () => {
-    setIsRevealed(true)
-    setIsPaused(false)
+    if (isAnimating) return
+    setIsAnimating(true)
+
+    // Clean up any existing context
+    if (revealContextRef.current) {
+      revealContextRef.current.revert()
+    }
+
+    if (!backCardRef.current || !revealContainerRef.current) return
+
+    const ctx = gsap.context(() => {
+      const masterTl = createTimeline()
+
+      // Step 1: Hide back card immediately (no animation)
+      if (backCardRef.current) {
+        masterTl.set(backCardRef.current, {
+          opacity: 0,
+          visibility: 'hidden',
+        }, 0)
+      }
+
+      // Step 2: Cards appear from behind the back card (train animation)
+      const cardElements = cardRevealRefs.current.filter(Boolean) as HTMLDivElement[]
+      if (cardElements.length === 0) return
+
+      // Find Meteor card index to center the animation on it (for continuity)
+      const meteorIndex = cards.findIndex((card) => card.src.includes('METEOR'))
+      const centerIndex = meteorIndex >= 0 ? meteorIndex : Math.floor(cards.length / 2)
+      const initialSliderIndex = meteorIndex >= 0 ? meteorIndex : Math.floor(cards.length / 2)
+
+      const cardWidth = 300
+      const initialZ = -400 // Start behind the back card
+      const containerWidth = revealContainerRef.current?.offsetWidth || window.innerWidth
+
+      // Position all cards initially at center (stacked)
+      cardElements.forEach((card, index) => {
+        gsap.set(card, {
+          left: '50%',
+          top: '50%',
+          x: -cardWidth / 2, // Center horizontally
+          y: -219, // Half card height (center vertically)
+          opacity: 0,
+          scale: 1, // Start at normal size, hidden
+          rotationY: 0,
+          visibility: 'hidden', // Ensure completely hidden
+        })
+      })
+
+      // Step 2: Reveal only Reverse, Lightning, Meteor, and Freeze sequentially
+      // Start revealing immediately after back card is hidden
+      const revealStartTime = 0.1 // Small delay to ensure back card is hidden
+      
+      // Find indices for Reverse, Lightning, Meteor, and Freeze
+      const cardsToReveal = [
+        cards.findIndex((card) => card.name === 'Reverse'),
+        cards.findIndex((card) => card.name === 'Lightning'),
+        cards.findIndex((card) => card.name === 'Meteor'),
+        cards.findIndex((card) => card.name === 'Freeze'),
+      ].filter(index => index >= 0) // Filter out any not found
+      
+      // Reveal only the specified cards one by one with the same duration and stagger
+      cardsToReveal.forEach((cardIndex, revealIndex) => {
+        const card = cardElements[cardIndex]
+        if (card) {
+          masterTl.to(
+            card,
+            {
+              scale: 1,
+              opacity: 1,
+              visibility: 'visible',
+              duration: 1, // Same duration for all cards
+              ease: 'power2.out',
+            },
+            revealStartTime + (revealIndex * 0.3) // Same stagger between each card
+          )
+        }
+      })
+      
+      // Show all other cards at once (but they won't be visible until spread)
+      cardElements.forEach((card, index) => {
+        if (!cardsToReveal.includes(index)) {
+          masterTl.set(card, {
+            opacity: 1,
+            visibility: 'visible',
+            scale: 1,
+          }, revealStartTime + (cardsToReveal.length * 0.3) + 1.0) // After revealed cards finish
+        }
+      })
+
+      // Step 3: Cards spread out slowly to form slider layout (ending on Meteor)
+      const gap = 20
+      const totalCardWidth = cardWidth + gap
+      // Cards start spreading after the revealed cards finish
+      const revealEndTime = revealStartTime + ((cardsToReveal.length - 1) * 0.3) + 1.0 // When last revealed card finishes
+      const startTime = revealEndTime + 0.3 // Small pause before spreading
+
+      cardElements.forEach((card, index) => {
+        const distanceFromCenter = index - centerIndex
+        const finalX = distanceFromCenter * totalCardWidth - cardWidth / 2
+
+        // Meteor card (centerIndex) should be the last to settle into position
+        const isMeteor = index === centerIndex
+        const delayOffset = isMeteor ? 0.2 : 0 // Meteor settles last
+
+        masterTl.to(
+          card,
+          {
+            x: finalX,
+            duration: 1.5,
+            ease: 'power2.inOut',
+          },
+          startTime + index * 0.08 + delayOffset // Meteor ends last for focus
+        )
+      })
+
+      // Step 4: Fade out reveal container and show slider
+      const finalTime = startTime + cardElements.length * 0.1 + 1.5 // Updated for slower timing
+
+      masterTl.to(
+        revealContainerRef.current,
+        {
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.in',
+          onComplete: () => {
+            if (revealContextRef.current) {
+              revealContextRef.current.revert()
+              revealContextRef.current = null
+            }
+            // Set currentIndex to Meteor immediately
+            setCurrentIndex(initialSliderIndex)
+            setIsInitialMount(true)
+            
+            // Calculate translateX for Meteor position before revealing slider
+            if (sliderRef.current) {
+              const sliderWidth = sliderRef.current.offsetWidth
+              const slideWidth = sliderWidth * 0.75
+              const gap = sliderWidth * 0.05
+              const totalSlideWidth = slideWidth + gap
+              const meteorTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (initialSliderIndex * totalSlideWidth)
+              setTranslateX(meteorTranslateX)
+            }
+            
+            // Use a small delay to ensure state is updated, then reveal slider with fade-in
+            setTimeout(() => {
+              setIsRevealed(true)
+              setIsPaused(false)
+              setIsAnimating(false)
+              // Disable initial mount after slider is revealed so transitions work for future interactions
+              requestAnimationFrame(() => {
+                setIsInitialMount(false)
+              })
+            }, 50)
+          },
+        },
+        finalTime
+      )
+    }, revealContainerRef)
+
+    revealContextRef.current = ctx
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -89,6 +252,13 @@ export function CardSlider() {
 
   const handleCardClick = (index: number) => {
     if (!isRevealed) return
+    handleFocus() // Switch to slider mode on click
+    // Card click no longer opens details - just focuses
+  }
+
+  const handleDetailsClick = (index: number) => {
+    if (!isRevealed) return
+    handleFocus() // Switch to slider mode
     setSelectedCardIndex(index)
     setShowDetail(true)
     setIsPaused(true)
@@ -97,11 +267,12 @@ export function CardSlider() {
   const handleCloseDetail = () => {
     setShowDetail(false)
     setSelectedCardIndex(null)
-    setTimeout(() => setIsPaused(false), autoPlayInterval)
+    handleBlur() // Return to train mode after closing detail
   }
 
   const goToPrevious = () => {
     if (!isRevealed) return
+    handleFocus() // Switch to slider mode
     setIsPaused(true)
     setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length)
     setTimeout(() => setIsPaused(false), autoPlayInterval)
@@ -109,16 +280,19 @@ export function CardSlider() {
 
   const goToNext = () => {
     if (!isRevealed) return
+    handleFocus() // Switch to slider mode
     setIsPaused(true)
     setCurrentIndex((prev) => (prev + 1) % cards.length)
     setTimeout(() => setIsPaused(false), autoPlayInterval)
   }
 
   const [translateX, setTranslateX] = useState(0)
+  const [isInitialMount, setIsInitialMount] = useState(true)
+  const trainAnimationRef = useRef<gsap.core.Tween | null>(null)
 
-  // Calculate translateX for simple CSS transition
+  // Calculate translateX for simple CSS transition or train animation
   useEffect(() => {
-    if (!isRevealed || !sliderRef.current) {
+    if (!isRevealed || !sliderRef.current || !containerRef.current) {
       setTranslateX(0)
       return
     }
@@ -128,10 +302,88 @@ export function CardSlider() {
     const gap = sliderWidth * 0.05 // 5% gap between cards
     const totalSlideWidth = slideWidth + gap
     
-    // Center the current slide
-    const newTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (currentIndex * totalSlideWidth)
-    setTranslateX(newTranslateX)
-  }, [currentIndex, isRevealed])
+    // On initial mount (after reveal), set translateX immediately without transition
+    if (isInitialMount) {
+      const newTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (currentIndex * totalSlideWidth)
+      setTranslateX(newTranslateX)
+      // Re-enable transitions after a frame
+      requestAnimationFrame(() => {
+        setIsInitialMount(false)
+        // Start train animation if not focused
+        if (!isFocused) {
+          startTrainAnimation(sliderWidth, slideWidth, gap, totalSlideWidth)
+        }
+      })
+      return
+    }
+    
+    // If focused, use slider behavior
+    if (isFocused) {
+      // Stop train animation
+      if (trainAnimationRef.current) {
+        trainAnimationRef.current.kill()
+        trainAnimationRef.current = null
+      }
+      // Center the current slide
+      const newTranslateX = (sliderWidth / 2) - (slideWidth / 2) - (currentIndex * totalSlideWidth)
+      setTranslateX(newTranslateX)
+    } else {
+      // If not focused, use train animation (continuous scrolling)
+      if (!trainAnimationRef.current) {
+        startTrainAnimation(sliderWidth, slideWidth, gap, totalSlideWidth)
+      }
+    }
+  }, [currentIndex, isRevealed, isInitialMount, isFocused])
+
+  // Train animation function - continuous scrolling like a train
+  const startTrainAnimation = (sliderWidth: number, slideWidth: number, gap: number, totalSlideWidth: number) => {
+    if (!containerRef.current || trainAnimationRef.current) return
+    
+    const totalWidth = cards.length * totalSlideWidth
+    const startX = translateX
+    
+    // Create smooth infinite train animation by animating the translateX value
+    const obj = { x: startX }
+    trainAnimationRef.current = gsap.to(obj, {
+      x: startX - totalWidth,
+      duration: totalWidth / 40, // Adjust speed (pixels per second) - smooth train movement
+      ease: 'none',
+      repeat: -1,
+      onUpdate: () => {
+        setTranslateX(obj.x)
+        // Reset to start for seamless loop
+        if (obj.x <= startX - totalWidth) {
+          obj.x = startX
+        }
+      },
+    })
+  }
+
+  // Handle focus events - switch to slider mode
+  const handleFocus = () => {
+    setIsFocused(true)
+    setIsPaused(true)
+    // Stop train animation
+    if (trainAnimationRef.current) {
+      trainAnimationRef.current.kill()
+      trainAnimationRef.current = null
+    }
+  }
+
+  // Handle blur - return to train mode after delay
+  const handleBlur = () => {
+    setIsFocused(false)
+    // Resume train animation after a delay
+    setTimeout(() => {
+      if (!isFocused && isRevealed && sliderRef.current && containerRef.current) {
+        const sliderWidth = sliderRef.current.offsetWidth
+        const slideWidth = sliderWidth * 0.75
+        const gap = sliderWidth * 0.05
+        const totalSlideWidth = slideWidth + gap
+        startTrainAnimation(sliderWidth, slideWidth, gap, totalSlideWidth)
+      }
+    }, 2000) // Resume train after 2 seconds of no interaction
+  }
 
   // Set initial slide widths and gap on mount and resize
   useEffect(() => {
@@ -192,32 +444,20 @@ export function CardSlider() {
     }
   }, [isPaused, isRevealed, cards.length, autoPlayInterval])
 
-  // Animate reveal
+  // Animate slider entrance after reveal
   useEffect(() => {
-    if (!isRevealed || !backCardRef.current || !sliderRef.current) return
+    if (!isRevealed || !sliderRef.current) return
 
     const ctx = gsap.context(() => {
-      // Flip and fade out back card
-      if (backCardRef.current) {
-        gsap.to(backCardRef.current, {
-          rotationY: 90,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power2.in',
-        })
-      }
-
-      // Reveal slider
+      // Reveal slider with smooth fade-in animation for continuity
       if (sliderRef.current) {
         gsap.fromTo(
           sliderRef.current,
-          { opacity: 0, scale: 0.9 },
+          { opacity: 0 },
           {
             opacity: 1,
-            scale: 1,
-            duration: 0.8,
-            ease: 'back.out(1.7)',
-            delay: 0.3,
+            duration: 1.0,
+            ease: 'power2.out',
           }
         )
       }
@@ -227,6 +467,16 @@ export function CardSlider() {
       ctx.revert()
     }
   }, [isRevealed])
+
+  // Cleanup animation context on unmount
+  useEffect(() => {
+    return () => {
+      if (revealContextRef.current) {
+        revealContextRef.current.revert()
+        revealContextRef.current = null
+      }
+    }
+  }, [])
 
   // Animate detail view
   useEffect(() => {
@@ -291,7 +541,8 @@ export function CardSlider() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-black py-16 md:py-24 overflow-hidden"
+      className={`relative w-full bg-black py-16 md:py-24 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
+      style={{ transformStyle: 'preserve-3d' }}
     >
       <div className="container mx-auto px-4">
         {/* Section Title */}
@@ -306,17 +557,22 @@ export function CardSlider() {
           Game Cards
         </h2>
 
-        {/* Back Card - Shown initially */}
+        {/* Back Card and Reveal Animation Container */}
         {!isRevealed && (
-          <div className="flex justify-center items-center min-h-[500px]">
+          <div 
+            ref={revealContainerRef}
+            className="relative w-full min-h-[500px] flex justify-center items-center overflow-visible"
+            style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}
+          >
+            {/* Back Card - Shown initially */}
             <div
               ref={backCardRef}
-              className="relative cursor-pointer transition-transform duration-300 hover:scale-105"
+              className="relative cursor-pointer transition-transform duration-300 hover:scale-105 z-50"
               onClick={handleReveal}
               style={{
                 width: '300px',
-                height: '438px', // Maintain aspect ratio (762:1114)
-                perspective: '1000px',
+                height: '438px',
+                transformStyle: 'preserve-3d',
               }}
             >
               <Image
@@ -327,24 +583,59 @@ export function CardSlider() {
                 className="w-full h-full object-contain"
                 style={{
                   filter: 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.3))',
+                  transformStyle: 'preserve-3d',
                 }}
                 priority
               />
-              {/* Click hint */}
-              <div className="absolute inset-0 flex flex-col items-center justify-end pointer-events-none pb-8">
-                <div className="w-24 border-t border-[#D4AF37] mb-4" style={{ opacity: 0.6 }}></div>
-                <p 
-                  className="text-lg md:text-xl uppercase tracking-wider font-semibold"
+            </div>
+            
+            {/* Click hint - Positioned below the back card */}
+            <div className="absolute top-full mt-4 w-full flex flex-col items-center pointer-events-none">
+              <div className="w-24 border-t border-[#D4AF37] mb-4" style={{ opacity: 0.6 }}></div>
+              <p 
+                className="text-lg md:text-xl uppercase tracking-wider font-semibold"
+                style={{
+                  fontFamily: "'TheWalkyrDemo', serif",
+                  color: '#D4AF37',
+                  textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.4)',
+                  letterSpacing: '2px',
+                }}
+              >
+                CLICK TO REVEAL
+              </p>
+            </div>
+
+            {/* Reveal Cards - Hidden initially, appear from behind back card */}
+            <div className="absolute inset-0 pointer-events-none overflow-visible flex items-center justify-center">
+              {cards.map((card, index) => (
+                <div
+                  key={index}
+                  ref={(el) => {
+                    cardRevealRefs.current[index] = el
+                  }}
+                  className="absolute"
                   style={{
-                    fontFamily: "'TheWalkyrDemo', serif",
-                    color: '#D4AF37',
-                    textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.4)',
-                    letterSpacing: '2px',
+                    width: '300px',
+                    height: '438px',
+                    opacity: 0,
+                    visibility: 'hidden',
+                    transformStyle: 'preserve-3d',
+                    willChange: 'transform, opacity',
                   }}
                 >
-                  CLICK TO REVEAL
-                </p>
-              </div>
+                  <Image
+                    src={card.src}
+                    alt={card.name}
+                    width={300}
+                    height={438}
+                    className="w-full h-full object-contain"
+                    style={{
+                      filter: 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.5))',
+                      transformStyle: 'preserve-3d',
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -355,17 +646,24 @@ export function CardSlider() {
             ref={sliderRef}
             className="relative w-full overflow-visible"
             style={{ minHeight: '500px' }}
-            onTouchStart={handleTouchStart}
+            onTouchStart={(e) => {
+              handleFocus()
+              handleTouchStart(e)
+            }}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            onMouseEnter={handleFocus}
+            onMouseLeave={handleBlur}
           >
             {/* Cards Container */}
             <div
               ref={containerRef}
-              className="flex h-full items-center transition-transform duration-300 ease-in-out"
+              className="flex h-full items-center transition-transform ease-in-out"
               style={{ 
                 width: 'max-content',
                 transform: `translateX(${translateX}px)`,
+                transitionDuration: isInitialMount || !isFocused ? '0ms' : '300ms', // No transition for train animation
+                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               {cards.map((card, index) => {
@@ -373,34 +671,46 @@ export function CardSlider() {
                 return (
                   <div
                     key={index}
-                    className="relative flex-shrink-0 cursor-pointer"
-                    onClick={() => handleCardClick(index)}
+                    className="relative flex-shrink-0"
                     style={{ 
                       width: '300px',
                       height: '438px', // Maintain aspect ratio
                     }}
+                    onMouseEnter={handleFocus}
                   >
-                    <Image
-                      src={card.src}
-                      alt={card.name}
-                      width={300}
-                      height={438}
-                      className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
-                      style={{
-                        filter: isActive 
-                          ? 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.5))' 
-                          : 'drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3))',
-                      }}
-                    />
-                    {/* Click hint overlay */}
+                    <div>
+                      <Image
+                        src={card.src}
+                        alt={card.name}
+                        width={300}
+                        height={438}
+                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+                        style={{
+                          filter: isActive 
+                            ? 'drop-shadow(0 10px 30px rgba(212, 175, 55, 0.5))' 
+                            : 'drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3))',
+                        }}
+                      />
+                    </div>
+                    {/* Details button - Positioned below the card, separate from card */}
                     {isActive && (
-                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center pointer-events-none z-10">
-                        <div 
-                          className="px-4 py-2 rounded-lg border-2 border-[#D4AF37]"
+                      <div className="absolute top-full mt-4 w-full flex flex-col items-center z-10">
+                        <div className="w-24 border-t border-[#D4AF37] mb-4" style={{ opacity: 0.6 }}></div>
+                        <button
+                          onClick={() => handleDetailsClick(index)}
+                          className="px-4 py-2 rounded-lg border-2 border-[#D4AF37] cursor-pointer transition-all duration-300 hover:scale-105"
                           style={{
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             backdropFilter: 'blur(4px)',
                             boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.1)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.2)'
+                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6), inset 0 0 15px rgba(212, 175, 55, 0.2)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.1)'
                           }}
                         >
                           <p 
@@ -414,7 +724,7 @@ export function CardSlider() {
                           >
                             CLICK FOR DETAILS
                           </p>
-                        </div>
+                        </button>
                       </div>
                     )}
                   </div>
