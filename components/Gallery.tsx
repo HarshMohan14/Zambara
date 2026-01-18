@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 
@@ -10,39 +10,24 @@ export function Gallery() {
   const badgeRef = useRef<HTMLDivElement>(null)
   const galleryRef = useRef<HTMLDivElement>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
 
-  const images = [
+  const images = useMemo(() => [
     // Row 1: Full width image
-    { src: '/p7.jpeg', colSpan: 1, mdColSpan: 6, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'The Gathering', direction: 'bottom' },
+    { src: '/p7.jpeg', mdColSpan: 6, mdRowSpan: 1, title: 'The Gathering', direction: 'bottom' as const },
     // Row 2: Two equal width images
-    { src: '/p5.jpg', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Champion Victory', direction: 'bottom' },
-    { src: '/p6.jpg', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Strategic Play', direction: 'left' },
+    { src: '/p5.jpg', mdColSpan: 3, mdRowSpan: 1, title: 'Champion Victory', direction: 'bottom' as const },
+    { src: '/p6.jpg', mdColSpan: 3, mdRowSpan: 1, title: 'Strategic Play', direction: 'left' as const },
     // Row 3: Full width image
-    { src: '/p8.jpeg', colSpan: 1, mdColSpan: 6, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'Battle Arena', direction: 'right' },
+    { src: '/p8.jpeg', mdColSpan: 6, mdRowSpan: 1, title: 'Battle Arena', direction: 'right' as const },
     // Row 4: Two equal width images
-    { src: '/p1.png', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Epic Showdown', direction: 'right' },
-    { src: '/p2.png', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'Mystical Powers', direction: 'left' },
+    { src: '/p1.png', mdColSpan: 3, mdRowSpan: 1, title: 'Epic Showdown', direction: 'right' as const },
+    { src: '/p2.png', mdColSpan: 3, mdRowSpan: 1, title: 'Mystical Powers', direction: 'left' as const },
     // Row 5: Full width image
-    { src: '/p4.jpg', colSpan: 1, mdColSpan: 6, rowSpan: 1, mdRowSpan: 1, aspect: 'portrait', title: 'Elemental Mastery', direction: 'left' },
+    { src: '/p4.jpg', mdColSpan: 6, mdRowSpan: 1, title: 'Elemental Mastery', direction: 'left' as const },
     // Row 6: Two equal width images
-    { src: '/p3.png', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'portrait', title: 'Heroic Journey', direction: 'top' },
-    { src: '/p5.jpg', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Battle Ready', direction: 'bottom' },
-  ]
-
-  // Handle responsive layout
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    return () => {
-      window.removeEventListener('resize', checkMobile)
-    }
-  }, [])
+    { src: '/p3.png', mdColSpan: 3, mdRowSpan: 1, title: 'Heroic Journey', direction: 'top' as const },
+    { src: '/p5.jpg', mdColSpan: 3, mdRowSpan: 1, title: 'Battle Ready', direction: 'bottom' as const },
+  ], [])
 
   // Scroll-triggered animation for section header
   useEffect(() => {
@@ -105,24 +90,14 @@ export function Gallery() {
         const imageData = images[index]
         if (!imageData) return
 
-        // Determine animation direction
-        let fromX = 0
-        let fromY = 0
-        
-        switch (imageData.direction) {
-          case 'left':
-            fromX = -80
-            break
-          case 'right':
-            fromX = 80
-            break
-          case 'top':
-            fromY = -80
-            break
-          case 'bottom':
-            fromY = 80
-            break
+        // Determine animation direction - optimized with map
+        const directionMap: Record<string, { x: number; y: number }> = {
+          left: { x: -80, y: 0 },
+          right: { x: 80, y: 0 },
+          top: { x: 0, y: -80 },
+          bottom: { x: 0, y: 80 },
         }
+        const { x: fromX, y: fromY } = directionMap[imageData.direction] || { x: 0, y: 0 }
 
         // Set initial state
         gsap.set(item, {
@@ -171,20 +146,8 @@ export function Gallery() {
     return () => {
       ctx.revert()
     }
-  }, [])
+  }, [images])
 
-  const getAspectRatio = (aspect: string, rowSpan: number, mdRowSpan: number) => {
-    // Mobile-optimized heights - smaller for better scrolling
-    const mobileBaseHeight = 280 // Optimized for mobile screens
-    const desktopBaseHeight = 240
-    
-    return { 
-      minHeight: `${mobileBaseHeight * rowSpan}px`,
-      '@media (min-width: 768px)': {
-        minHeight: `${desktopBaseHeight * mdRowSpan}px`
-      }
-    }
-  }
 
   return (
     <section
@@ -259,7 +222,7 @@ export function Gallery() {
         >
           {images.map((image, index) => {
             // Use same colSpan for both mobile and desktop
-            const colSpan = image.mdColSpan > 6 ? 6 : image.mdColSpan < 1 ? 1 : image.mdColSpan
+            const colSpan = Math.min(Math.max(image.mdColSpan, 1), 6)
             const rowSpan = image.mdRowSpan
             const minHeight = 240 * image.mdRowSpan
             
@@ -290,8 +253,9 @@ export function Gallery() {
                       ? 'brightness(1.15) contrast(1.1) saturate(1.1)' 
                       : 'brightness(0.9) contrast(1)',
                   }}
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes={image.mdColSpan === 6 ? "(max-width: 768px) 100vw, 100vw" : "(max-width: 768px) 100vw, 50vw"}
                   priority={index < 2}
+                  loading={index < 2 ? "eager" : "lazy"}
                 />
               </div>
 
