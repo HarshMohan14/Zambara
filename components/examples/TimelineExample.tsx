@@ -17,8 +17,14 @@ export function TimelineExample() {
   useEffect(() => {
     if (!containerRef.current) return
 
-    // Create a master timeline
-    const masterTl = createTimeline()
+    // Create a master timeline with ScrollTrigger
+    const masterTl = createTimeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top 80%',
+        toggleActions: 'play none none reverse',
+      },
+    })
 
     // Sequence 1: Title animation
     masterTl.fromTo(
@@ -58,13 +64,6 @@ export function TimelineExample() {
       },
       '-=0.2'
     )
-
-    // Add ScrollTrigger to the timeline
-    masterTl.scrollTrigger = {
-      trigger: containerRef.current,
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
-    }
 
     return () => {
       masterTl.kill()

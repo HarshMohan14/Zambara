@@ -36,23 +36,24 @@ export function TimelineAnimation({
     const container = containerRef.current
     if (!container) return
 
-    // Create timeline
-    const tl = createTimeline({
+    // Merge scrollTrigger into timeline config if provided
+    const finalTimelineConfig = {
       ...timelineConfig,
       onComplete,
-    })
+      ...(scrollTrigger !== false && {
+        scrollTrigger: {
+          trigger: container,
+          start: 'top 80%',
+          toggleActions: 'play none none reverse',
+          ...scrollTrigger,
+        },
+      }),
+    }
+
+    // Create timeline
+    const tl = createTimeline(finalTimelineConfig)
 
     timelineRef.current = tl
-
-    // Add ScrollTrigger if provided
-    if (scrollTrigger !== false) {
-      tl.scrollTrigger = {
-        trigger: container,
-        start: 'top 80%',
-        toggleActions: 'play none none reverse',
-        ...scrollTrigger,
-      }
-    }
 
     // Animate the container
     tl.fromTo(

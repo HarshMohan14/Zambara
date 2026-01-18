@@ -39,17 +39,20 @@ export function StaggerChildren({
     const children = Array.from(container.children) as HTMLElement[]
     if (children.length === 0) return
 
-    const tl = createTimeline(timelineConfig)
-
-    // Add ScrollTrigger if provided
-    if (scrollTrigger !== false) {
-      tl.scrollTrigger = {
-        trigger: container,
-        start: scrollTriggerDefaults.start,
-        toggleActions: scrollTriggerDefaults.toggleActions,
-        ...scrollTrigger,
-      }
+    // Merge scrollTrigger into timeline config if provided
+    const finalTimelineConfig = {
+      ...timelineConfig,
+      ...(scrollTrigger !== false && {
+        scrollTrigger: {
+          trigger: container,
+          start: scrollTriggerDefaults.start,
+          toggleActions: scrollTriggerDefaults.toggleActions,
+          ...scrollTrigger,
+        },
+      }),
     }
+
+    const tl = createTimeline(finalTimelineConfig)
 
     // Animate children with stagger
     tl.fromTo(

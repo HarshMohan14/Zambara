@@ -28,7 +28,7 @@ export function generateSEOMetadata({
     description: description || 'A highly animated and SEO-optimized Next.js web application',
     keywords: keywords.length > 0 ? keywords : ['Next.js', 'React', 'Animation', 'SEO'],
     openGraph: {
-      type,
+      ...(type === 'website' || type === 'article' ? { type } : {}),
       url: fullUrl,
       title: title || 'Zambara',
       description: description || 'A highly animated and SEO-optimized Next.js web application',
