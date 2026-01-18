@@ -13,14 +13,21 @@ export function Gallery() {
   const [isMobile, setIsMobile] = useState(false)
 
   const images = [
-    { src: '/p4.jpg', colSpan: 1, mdColSpan: 2, rowSpan: 1, mdRowSpan: 2, aspect: 'portrait', title: 'Elemental Mastery', direction: 'left' },
-    { src: '/p8.jpeg', colSpan: 1, mdColSpan: 4, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'Battle Arena', direction: 'right' },
-    { src: '/p5.jpg', colSpan: 1, mdColSpan: 2, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Champion Victory', direction: 'bottom' },
-    { src: '/p6.jpg', colSpan: 1, mdColSpan: 2, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Strategic Play', direction: 'left' },
+    // Row 1: Full width image
     { src: '/p7.jpeg', colSpan: 1, mdColSpan: 6, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'The Gathering', direction: 'bottom' },
-    { src: '/p1.png', colSpan: 1, mdColSpan: 2, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Epic Showdown', direction: 'right' },
-    { src: '/p2.png', colSpan: 1, mdColSpan: 4, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'Mystical Powers', direction: 'left' },
-    { src: '/p3.png', colSpan: 1, mdColSpan: 2, rowSpan: 1, mdRowSpan: 2, aspect: 'portrait', title: 'Heroic Journey', direction: 'top' },
+    // Row 2: Two equal width images
+    { src: '/p5.jpg', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Champion Victory', direction: 'bottom' },
+    { src: '/p6.jpg', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Strategic Play', direction: 'left' },
+    // Row 3: Full width image
+    { src: '/p8.jpeg', colSpan: 1, mdColSpan: 6, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'Battle Arena', direction: 'right' },
+    // Row 4: Two equal width images
+    { src: '/p1.png', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Epic Showdown', direction: 'right' },
+    { src: '/p2.png', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'landscape', title: 'Mystical Powers', direction: 'left' },
+    // Row 5: Full width image
+    { src: '/p4.jpg', colSpan: 1, mdColSpan: 6, rowSpan: 1, mdRowSpan: 1, aspect: 'portrait', title: 'Elemental Mastery', direction: 'left' },
+    // Row 6: Two equal width images
+    { src: '/p3.png', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'portrait', title: 'Heroic Journey', direction: 'top' },
+    { src: '/p5.jpg', colSpan: 1, mdColSpan: 3, rowSpan: 1, mdRowSpan: 1, aspect: 'square', title: 'Battle Ready', direction: 'bottom' },
   ]
 
   // Handle responsive layout
@@ -242,18 +249,19 @@ export function Gallery() {
           WITNESS THE ELEMENTS IN ACTION
         </p>
 
-        {/* Gallery Grid - Mobile-First Design */}
+        {/* Gallery Grid - Same Layout for Mobile and Desktop */}
         <div
           ref={galleryRef}
-          className="grid grid-cols-1 md:grid-cols-6 gap-3 md:gap-6"
+          className="grid grid-cols-6 gap-3 md:gap-6"
           style={{ 
             gridAutoRows: 'minmax(280px, auto)',
           }}
         >
           {images.map((image, index) => {
-            const colSpan = isMobile ? image.colSpan : (image.mdColSpan > 6 ? 6 : image.mdColSpan < 1 ? 1 : image.mdColSpan)
-            const rowSpan = isMobile ? image.rowSpan : image.mdRowSpan
-            const minHeight = isMobile ? 280 * image.rowSpan : 240 * image.mdRowSpan
+            // Use same colSpan for both mobile and desktop
+            const colSpan = image.mdColSpan > 6 ? 6 : image.mdColSpan < 1 ? 1 : image.mdColSpan
+            const rowSpan = image.mdRowSpan
+            const minHeight = 240 * image.mdRowSpan
             
             return (
             <div
@@ -282,7 +290,7 @@ export function Gallery() {
                       ? 'brightness(1.15) contrast(1.1) saturate(1.1)' 
                       : 'brightness(0.9) contrast(1)',
                   }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   priority={index < 2}
                 />
               </div>
