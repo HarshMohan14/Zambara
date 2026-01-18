@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 189.09 41.24">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: .07em;
+      }
+
+      .cls-2 {
+        letter-spacing: .17em;
+      }
+
+      .cls-3 {
+        letter-spacing: .16em;
+      }
+
+      .cls-4 {
+        fill: #3b1015;
+        font-family: TheWalkyr-Demo, 'The Walkyr';
+        font-size: 17.51px;
+      }
+
+      .cls-5 {
+        letter-spacing: .2em;
+      }
+
+      .cls-6 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-7 {
+        letter-spacing: .17em;
+      }
+
+      .cls-8 {
+        letter-spacing: .2em;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="0" y1="20.62" x2="189.09" y2="20.62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ebc17d"/>
+      <stop offset=".34" stop-color="#dfb77c"/>
+      <stop offset="1" stop-color="#c08329"/>
+    </linearGradient>
+  </defs>
+  <path class="cls-6" d="M22.48,41.24h-12.89l-6.88-11.09c-3.62-5.84-3.62-13.23,0-19.07L9.59,0h169.05l7.19,10.27c4.36,6.22,4.36,14.51,0,20.73l-7.19,10.25H22.48Z"/>
+  <text class="cls-4" transform="translate(16.59 26.31)"><tspan class="cls-7" x="0" y="0">b</tspan><tspan class="cls-3" x="15.62" y="0">a</tspan><tspan class="cls-5" x="31.89" y="0">ttle </tspan><tspan class="cls-1" x="97.21" y="0">p</tspan><tspan class="cls-2" x="110.24" y="0">a</tspan><tspan class="cls-8" x="126.76" y="0">ck</tspan></text>
+</svg>
