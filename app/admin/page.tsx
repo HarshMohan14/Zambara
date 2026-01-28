@@ -7,6 +7,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     games: 0,
     scores: 0,
+    events: 0,
+    hosts: 0,
     bookings: 0,
     preBookings: 0,
     contacts: 0,
@@ -16,9 +18,11 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [gamesRes, scoresRes, bookingsRes, preBookingsRes, contactsRes, newsletterRes] = await Promise.all([
+      const [gamesRes, scoresRes, eventsRes, hostsRes, bookingsRes, preBookingsRes, contactsRes, newsletterRes] = await Promise.all([
         apiClient.getGames({ limit: 1 }),
         apiClient.getScores({ limit: 1 }),
+        apiClient.getEvents({ limit: 1 }),
+        apiClient.getHosts({ limit: 1 }),
         apiClient.getBookings({ limit: 1 }),
         apiClient.getPreBookings({ limit: 1 }),
         apiClient.getContactMessages({ limit: 1 }),
@@ -28,6 +32,8 @@ export default function AdminDashboard() {
       console.log('Dashboard stats responses:', {
         games: gamesRes,
         scores: scoresRes,
+        events: eventsRes,
+        hosts: hostsRes,
         bookings: bookingsRes,
         preBookings: preBookingsRes,
         contacts: contactsRes,
@@ -36,6 +42,8 @@ export default function AdminDashboard() {
 
       const gamesData = gamesRes.data as { total?: number } | undefined
       const scoresData = scoresRes.data as { total?: number } | undefined
+      const eventsData = eventsRes.data as { total?: number } | undefined
+      const hostsData = hostsRes.data as { total?: number } | undefined
       const bookingsData = bookingsRes.data as { total?: number } | undefined
       const preBookingsData = preBookingsRes.data as { total?: number } | undefined
       const contactsData = contactsRes.data as { total?: number } | undefined
@@ -44,6 +52,8 @@ export default function AdminDashboard() {
       setStats({
         games: gamesData?.total || 0,
         scores: scoresData?.total || 0,
+        events: eventsData?.total || 0,
+        hosts: hostsData?.total || 0,
         bookings: bookingsData?.total || 0,
         preBookings: preBookingsData?.total || 0,
         contacts: contactsData?.total || 0,
@@ -86,6 +96,18 @@ export default function AdminDashboard() {
       icon: '🏆',
     },
     {
+      title: 'Events',
+      value: stats.events,
+      color: '#d1a058',
+      icon: '🎪',
+    },
+    {
+      title: 'Hosts',
+      value: stats.hosts,
+      color: '#d1a058',
+      icon: '👤',
+    },
+    {
       title: 'Bookings',
       value: stats.bookings,
       color: '#d1a058',
@@ -126,7 +148,7 @@ export default function AdminDashboard() {
       {loading ? (
         <div className="text-[#d1a058]">Loading statistics...</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4 md:gap-6">
           {statCards.map((stat, index) => (
             <div
               key={index}
@@ -235,6 +257,40 @@ export default function AdminDashboard() {
               style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
             >
               Manage bookings
+            </div>
+          </a>
+          <a
+            href="/admin/events"
+            className="block p-4 bg-[#d1a058]/10 border border-[#d1a058]/30 rounded-lg hover:bg-[#d1a058]/20 transition-all"
+          >
+            <div
+              className="font-semibold text-white"
+              style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+            >
+              Events
+            </div>
+            <div
+              className="text-sm text-white/60 mt-1"
+              style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
+            >
+              Manage events
+            </div>
+          </a>
+          <a
+            href="/admin/hosts"
+            className="block p-4 bg-[#d1a058]/10 border border-[#d1a058]/30 rounded-lg hover:bg-[#d1a058]/20 transition-all"
+          >
+            <div
+              className="font-semibold text-white"
+              style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+            >
+              Hosts
+            </div>
+            <div
+              className="text-sm text-white/60 mt-1"
+              style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
+            >
+              Manage hosts
             </div>
           </a>
           <a

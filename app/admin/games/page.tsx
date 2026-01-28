@@ -11,9 +11,8 @@ interface Player {
 
 interface Game {
   id: string
-  name: string
-  description?: string
-  difficulty: string
+  eventId?: string
+  hostId?: string
   players: Player[]
   status: 'running' | 'completed'
   startTime: string
@@ -43,10 +42,13 @@ export default function AdminGames() {
   const [total, setTotal] = useState(0)
   const [updatingLeaderboard, setUpdatingLeaderboard] = useState<string | null>(null)
   const [leaderboardStatuses, setLeaderboardStatuses] = useState<Record<string, LeaderboardStatus>>({})
+  const [events, setEvents] = useState<Array<{ id: string; name: string }>>([])
+  const [hosts, setHosts] = useState<Array<{ id: string; name: string }>>([])
+  const [eventsMap, setEventsMap] = useState<Record<string, string>>({})
+  const [hostsMap, setHostsMap] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    difficulty: 'medium',
+    eventId: '',
+    hostId: '',
     players: [
       { name: '', mobile: '' },
       { name: '', mobile: '' },
@@ -64,7 +66,43 @@ export default function AdminGames() {
 
   useEffect(() => {
     fetchGames()
+    fetchEventsAndHosts()
   }, [filter, currentPage])
+
+  const fetchEventsAndHosts = async () => {
+    try {
+      const [eventsRes, hostsRes] = await Promise.all([
+        apiClient.getEvents({ limit: 100 }),
+        apiClient.getHosts({ limit: 100 }),
+      ])
+
+      if (eventsRes.success && eventsRes.data) {
+        const eventsData = eventsRes.data as { events?: any[] }
+        const eventsList = eventsData.events?.map((e: any) => ({ id: e.id, name: e.name })) || []
+        setEvents(eventsList)
+        // Create a map for quick lookup
+        const eventsMapObj: Record<string, string> = {}
+        eventsList.forEach((e) => {
+          eventsMapObj[e.id] = e.name
+        })
+        setEventsMap(eventsMapObj)
+      }
+
+      if (hostsRes.success && hostsRes.data) {
+        const hostsData = hostsRes.data as { hosts?: any[] }
+        const hostsList = hostsData.hosts?.map((h: any) => ({ id: h.id, name: h.name })) || []
+        setHosts(hostsList)
+        // Create a map for quick lookup
+        const hostsMapObj: Record<string, string> = {}
+        hostsList.forEach((h) => {
+          hostsMapObj[h.id] = h.name
+        })
+        setHostsMap(hostsMapObj)
+      }
+    } catch (error) {
+      console.error('Error fetching events and hosts:', error)
+    }
+  }
 
   const fetchGames = async () => {
     try {
@@ -175,6 +213,16 @@ export default function AdminGames() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validate event and host are selected
+    if (!formData.eventId || !formData.eventId.trim()) {
+      alert('Please select an event')
+      return
+    }
+    if (!formData.hostId || !formData.hostId.trim()) {
+      alert('Please select a host')
+      return
+    }
+    
     const validPlayers = formData.players.filter(p => p.name.trim().length > 0 && p.mobile.trim().length > 0)
     if (validPlayers.length < 3) {
       alert('Please add at least 3 players with both name and mobile number')
@@ -198,9 +246,8 @@ export default function AdminGames() {
       if (editingGame) {
         // Update existing game
         const response = await apiClient.updateGame(editingGame.id, {
-          name: formData.name,
-          description: formData.description,
-          difficulty: formData.difficulty as 'easy' | 'medium' | 'hard' | undefined,
+          eventId: formData.eventId,
+          hostId: formData.hostId,
         })
         if (response.success) {
           alert('Game updated successfully!')
@@ -215,8 +262,8 @@ export default function AdminGames() {
       } else {
         // Create new game
         const response = await apiClient.createGame({
-          ...formData,
-          difficulty: formData.difficulty as 'easy' | 'medium' | 'hard' | undefined,
+          eventId: formData.eventId,
+          hostId: formData.hostId,
           players: validPlayers.map(p => ({
             name: p.name.trim(),
             mobile: p.mobile.trim(),
@@ -242,9 +289,8 @@ export default function AdminGames() {
     e.stopPropagation()
     setEditingGame(game)
     setFormData({
-      name: game.name,
-      description: game.description || '',
-      difficulty: game.difficulty,
+      eventId: (game as any).eventId || '',
+      hostId: (game as any).hostId || '',
       players: game.players.map(p => 
         typeof p === 'string' 
           ? { name: p, mobile: '' } // Handle legacy data
@@ -277,9 +323,8 @@ export default function AdminGames() {
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      description: '',
-      difficulty: 'medium',
+      eventId: '',
+      hostId: '',
       players: [
         { name: '', mobile: '' },
         { name: '', mobile: '' },
@@ -344,41 +389,40 @@ export default function AdminGames() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-2 text-white">Name *</label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-2 bg-black/60 border-2 border-[#d1a058]/30 rounded-lg text-white focus:border-[#d1a058] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-white">Difficulty</label>
+              <label className="block mb-2 text-white">Event *</label>
               <select
-                value={formData.difficulty}
+                required
+                value={formData.eventId}
                 onChange={(e) =>
-                  setFormData({ ...formData, difficulty: e.target.value })
+                  setFormData({ ...formData, eventId: e.target.value })
                 }
                 className="w-full px-4 py-2 bg-black/60 border-2 border-[#d1a058]/30 rounded-lg text-white focus:border-[#d1a058] focus:outline-none"
               >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
+                <option value="">Select Event *</option>
+                {events.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div className="md:col-span-2">
-              <label className="block mb-2 text-white">Description</label>
-              <textarea
-                value={formData.description}
+            <div>
+              <label className="block mb-2 text-white">Host *</label>
+              <select
+                required
+                value={formData.hostId}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
+                  setFormData({ ...formData, hostId: e.target.value })
                 }
                 className="w-full px-4 py-2 bg-black/60 border-2 border-[#d1a058]/30 rounded-lg text-white focus:border-[#d1a058] focus:outline-none"
-                rows={3}
-              />
+              >
+                <option value="">Select Host *</option>
+                {hosts.map((host) => (
+                  <option key={host.id} value={host.id}>
+                    {host.name}
+                  </option>
+                ))}
+              </select>
             </div>
             {!editingGame && (
               <div className="md:col-span-2">
@@ -506,14 +550,23 @@ export default function AdminGames() {
                           fontFamily: "'BlinkerSemiBold', sans-serif",
                         }}
                       >
-                        {game.name}
+                        {game.eventId && eventsMap[game.eventId] 
+                          ? eventsMap[game.eventId] 
+                          : game.hostId && hostsMap[game.hostId]
+                          ? `${hostsMap[game.hostId]}'s Game`
+                          : 'Game'}
                       </h3>
                       <div className="flex flex-wrap gap-2 mb-2">
-                        <span
-                          className="px-2 py-1 bg-[#d1a058]/20 border border-[#d1a058]/30 rounded text-[#d1a058] text-xs uppercase"
-                        >
-                          {game.difficulty}
-                        </span>
+                        {game.eventId && eventsMap[game.eventId] && (
+                          <span className="px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded text-blue-400 text-xs">
+                            Event: {eventsMap[game.eventId]}
+                          </span>
+                        )}
+                        {game.hostId && hostsMap[game.hostId] && (
+                          <span className="px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded text-purple-400 text-xs">
+                            Host: {hostsMap[game.hostId]}
+                          </span>
+                        )}
                         <span
                           className={`px-2 py-1 rounded text-xs uppercase ${
                             game.status === 'running'
@@ -542,9 +595,6 @@ export default function AdminGames() {
                       </button>
                     </div>
                   </div>
-                  {game.description && (
-                    <p className="text-white/60 text-sm mb-3 line-clamp-2">{game.description}</p>
-                  )}
                   <div className="mb-3">
                     <div className="text-white/60 text-xs mb-1">Players ({game.players.length})</div>
                     <div className="flex flex-wrap gap-1">

@@ -16,6 +16,8 @@ import {
   newsletterCollection,
   bookingsCollection,
   preBookingsCollection,
+  eventsCollection,
+  hostsCollection,
 } from '@/lib/firestore'
 
 // POST /api/admin/delete-all-data - Delete all data from all collections
@@ -30,6 +32,8 @@ export async function POST(request: NextRequest) {
       { name: 'leaderboard', collection: leaderboardCollection },
       { name: 'bracelets', collection: braceletsCollection },
       { name: 'userBracelets', collection: userBraceletsCollection },
+      { name: 'events', collection: eventsCollection },
+      { name: 'hosts', collection: hostsCollection },
       { name: 'contact', collection: contactCollection },
       { name: 'newsletter', collection: newsletterCollection },
       { name: 'bookings', collection: bookingsCollection },

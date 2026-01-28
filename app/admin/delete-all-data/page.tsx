@@ -16,6 +16,8 @@ export default function DeleteAllData() {
       '- Scores\n' +
       '- Leaderboard\n' +
       '- Bracelets\n' +
+      '- Events\n' +
+      '- Hosts\n' +
       '- Contact Messages\n' +
       '- Newsletter Subscribers\n' +
       '- Bookings\n' +
@@ -100,6 +102,8 @@ export default function DeleteAllData() {
           <li>Leaderboard</li>
           <li>Bracelets</li>
           <li>User Bracelets</li>
+          <li>Events</li>
+          <li>Hosts</li>
           <li>Contact Messages</li>
           <li>Newsletter Subscribers</li>
           <li>Bookings</li>

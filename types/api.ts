@@ -4,10 +4,9 @@ export interface Player {
 }
 
 export interface CreateGameRequest {
-  name: string
-  description?: string
-  difficulty?: 'easy' | 'medium' | 'hard'
   players: Player[] // Array of players with name and mobile (3-6 players)
+  eventId: string // Reference to event (required)
+  hostId: string // Reference to host (required)
 }
 
 export interface CompleteGameRequest {
@@ -68,4 +67,25 @@ export interface CreatePreBookingRequest {
   numberOfPlayers: number
   specialRequests?: string
   status?: 'pending' | 'confirmed' | 'cancelled'
+}
+
+export interface CreateEventRequest {
+  name: string
+  description?: string
+  startDate: string // ISO date string
+  endDate?: string // ISO date string (optional)
+  location?: string
+  hostId?: string // Reference to host
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+  maxParticipants?: number
+  image?: string
+}
+
+export interface CreateHostRequest {
+  name: string
+  email: string
+  mobile: string
+  bio?: string
+  image?: string
+  status?: 'active' | 'inactive'
 }

@@ -92,6 +92,8 @@ const collections = [
   'leaderboard',
   'bracelets',
   'userBracelets',
+  'events',
+  'hosts',
   'contact',
   'newsletter',
   'bookings',

@@ -71,6 +71,12 @@ export async function getGames(params?: {
     if (params?.status) {
       q = query(q, where('status', '==', params.status))
     }
+    if (params?.eventId) {
+      q = query(q, where('eventId', '==', params.eventId))
+    }
+    if (params?.hostId) {
+      q = query(q, where('hostId', '==', params.hostId))
+    }
     
     // Try to add orderBy, but fetch all matching documents first for accurate total count
     let useOrderBy = false
@@ -141,24 +147,18 @@ export async function getGameById(id: string) {
 }
 
 export async function createGame(data: {
-  name: string
-  description?: string
-  difficulty?: string
   players: Array<{ name: string; mobile: string }>
+  eventId: string
+  hostId: string
 }) {
   const gameData: any = {
-    name: data.name,
-    difficulty: data.difficulty || 'medium',
+    eventId: data.eventId.trim(),
+    hostId: data.hostId.trim(),
     players: data.players, // Store as array of objects with name and mobile
     status: 'running',
     startTime: Timestamp.now(),
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
-  }
-  
-  // Only add description if it has a value
-  if (data.description !== undefined && data.description !== null && data.description !== '') {
-    gameData.description = data.description
   }
   
   const docRef = await addDoc(gamesCollection, gameData)
@@ -248,7 +248,12 @@ export async function updateGame(id: string, data: any) {
   // Only add fields that are defined and not undefined
   Object.keys(data).forEach((key) => {
     if (data[key] !== undefined && data[key] !== null) {
-      updateData[key] = data[key]
+      // Handle eventId and hostId - if empty string, use deleteField() to remove
+      if ((key === 'eventId' || key === 'hostId') && data[key] === '') {
+        updateData[key] = deleteField()
+      } else {
+        updateData[key] = data[key]
+      }
     }
   })
   
@@ -1512,5 +1517,321 @@ export async function updatePreBooking(id: string, data: {
 
 export async function deletePreBooking(id: string) {
   const docRef = doc(db, 'preBookings', id)
+  await deleteDoc(docRef)
+}
+
+// Events
+export const eventsCollection = collection(db, 'events')
+
+export async function getEvents(params?: {
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+  hostId?: string
+  limit?: number
+  offset?: number
+}) {
+  try {
+    let q = query(eventsCollection)
+    
+    if (params?.status) {
+      q = query(q, where('status', '==', params.status))
+    }
+    if (params?.hostId) {
+      q = query(q, where('hostId', '==', params.hostId))
+    }
+    
+    let useOrderBy = false
+    try {
+      q = query(q, orderBy('startDate', 'desc'))
+      useOrderBy = true
+    } catch (error: any) {
+      console.warn('[getEvents] Index may be needed for orderBy, will sort client-side')
+      useOrderBy = false
+    }
+    
+    const querySnapshot = await getDocs(q)
+    let events = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...convertTimestamps(doc.data()),
+    }))
+    
+    if (!useOrderBy) {
+      events.sort((a: any, b: any) => {
+        const aDate = a.startDate ? new Date(a.startDate).getTime() : 0
+        const bDate = b.startDate ? new Date(b.startDate).getTime() : 0
+        return bDate - aDate
+      })
+    }
+    
+    const total = events.length
+    const offset = params?.offset || 0
+    const limit = params?.limit || events.length
+    const paginatedEvents = events.slice(offset, offset + limit)
+    
+    return {
+      events: paginatedEvents,
+      total: total,
+    }
+  } catch (error: any) {
+    console.error('[getEvents] Error fetching events:', error)
+    if (error.code === 'failed-precondition') {
+      return {
+        events: [],
+        total: 0,
+      }
+    }
+    throw error
+  }
+}
+
+export async function getEvent(id: string) {
+  const docRef = doc(db, 'events', id)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...convertTimestamps(docSnap.data()) }
+  }
+  return null
+}
+
+export async function createEvent(data: {
+  name: string
+  description?: string
+  startDate: string
+  endDate?: string
+  location?: string
+  hostId?: string
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+  maxParticipants?: number
+  image?: string
+}) {
+  const eventData: any = {
+    name: data.name.trim(),
+    startDate: data.startDate,
+    status: (data.status || 'upcoming') as 'upcoming' | 'ongoing' | 'completed' | 'cancelled',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  
+  if (data.description && data.description.trim()) {
+    eventData.description = data.description.trim()
+  }
+  if (data.endDate && data.endDate.trim()) {
+    eventData.endDate = data.endDate.trim()
+  }
+  if (data.location && data.location.trim()) {
+    eventData.location = data.location.trim()
+  }
+  if (data.hostId && data.hostId.trim()) {
+    eventData.hostId = data.hostId.trim()
+  }
+  if (data.maxParticipants !== undefined) {
+    eventData.maxParticipants = data.maxParticipants
+  }
+  if (data.image && data.image.trim()) {
+    eventData.image = data.image.trim()
+  }
+  
+  const docRef = await addDoc(eventsCollection, eventData)
+  return getEvent(docRef.id)
+}
+
+export async function updateEvent(id: string, data: {
+  name?: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  location?: string
+  hostId?: string
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+  maxParticipants?: number
+  image?: string
+}) {
+  const docRef = doc(db, 'events', id)
+  const updateData: any = {
+    updatedAt: Timestamp.now(),
+  }
+  
+  if (data.name !== undefined) updateData.name = data.name.trim()
+  if (data.description !== undefined) {
+    if (data.description && data.description.trim()) {
+      updateData.description = data.description.trim()
+    } else {
+      updateData.description = deleteField()
+    }
+  }
+  if (data.startDate !== undefined) updateData.startDate = data.startDate
+  if (data.endDate !== undefined) {
+    if (data.endDate && data.endDate.trim()) {
+      updateData.endDate = data.endDate.trim()
+    } else {
+      updateData.endDate = deleteField()
+    }
+  }
+  if (data.location !== undefined) {
+    if (data.location && data.location.trim()) {
+      updateData.location = data.location.trim()
+    } else {
+      updateData.location = deleteField()
+    }
+  }
+  if (data.hostId !== undefined) {
+    if (data.hostId && data.hostId.trim()) {
+      updateData.hostId = data.hostId.trim()
+    } else {
+      updateData.hostId = deleteField()
+    }
+  }
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.maxParticipants !== undefined) updateData.maxParticipants = data.maxParticipants
+  if (data.image !== undefined) {
+    if (data.image && data.image.trim()) {
+      updateData.image = data.image.trim()
+    } else {
+      updateData.image = deleteField()
+    }
+  }
+  
+  await updateDoc(docRef, updateData)
+  return getEvent(id)
+}
+
+export async function deleteEvent(id: string) {
+  const docRef = doc(db, 'events', id)
+  await deleteDoc(docRef)
+}
+
+// Hosts
+export const hostsCollection = collection(db, 'hosts')
+
+export async function getHosts(params?: {
+  status?: 'active' | 'inactive'
+  limit?: number
+  offset?: number
+}) {
+  try {
+    let q = query(hostsCollection)
+    
+    if (params?.status) {
+      q = query(q, where('status', '==', params.status))
+    }
+    
+    let useOrderBy = false
+    try {
+      q = query(q, orderBy('createdAt', 'desc'))
+      useOrderBy = true
+    } catch (error: any) {
+      console.warn('[getHosts] Index may be needed for orderBy, will sort client-side')
+      useOrderBy = false
+    }
+    
+    const querySnapshot = await getDocs(q)
+    let hosts = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...convertTimestamps(doc.data()),
+    }))
+    
+    if (!useOrderBy) {
+      hosts.sort((a: any, b: any) => {
+        const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return bDate - aDate
+      })
+    }
+    
+    const total = hosts.length
+    const offset = params?.offset || 0
+    const limit = params?.limit || hosts.length
+    const paginatedHosts = hosts.slice(offset, offset + limit)
+    
+    return {
+      hosts: paginatedHosts,
+      total: total,
+    }
+  } catch (error: any) {
+    console.error('[getHosts] Error fetching hosts:', error)
+    if (error.code === 'failed-precondition') {
+      return {
+        hosts: [],
+        total: 0,
+      }
+    }
+    throw error
+  }
+}
+
+export async function getHost(id: string) {
+  const docRef = doc(db, 'hosts', id)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...convertTimestamps(docSnap.data()) }
+  }
+  return null
+}
+
+export async function createHost(data: {
+  name: string
+  email: string
+  mobile: string
+  bio?: string
+  image?: string
+  status?: 'active' | 'inactive'
+}) {
+  const hostData: any = {
+    name: data.name.trim(),
+    email: data.email.trim().toLowerCase(),
+    mobile: data.mobile.trim(),
+    status: (data.status || 'active') as 'active' | 'inactive',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  
+  if (data.bio && data.bio.trim()) {
+    hostData.bio = data.bio.trim()
+  }
+  if (data.image && data.image.trim()) {
+    hostData.image = data.image.trim()
+  }
+  
+  const docRef = await addDoc(hostsCollection, hostData)
+  return getHost(docRef.id)
+}
+
+export async function updateHost(id: string, data: {
+  name?: string
+  email?: string
+  mobile?: string
+  bio?: string
+  image?: string
+  status?: 'active' | 'inactive'
+}) {
+  const docRef = doc(db, 'hosts', id)
+  const updateData: any = {
+    updatedAt: Timestamp.now(),
+  }
+  
+  if (data.name !== undefined) updateData.name = data.name.trim()
+  if (data.email !== undefined) updateData.email = data.email.trim().toLowerCase()
+  if (data.mobile !== undefined) updateData.mobile = data.mobile.trim()
+  if (data.bio !== undefined) {
+    if (data.bio && data.bio.trim()) {
+      updateData.bio = data.bio.trim()
+    } else {
+      updateData.bio = deleteField()
+    }
+  }
+  if (data.image !== undefined) {
+    if (data.image && data.image.trim()) {
+      updateData.image = data.image.trim()
+    } else {
+      updateData.image = deleteField()
+    }
+  }
+  if (data.status !== undefined) updateData.status = data.status
+  
+  await updateDoc(docRef, updateData)
+  return getHost(id)
+}
+
+export async function deleteHost(id: string) {
+  const docRef = doc(db, 'hosts', id)
   await deleteDoc(docRef)
 }

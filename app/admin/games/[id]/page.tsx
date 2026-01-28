@@ -11,9 +11,8 @@ interface Player {
 
 interface Game {
   id: string
-  name: string
-  description?: string
-  difficulty: string
+  eventId?: string
+  hostId?: string
   players: Player[] | string[] // Support both formats for backward compatibility
   status: 'running' | 'completed'
   startTime: string
@@ -33,6 +32,8 @@ export default function GameDetail() {
   const [completing, setCompleting] = useState(false)
   const [winnerId, setWinnerId] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [eventName, setEventName] = useState<string>('')
+  const [hostName, setHostName] = useState<string>('')
 
   useEffect(() => {
     fetchGame()
@@ -50,6 +51,29 @@ export default function GameDetail() {
         } else if (gameData.winner) {
           // Legacy support
           setWinnerId(gameData.winner)
+        }
+        
+        // Fetch event and host names if IDs exist
+        if (gameData.eventId) {
+          try {
+            const eventRes = await apiClient.getEvent(gameData.eventId)
+            if (eventRes.success && eventRes.data) {
+              setEventName((eventRes.data as any).name)
+            }
+          } catch (err) {
+            console.error('Error fetching event:', err)
+          }
+        }
+        
+        if (gameData.hostId) {
+          try {
+            const hostRes = await apiClient.getHost(gameData.hostId)
+            if (hostRes.success && hostRes.data) {
+              setHostName((hostRes.data as any).name)
+            }
+          } catch (err) {
+            console.error('Error fetching host:', err)
+          }
         }
       } else {
         setError('Failed to load game')
@@ -129,16 +153,24 @@ export default function GameDetail() {
             color: '#d1a058',
           }}
         >
-          {game.name}
+          {eventName || hostName ? `${eventName || 'Game'} - ${hostName || 'Host'}` : 'Game Details'}
         </h1>
       </div>
 
       <div className="bg-black/60 border-2 border-[#d1a058]/30 rounded-lg p-4 md:p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <div className="text-white/60 text-sm mb-1">Difficulty</div>
-            <div className="text-white font-semibold uppercase">{game.difficulty}</div>
-          </div>
+          {eventName && (
+            <div>
+              <div className="text-white/60 text-sm mb-1">Event</div>
+              <div className="text-white font-semibold">{eventName}</div>
+            </div>
+          )}
+          {hostName && (
+            <div>
+              <div className="text-white/60 text-sm mb-1">Host</div>
+              <div className="text-white font-semibold">{hostName}</div>
+            </div>
+          )}
           <div>
             <div className="text-white/60 text-sm mb-1">Status</div>
             <span
@@ -161,13 +193,6 @@ export default function GameDetail() {
             )}
           </div>
         </div>
-
-        {game.description && (
-          <div className="mb-6">
-            <div className="text-white/60 text-sm mb-1">Description</div>
-            <div className="text-white">{game.description}</div>
-          </div>
-        )}
 
         <div>
           <div className="text-white/60 text-sm mb-2">Players ({game.players.length})</div>

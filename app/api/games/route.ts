@@ -42,13 +42,11 @@ export async function POST(request: NextRequest) {
     const body: CreateGameRequest = await request.json()
 
     // Validation
-    const nameError = validateRequired(body.name, 'Name')
-    if (nameError) return errorResponse(nameError)
+    const eventIdError = validateRequired(body.eventId, 'Event')
+    if (eventIdError) return errorResponse(eventIdError)
 
-    const validDifficulties = ['easy', 'medium', 'hard']
-    if (body.difficulty && !validDifficulties.includes(body.difficulty)) {
-      return errorResponse('Difficulty must be one of: easy, medium, hard')
-    }
+    const hostIdError = validateRequired(body.hostId, 'Host')
+    if (hostIdError) return errorResponse(hostIdError)
 
     // Validate players
     if (!body.players || !Array.isArray(body.players)) {
@@ -96,10 +94,9 @@ export async function POST(request: NextRequest) {
     }
 
     const game = await createGame({
-      name: body.name,
-      description: body.description,
-      difficulty: body.difficulty || 'medium',
       players: validatedPlayers,
+      eventId: body.eventId,
+      hostId: body.hostId,
     })
 
     if (!game) {

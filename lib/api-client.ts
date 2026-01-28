@@ -6,6 +6,8 @@ import type {
   NewsletterRequest,
   CreateBookingRequest,
   CreatePreBookingRequest,
+  CreateEventRequest,
+  CreateHostRequest,
 } from '@/types/api'
 
 export interface ApiResponse<T = any> {
@@ -360,6 +362,101 @@ class ApiClient {
 
   async deletePreBooking(id: string) {
     return this.request(`/pre-bookings/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Events
+  async getEvents(params?: {
+    status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+    hostId?: string
+    limit?: number
+    offset?: number
+  }) {
+    const query = new URLSearchParams()
+    if (params?.status) query.append('status', params.status)
+    if (params?.hostId) query.append('hostId', params.hostId)
+    if (params?.limit) query.append('limit', params.limit.toString())
+    if (params?.offset) query.append('offset', params.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/events${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getEvent(id: string) {
+    return this.request(`/events/${id}`)
+  }
+
+  async createEvent(data: CreateEventRequest) {
+    return this.request('/events', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateEvent(id: string, data: {
+    name?: string
+    description?: string
+    startDate?: string
+    endDate?: string
+    location?: string
+    hostId?: string
+    status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+    maxParticipants?: number
+    image?: string
+  }) {
+    return this.request(`/events/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteEvent(id: string) {
+    return this.request(`/events/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Hosts
+  async getHosts(params?: {
+    status?: 'active' | 'inactive'
+    limit?: number
+    offset?: number
+  }) {
+    const query = new URLSearchParams()
+    if (params?.status) query.append('status', params.status)
+    if (params?.limit) query.append('limit', params.limit.toString())
+    if (params?.offset) query.append('offset', params.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/hosts${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getHost(id: string) {
+    return this.request(`/hosts/${id}`)
+  }
+
+  async createHost(data: CreateHostRequest) {
+    return this.request('/hosts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateHost(id: string, data: {
+    name?: string
+    email?: string
+    mobile?: string
+    bio?: string
+    image?: string
+    status?: 'active' | 'inactive'
+  }) {
+    return this.request(`/hosts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteHost(id: string) {
+    return this.request(`/hosts/${id}`, {
       method: 'DELETE',
     })
   }
