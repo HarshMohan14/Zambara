@@ -11,6 +11,7 @@ export interface ApiResponse<T = any> {
   data?: T
   error?: string
   message?: string
+  status?: number // HTTP status code for error handling
 }
 
 class ApiClient {
