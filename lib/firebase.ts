@@ -38,7 +38,17 @@ if (getApps().length === 0) {
 }
 
 // Initialize Firebase services
-export const auth: Auth = getAuth(app)
+// Only initialize auth if we have valid config (auth requires apiKey)
+let authInstance: Auth | null = null
+try {
+  if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+    authInstance = getAuth(app)
+  }
+} catch (error) {
+  console.warn('⚠️ Firebase Auth initialization skipped:', error)
+}
+
+export const auth: Auth | null = authInstance
 export const db: Firestore = getFirestore(app)
 
 // Initialize Analytics only on client side

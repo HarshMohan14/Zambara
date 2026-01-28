@@ -94,7 +94,23 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
           })}
         </nav>
 
-        <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-[#d1a058]/20">
+        <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-[#d1a058]/20 space-y-2">
+          <Link
+            href="/admin/delete-all-data"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all ${
+              pathname === '/admin/delete-all-data'
+                ? 'bg-red-500/20 border-2 border-red-500'
+                : 'hover:bg-red-500/10 border-2 border-transparent'
+            }`}
+            style={{
+              fontFamily: "'BlinkerSemiBold', sans-serif",
+              color: pathname === '/admin/delete-all-data' ? '#ef4444' : '#ffffff',
+            }}
+          >
+            <span className="text-lg md:text-xl">🗑️</span>
+            <span className="text-sm md:text-base">Delete All Data</span>
+          </Link>
           <Link
             href="/"
             onClick={handleLinkClick}
