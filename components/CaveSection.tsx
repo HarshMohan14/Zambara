@@ -3,10 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
+import { apiClient } from '@/lib/api-client'
 
 export function CaveSection() {
   const [activeTab, setActiveTab] = useState<'2-4' | '5-8'>('2-4')
   const [showPreBookForm, setShowPreBookForm] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -360,13 +363,36 @@ export function CaveSection() {
             </h2>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault()
-                // Handle form submission here
-                console.log('Form submitted:', formData)
-                alert('Thank you for your pre-booking! We will contact you soon.')
-                setShowPreBookForm(false)
-                setFormData({ name: '', email: '', phone: '', pack: '2-4' })
+                setIsSubmitting(true)
+                setSubmitError(null)
+                
+                try {
+                  // Map pack to numberOfPlayers (use max of range)
+                  const numberOfPlayers = formData.pack === '2-4' ? 4 : 8
+                  
+                  const response = await apiClient.createPreBooking({
+                    name: formData.name.trim(),
+                    email: formData.email.trim(),
+                    mobile: formData.phone.trim(),
+                    numberOfPlayers: numberOfPlayers,
+                    specialRequests: `Pack: ${formData.pack} players`,
+                  })
+                  
+                  if (response.success) {
+                    alert('Thank you for your pre-booking! We will contact you soon.')
+                    setShowPreBookForm(false)
+                    setFormData({ name: '', email: '', phone: '', pack: '2-4' })
+                  } else {
+                    setSubmitError(response.error || 'Failed to submit pre-booking. Please try again.')
+                  }
+                } catch (error: any) {
+                  console.error('Error submitting pre-booking:', error)
+                  setSubmitError(error?.message || 'An unexpected error occurred. Please try again.')
+                } finally {
+                  setIsSubmitting(false)
+                }
               }}
               className="space-y-6"
             >
@@ -476,9 +502,16 @@ export function CaveSection() {
                 </div>
               </div>
 
+              {submitError && (
+                <div className="bg-red-500/20 border-2 border-red-500/50 rounded-lg p-4 text-red-300 text-sm">
+                  {submitError}
+                </div>
+              )}
+              
               <button
                 type="submit"
-                className="w-full px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide"
+                disabled={isSubmitting}
+                className="w-full px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   fontFamily: "'BlinkerSemiBold', sans-serif",
                   background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
@@ -488,15 +521,17 @@ export function CaveSection() {
                   letterSpacing: '1px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)'
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+                  if (!isSubmitting) {
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'scale(1)'
                   e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
                 }}
               >
-                SUBMIT PRE-BOOKING
+                {isSubmitting ? 'SUBMITTING...' : 'SUBMIT PRE-BOOKING'}
               </button>
             </form>
           </div>

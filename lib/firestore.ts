@@ -15,6 +15,7 @@ import {
   Timestamp,
   QueryConstraint,
   DocumentData,
+  deleteField,
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -53,6 +54,8 @@ export async function getUserById(id: string) {
 export const gamesCollection = collection(db, 'games')
 
 export async function getGames(params?: {
+  eventId?: string
+  hostId?: string
   difficulty?: string
   status?: 'running' | 'completed'
   limit?: number
@@ -430,51 +433,99 @@ export async function updateLeaderboard(gameId: string) {
   try {
     console.log(`[Leaderboard Update] Starting update for game ${gameId}`)
     
-    // Get all scores for this game (without limit first to get all)
-    let scoresData
-    try {
-      scoresData = await getScores({
+    // Get the game to find its eventId
+    const game = await getGameById(gameId)
+    if (!game) {
+      return {
+        success: false,
+        message: `Game ${gameId} not found`,
         gameId,
-        limit: 1000, // Get all scores
-        orderBy: 'score',
-        order: 'desc',
-      })
-    } catch (scoreError: any) {
-      console.error('[Leaderboard Update] Error fetching scores:', scoreError)
-      // Try without orderBy
-      scoresData = await getScores({
-        gameId,
-        limit: 1000,
-      })
-      // Sort manually
-      scoresData.scores.sort((a: any, b: any) => (b.score || 0) - (a.score || 0))
+        entriesUpdated: 0,
+        totalEntries: 0,
+        results: [],
+      }
     }
     
-    console.log(`[Leaderboard Update] Found ${scoresData.scores.length} scores for game ${gameId}`)
+    const gameData = game as any
+    const eventId = gameData.eventId
     
-    // If getScores returned empty, try direct query
-    if (!scoresData || scoresData.scores.length === 0) {
-      console.warn(`[Leaderboard Update] getScores returned empty, checking Firestore directly...`)
-      // Check if scores exist in Firestore directly
-      const directCheck = query(scoresCollection, where('gameId', '==', gameId))
-      const directSnapshot = await getDocs(directCheck)
-      console.log(`[Leaderboard Update] Direct check found ${directSnapshot.size} scores in Firestore`)
-      
-      if (directSnapshot.size === 0) {
-        return { success: false, message: 'No scores found for this game. Complete a game first to create scores.' }
-      } else {
-        // Scores exist but getScores didn't return them - use direct query results
-        console.log(`[Leaderboard Update] Using direct query results (${directSnapshot.size} scores)`)
-        scoresData = {
-          scores: directSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...convertTimestamps(doc.data()),
-          })),
-          total: directSnapshot.size,
-        }
-        // Sort by score descending
-        scoresData.scores.sort((a: any, b: any) => (b.score || 0) - (a.score || 0))
+    if (!eventId) {
+      return {
+        success: false,
+        message: `Game ${gameId} does not have an eventId. Please update the game to include an event.`,
+        gameId,
+        entriesUpdated: 0,
+        totalEntries: 0,
+        results: [],
       }
+    }
+    
+    console.log(`[Leaderboard Update] Found eventId: ${eventId} for game ${gameId}`)
+    
+    // Get all games with this eventId
+    const gamesWithEvent = await getGames({ eventId, limit: 1000 })
+    console.log(`[Leaderboard Update] Found ${gamesWithEvent.games.length} games for event ${eventId}`)
+    
+    // Get all scores for all games in this event
+    let allScores: any[] = []
+    for (const g of gamesWithEvent.games) {
+      const gId = (g as any).id
+      try {
+        const scoresData = await getScores({
+          gameId: gId,
+          limit: 1000,
+        })
+        if (scoresData && scoresData.scores && Array.isArray(scoresData.scores)) {
+          allScores = allScores.concat(scoresData.scores.map((s: any) => ({ ...s, gameId: gId })))
+        }
+      } catch (error: any) {
+        console.warn(`[Leaderboard Update] Error fetching scores for game ${gId}:`, error.message)
+      }
+    }
+    
+    console.log(`[Leaderboard Update] Found ${allScores.length} total scores for event ${eventId}`)
+    
+    if (allScores.length === 0) {
+      const completedGames = gamesWithEvent.games.filter((g: any) => g.status === 'completed')
+      if (completedGames.length === 0) {
+        return {
+          success: false,
+          message: 'No completed games found for this event. Complete games first to create scores.',
+          gameId,
+          entriesUpdated: 0,
+          totalEntries: 0,
+          results: [],
+        }
+      }
+      return {
+        success: false,
+        message: `No scores found for event ${eventId}. Found ${completedGames.length} completed game(s) but no scores.`,
+        gameId,
+        entriesUpdated: 0,
+        totalEntries: 0,
+        results: [],
+      }
+    }
+    
+    // Sort by time (ascending - lower time is better), then by playerName for consistency
+    allScores.sort((a: any, b: any) => {
+      const timeA = a.time !== undefined && a.time !== null ? Number(a.time) : Infinity
+      const timeB = b.time !== undefined && b.time !== null ? Number(b.time) : Infinity
+      if (timeA !== timeB) {
+        return timeA - timeB
+      }
+      const nameA = a.playerName || ''
+      const nameB = b.playerName || ''
+      return nameA.localeCompare(nameB)
+    })
+    
+    // Take top 10 for leaderboard
+    const topScores = allScores.slice(0, 10)
+    
+    // Use the scores for leaderboard update
+    const scoresData = {
+      scores: topScores,
+      total: topScores.length,
     }
     
     // Log scores being processed
@@ -489,19 +540,25 @@ export async function updateLeaderboard(gameId: string) {
     for (let i = 0; i < scoresData.scores.length; i++) {
       const score = scoresData.scores[i]
       try {
-        // Create a safe document ID using playerId if available, otherwise name_mobile_gameId
-        const playerId = (score as any).playerId || `${score.playerName}_${(score as any).playerMobile || 'unknown'}_${gameId}`
-        const docId = playerId.replace(/[^a-zA-Z0-9_]/g, '_')
+        // Create document ID: eventId_playerId
+        const playerId = (score as any).playerId || `${score.playerName}_${(score as any).playerMobile || 'unknown'}`
+        const docId = `${eventId}_${playerId}`.replace(/[^a-zA-Z0-9_]/g, '_')
         const leaderboardRef = doc(db, 'leaderboard', docId)
         
         // Check if document exists to preserve createdAt
         const existingDoc = await getDoc(leaderboardRef)
         const updateData: any = {
           playerName: score.playerName,
-          gameId: gameId,
+          eventId: eventId,
+          gameId: score.gameId || gameId, // Keep gameId for reference
           rank: i + 1,
-          score: score.score,
+          time: score.time !== undefined && score.time !== null ? Number(score.time) : null,
           updatedAt: Timestamp.now(),
+        }
+        
+        // Add score if it exists (for backward compatibility)
+        if (score.score !== undefined && score.score !== null) {
+          updateData.score = score.score
         }
         
         // Add mobile and playerId if available
@@ -1156,4 +1213,304 @@ export async function updateContactMessage(id: string, data: { read?: boolean })
     id: docSnap.id,
     ...convertTimestamps(docSnap.data()),
   }))
+}
+
+// Bookings
+export const bookingsCollection = collection(db, 'bookings')
+
+export async function getBookings(params?: {
+  status?: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  date?: string
+  limit?: number
+  offset?: number
+}) {
+  try {
+    let q = query(bookingsCollection)
+    
+    if (params?.status) {
+      q = query(q, where('status', '==', params.status))
+    }
+    if (params?.date) {
+      q = query(q, where('date', '==', params.date))
+    }
+    
+    let useOrderBy = false
+    try {
+      q = query(q, orderBy('createdAt', 'desc'))
+      useOrderBy = true
+    } catch (error: any) {
+      console.warn('[getBookings] Index may be needed for orderBy, will sort client-side')
+      useOrderBy = false
+    }
+    
+    const querySnapshot = await getDocs(q)
+    let bookings = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...convertTimestamps(doc.data()),
+    }))
+    
+    if (!useOrderBy) {
+      bookings.sort((a: any, b: any) => {
+        const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return bDate - aDate
+      })
+    }
+    
+    const total = bookings.length
+    const offset = params?.offset || 0
+    const limit = params?.limit || bookings.length
+    const paginatedBookings = bookings.slice(offset, offset + limit)
+    
+    return {
+      bookings: paginatedBookings,
+      total: total,
+    }
+  } catch (error: any) {
+    console.error('[getBookings] Error fetching bookings:', error)
+    if (error.code === 'failed-precondition') {
+      return {
+        bookings: [],
+        total: 0,
+      }
+    }
+    throw error
+  }
+}
+
+export async function getBooking(id: string) {
+  const docRef = doc(db, 'bookings', id)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...convertTimestamps(docSnap.data()) }
+  }
+  return null
+}
+
+export async function createBooking(data: {
+  name: string
+  email: string
+  mobile: string
+  date: string
+  time: string
+  numberOfPlayers: number
+  specialRequests?: string
+}) {
+  const bookingData: any = {
+    name: data.name.trim(),
+    email: data.email.trim().toLowerCase(),
+    mobile: data.mobile.trim(),
+    date: data.date,
+    time: data.time,
+    numberOfPlayers: data.numberOfPlayers,
+    status: 'pending' as const,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  
+  // Only add optional fields if they have values (Firestore doesn't allow undefined)
+  if (data.specialRequests && data.specialRequests.trim()) {
+    bookingData.specialRequests = data.specialRequests.trim()
+  }
+  
+  const docRef = await addDoc(bookingsCollection, bookingData)
+  return getBooking(docRef.id)
+}
+
+export async function updateBooking(id: string, data: {
+  status?: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  name?: string
+  email?: string
+  mobile?: string
+  date?: string
+  time?: string
+  numberOfPlayers?: number
+  specialRequests?: string
+}) {
+  const docRef = doc(db, 'bookings', id)
+  const updateData: any = {
+    updatedAt: Timestamp.now(),
+  }
+  
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.name !== undefined) updateData.name = data.name.trim()
+  if (data.email !== undefined) updateData.email = data.email.trim().toLowerCase()
+  if (data.mobile !== undefined) updateData.mobile = data.mobile.trim()
+  if (data.date !== undefined) updateData.date = data.date
+  if (data.time !== undefined) updateData.time = data.time
+  if (data.numberOfPlayers !== undefined) updateData.numberOfPlayers = data.numberOfPlayers
+  // Only set specialRequests if it has a value (Firestore doesn't allow undefined)
+  if (data.specialRequests !== undefined) {
+    if (data.specialRequests && data.specialRequests.trim()) {
+      updateData.specialRequests = data.specialRequests.trim()
+    } else {
+      updateData.specialRequests = deleteField()
+    }
+  }
+  
+  await updateDoc(docRef, updateData)
+  return getBooking(id)
+}
+
+export async function deleteBooking(id: string) {
+  const docRef = doc(db, 'bookings', id)
+  await deleteDoc(docRef)
+}
+
+// Pre-Bookings
+export const preBookingsCollection = collection(db, 'preBookings')
+
+export async function getPreBookings(params?: {
+  status?: 'pending' | 'confirmed' | 'cancelled'
+  limit?: number
+  offset?: number
+}) {
+  try {
+    let q = query(preBookingsCollection)
+    
+    if (params?.status) {
+      q = query(q, where('status', '==', params.status))
+    }
+    
+    let useOrderBy = false
+    try {
+      q = query(q, orderBy('createdAt', 'desc'))
+      useOrderBy = true
+    } catch (error: any) {
+      console.warn('[getPreBookings] Index may be needed for orderBy, will sort client-side')
+      useOrderBy = false
+    }
+    
+    const querySnapshot = await getDocs(q)
+    let preBookings = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...convertTimestamps(doc.data()),
+    }))
+    
+    if (!useOrderBy) {
+      preBookings.sort((a: any, b: any) => {
+        const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return bDate - aDate
+      })
+    }
+    
+    const total = preBookings.length
+    const offset = params?.offset || 0
+    const limit = params?.limit || preBookings.length
+    const paginatedPreBookings = preBookings.slice(offset, offset + limit)
+    
+    return {
+      preBookings: paginatedPreBookings,
+      total: total,
+    }
+  } catch (error: any) {
+    console.error('[getPreBookings] Error fetching pre-bookings:', error)
+    if (error.code === 'failed-precondition') {
+      return {
+        preBookings: [],
+        total: 0,
+      }
+    }
+    throw error
+  }
+}
+
+export async function getPreBooking(id: string) {
+  const docRef = doc(db, 'preBookings', id)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...convertTimestamps(docSnap.data()) }
+  }
+  return null
+}
+
+export async function createPreBooking(data: {
+  name: string
+  email: string
+  mobile: string
+  preferredDate?: string
+  preferredTime?: string
+  numberOfPlayers: number
+  specialRequests?: string
+  status?: 'pending' | 'confirmed' | 'cancelled'
+}) {
+  const preBookingData: any = {
+    name: data.name.trim(),
+    email: data.email.trim().toLowerCase(),
+    mobile: data.mobile.trim(),
+    numberOfPlayers: data.numberOfPlayers,
+    status: (data.status || 'pending') as 'pending' | 'confirmed' | 'cancelled',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  
+  // Only add optional fields if they have values (Firestore doesn't allow undefined)
+  if (data.preferredDate && data.preferredDate.trim()) {
+    preBookingData.preferredDate = data.preferredDate.trim()
+  }
+  if (data.preferredTime && data.preferredTime.trim()) {
+    preBookingData.preferredTime = data.preferredTime.trim()
+  }
+  if (data.specialRequests && data.specialRequests.trim()) {
+    preBookingData.specialRequests = data.specialRequests.trim()
+  }
+  
+  const docRef = await addDoc(preBookingsCollection, preBookingData)
+  return getPreBooking(docRef.id)
+}
+
+export async function updatePreBooking(id: string, data: {
+  status?: 'pending' | 'confirmed' | 'cancelled'
+  name?: string
+  email?: string
+  mobile?: string
+  preferredDate?: string
+  preferredTime?: string
+  numberOfPlayers?: number
+  specialRequests?: string
+}) {
+  const docRef = doc(db, 'preBookings', id)
+  const updateData: any = {
+    updatedAt: Timestamp.now(),
+  }
+  
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.name !== undefined) updateData.name = data.name.trim()
+  if (data.email !== undefined) updateData.email = data.email.trim().toLowerCase()
+  if (data.mobile !== undefined) updateData.mobile = data.mobile.trim()
+  // Only set preferredDate if it has a value (Firestore doesn't allow undefined)
+  if (data.preferredDate !== undefined) {
+    if (data.preferredDate && data.preferredDate.trim()) {
+      updateData.preferredDate = data.preferredDate.trim()
+    } else {
+      // To clear the field, use deleteField() from Firestore
+      updateData.preferredDate = deleteField()
+    }
+  }
+  // Only set preferredTime if it has a value
+  if (data.preferredTime !== undefined) {
+    if (data.preferredTime && data.preferredTime.trim()) {
+      updateData.preferredTime = data.preferredTime.trim()
+    } else {
+      updateData.preferredTime = deleteField()
+    }
+  }
+  if (data.numberOfPlayers !== undefined) updateData.numberOfPlayers = data.numberOfPlayers
+  // Only set specialRequests if it has a value
+  if (data.specialRequests !== undefined) {
+    if (data.specialRequests && data.specialRequests.trim()) {
+      updateData.specialRequests = data.specialRequests.trim()
+    } else {
+      updateData.specialRequests = deleteField()
+    }
+  }
+  
+  await updateDoc(docRef, updateData)
+  return getPreBooking(id)
+}
+
+export async function deletePreBooking(id: string) {
+  const docRef = doc(db, 'preBookings', id)
+  await deleteDoc(docRef)
 }

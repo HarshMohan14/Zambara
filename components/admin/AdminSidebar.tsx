@@ -9,6 +9,8 @@ const menuItems = [
   { href: '/admin/scores', label: 'Scores', icon: '🏆' },
   { href: '/admin/leaderboard', label: 'Leaderboard', icon: '📈' },
   { href: '/admin/bracelets', label: 'Bracelets', icon: '💎' },
+  { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
+  { href: '/admin/pre-bookings', label: 'Pre-Bookings', icon: '📋' },
   { href: '/admin/contact', label: 'Contact', icon: '📧' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📬' },
 ]

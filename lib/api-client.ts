@@ -4,6 +4,8 @@ import type {
   CreateBraceletRequest,
   ContactRequest,
   NewsletterRequest,
+  CreateBookingRequest,
+  CreatePreBookingRequest,
 } from '@/types/api'
 
 export interface ApiResponse<T = any> {
@@ -262,6 +264,102 @@ class ApiClient {
 
   async deleteNewsletterSubscriber(id: string) {
     return this.request(`/newsletter/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Bookings
+  async getBookings(params?: {
+    status?: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+    date?: string
+    limit?: number
+    offset?: number
+  }) {
+    const query = new URLSearchParams()
+    if (params?.status) query.append('status', params.status)
+    if (params?.date) query.append('date', params.date)
+    if (params?.limit) query.append('limit', params.limit.toString())
+    if (params?.offset) query.append('offset', params.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/bookings${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getBooking(id: string) {
+    return this.request(`/bookings/${id}`)
+  }
+
+  async createBooking(data: CreateBookingRequest) {
+    return this.request('/bookings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateBooking(id: string, data: {
+    status?: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+    name?: string
+    email?: string
+    mobile?: string
+    date?: string
+    time?: string
+    numberOfPlayers?: number
+    specialRequests?: string
+  }) {
+    return this.request(`/bookings/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteBooking(id: string) {
+    return this.request(`/bookings/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Pre-Bookings
+  async getPreBookings(params?: {
+    status?: 'pending' | 'confirmed' | 'cancelled'
+    limit?: number
+    offset?: number
+  }) {
+    const query = new URLSearchParams()
+    if (params?.status) query.append('status', params.status)
+    if (params?.limit) query.append('limit', params.limit.toString())
+    if (params?.offset) query.append('offset', params.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/pre-bookings${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getPreBooking(id: string) {
+    return this.request(`/pre-bookings/${id}`)
+  }
+
+  async createPreBooking(data: CreatePreBookingRequest) {
+    return this.request('/pre-bookings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updatePreBooking(id: string, data: {
+    status?: 'pending' | 'confirmed' | 'cancelled'
+    name?: string
+    email?: string
+    mobile?: string
+    preferredDate?: string
+    preferredTime?: string
+    numberOfPlayers?: number
+    specialRequests?: string
+  }) {
+    return this.request(`/pre-bookings/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deletePreBooking(id: string) {
+    return this.request(`/pre-bookings/${id}`, {
       method: 'DELETE',
     })
   }

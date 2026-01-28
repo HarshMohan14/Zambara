@@ -48,3 +48,24 @@ export interface LeaderboardQuery {
   limit?: number
   offset?: number
 }
+
+export interface CreateBookingRequest {
+  name: string
+  email: string
+  mobile: string
+  date: string // ISO date string
+  time: string // Time slot (e.g., "10:00 AM", "2:00 PM")
+  numberOfPlayers: number
+  specialRequests?: string
+}
+
+export interface CreatePreBookingRequest {
+  name: string
+  email: string
+  mobile: string
+  preferredDate?: string // ISO date string (optional)
+  preferredTime?: string // Time slot (optional)
+  numberOfPlayers: number
+  specialRequests?: string
+  status?: 'pending' | 'confirmed' | 'cancelled'
+}
