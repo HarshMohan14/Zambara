@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
+import Link from 'next/link'
 
 export function Navigation() {
   const navRef = useRef<HTMLElement>(null)
@@ -153,46 +154,60 @@ export function Navigation() {
             />
           </div>
 
-          {/* Hamburger Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-lg transition-all duration-300 hover:bg-[#d1a058]/20"
-            aria-label="Toggle menu"
-            style={{
-              border: '2px solid #d1a058',
-              color: '#d1a058',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.2)'
-              e.currentTarget.style.transform = 'scale(1.05)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
+          {/* Right side - Admin Link and Menu */}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="px-4 py-2 rounded-lg font-semibold uppercase transition-all duration-300 hover:scale-105"
+              style={{
+                fontFamily: "'BlinkerSemiBold', sans-serif",
+                backgroundColor: '#d1a058',
+                color: '#000',
+                boxShadow: '0 4px 15px rgba(209, 160, 88, 0.3)',
+              }}
             >
-              {isMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              Admin
+            </Link>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-lg transition-all duration-300 hover:bg-[#d1a058]/20"
+              aria-label="Toggle menu"
+              style={{
+                border: '2px solid #d1a058',
+                color: '#d1a058',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.2)'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                {isMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -332,6 +347,50 @@ export function Navigation() {
               }}
             >
               How to Play
+            </a>
+            <a
+              href="#leaderboard"
+              onClick={() => setIsMenuOpen(false)}
+              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
+              style={{
+                fontFamily: "'TheWalkyrDemo', serif",
+                color: '#d1a058',
+                border: '2px solid transparent',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
+                e.currentTarget.style.borderColor = '#d1a058'
+                e.currentTarget.style.transform = 'translateX(8px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.borderColor = 'transparent'
+                e.currentTarget.style.transform = 'translateX(0)'
+              }}
+            >
+              Leaderboard
+            </a>
+            <a
+              href="#contact"
+              onClick={() => setIsMenuOpen(false)}
+              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
+              style={{
+                fontFamily: "'TheWalkyrDemo', serif",
+                color: '#d1a058',
+                border: '2px solid transparent',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
+                e.currentTarget.style.borderColor = '#d1a058'
+                e.currentTarget.style.transform = 'translateX(8px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.borderColor = 'transparent'
+                e.currentTarget.style.transform = 'translateX(0)'
+              }}
+            >
+              Contact
             </a>
           </nav>
         </div>

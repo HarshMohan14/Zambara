@@ -5,7 +5,7 @@
 /* Custom Font - TheWalkyrDemo (for headlines and prices) */
 @font-face {
   font-family: 'TheWalkyrDemo';
-  src: url('/Demo_Fonts/thewalkyrdemo.ttf') format('truetype');
+  src: url('/TheWalkyrDemo.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

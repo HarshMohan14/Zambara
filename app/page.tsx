@@ -5,6 +5,9 @@ import { BattlePackSection } from '@/components/BattlePackSection'
 import { CaveSection } from '@/components/CaveSection'
 import { ImageSlider } from '@/components/ImageSlider'
 import { Gallery } from '@/components/Gallery'
+import { Leaderboard } from '@/components/Leaderboard'
+import { ContactForm } from '@/components/ContactForm'
+import { Newsletter } from '@/components/Newsletter'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -28,6 +31,13 @@ export default function Home() {
       </section>
       <ImageSlider />
       <Gallery />
+      <section id="leaderboard">
+        <Leaderboard />
+      </section>
+      <Newsletter />
+      <section id="contact">
+        <ContactForm />
+      </section>
     </main>
   )
 }

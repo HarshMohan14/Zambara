@@ -582,12 +582,18 @@ export function CardSlider() {
       className={`relative w-full bg-black py-8 md:py-12 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
       style={{ transformStyle: 'preserve-3d' }}
     >
-      {/* Hidden audio element for shuffle sound */}
+      {/* Hidden audio element for shuffle sound - optional, won't error if file doesn't exist */}
       <audio
         ref={shuffleSoundRef}
-        src="/shuffle.mp3"
-        preload="auto"
-      />
+        preload="none"
+        onError={(e) => {
+          // Silently handle missing audio file - it's optional
+          console.warn('Shuffle audio file not found, continuing without sound effect')
+        }}
+        style={{ display: 'none' }}
+      >
+        <source src="/shuffle.mp3" type="audio/mpeg" />
+      </audio>
       <div className="container mx-auto px-4">
         {/* Section Title */}
         <h2
