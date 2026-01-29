@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useConfirm } from '@/components/admin/ConfirmProvider'
 import { apiClient } from '@/lib/api-client'
 
 interface Subscriber {
@@ -63,10 +64,16 @@ export default function AdminNewsletter() {
     }
   }
 
+  const confirmDialog = useConfirm()
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this subscriber? This action cannot be undone.')) {
-      return
-    }
+    const ok = await confirmDialog.confirm({
+      title: 'Delete subscriber',
+      message: 'Are you sure you want to delete this subscriber? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+      variant: 'danger',
+    })
+    if (!ok) return
 
     try {
       const response = await apiClient.deleteNewsletterSubscriber(id)

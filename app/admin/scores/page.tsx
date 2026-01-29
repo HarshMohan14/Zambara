@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useConfirm } from '@/components/admin/ConfirmProvider'
 import { apiClient } from '@/lib/api-client'
 
 interface Ranking {
@@ -101,8 +102,16 @@ export default function AdminEventRankings() {
     }
   }
 
+  const confirmDialog = useConfirm()
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this ranking record? This cannot be undone.')) return
+    const ok = await confirmDialog.confirm({
+      title: 'Delete ranking record',
+      message: 'Delete this ranking record? This cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+      variant: 'danger',
+    })
+    if (!ok) return
     try {
       const res = await apiClient.deleteScore(id)
       if (res.success) {

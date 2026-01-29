@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Toaster } from 'sonner'
+import { ConfirmProvider } from '@/components/admin/ConfirmProvider'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 
@@ -13,6 +14,7 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
+    <ConfirmProvider>
     <div className="min-h-screen bg-black flex">
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col w-full md:w-auto">
@@ -41,5 +43,6 @@ export default function AdminLayout({
         }}
       />
     </div>
+    </ConfirmProvider>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useConfirm } from '@/components/admin/ConfirmProvider'
 import { apiClient } from '@/lib/api-client'
 
 interface Player {
@@ -226,11 +227,17 @@ export default function AdminGames() {
     setShowForm(true)
   }
 
+  const confirmDialog = useConfirm()
   const handleDelete = async (gameId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!confirm('Are you sure you want to delete this game? This action cannot be undone.')) {
-      return
-    }
+    const ok = await confirmDialog.confirm({
+      title: 'Delete game',
+      message: 'Are you sure you want to delete this game? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+      variant: 'danger',
+    })
+    if (!ok) return
 
     try {
       const response = await apiClient.deleteGame(gameId)

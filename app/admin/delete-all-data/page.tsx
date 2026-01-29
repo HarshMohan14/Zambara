@@ -2,42 +2,62 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useConfirm } from '@/components/admin/ConfirmProvider'
 import { apiClient } from '@/lib/api-client'
 
 export default function DeleteAllData() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+  const confirmDialog = useConfirm()
 
   const handleDeleteAll = async () => {
-    const confirmed = confirm(
-      '⚠️ WARNING: This will delete ALL data from ALL collections!\n\n' +
-      'This includes:\n' +
-      '- Games\n' +
-      '- Scores\n' +
-      '- Bracelets\n' +
-      '- Events\n' +
-      '- Hosts\n' +
-      '- Contact Messages\n' +
-      '- Newsletter Subscribers\n' +
-      '- Bookings\n' +
-      '- Pre-Bookings\n\n' +
-      'This action CANNOT be undone!\n\n' +
-      'Are you absolutely sure you want to proceed?'
-    )
-
+    const confirmed = await confirmDialog.confirm({
+      title: '⚠️ Warning',
+      message:
+        'This will delete ALL data from ALL collections!\n\n' +
+        'This includes:\n' +
+        '- Games\n' +
+        '- Scores\n' +
+        '- Bracelets\n' +
+        '- Events\n' +
+        '- Hosts\n' +
+        '- Contact Messages\n' +
+        '- Newsletter Subscribers\n' +
+        '- Bookings\n' +
+        '- Pre-Bookings\n\n' +
+        'This action CANNOT be undone!\n\n' +
+        'Are you absolutely sure you want to proceed?',
+      confirmLabel: 'Yes, continue',
+      cancelLabel: 'Cancel',
+      variant: 'danger',
+    })
     if (!confirmed) return
 
-    const doubleConfirm = confirm(
-      '⚠️ FINAL WARNING ⚠️\n\n' +
-      'You are about to PERMANENTLY DELETE ALL DATA.\n\n' +
-      'Type "DELETE ALL" in the next prompt to confirm.'
-    )
-
+    const doubleConfirm = await confirmDialog.confirm({
+      title: '⚠️ Final warning',
+      message:
+        'You are about to PERMANENTLY DELETE ALL DATA.\n\n' +
+        'In the next step you must type "DELETE ALL" to confirm.',
+      confirmLabel: 'Continue',
+      cancelLabel: 'Cancel',
+      variant: 'danger',
+    })
     if (!doubleConfirm) return
 
-    const finalConfirm = prompt('Type "DELETE ALL" to confirm:')
-    if (finalConfirm !== 'DELETE ALL') {
+    const finalConfirm = await confirmDialog.confirm({
+      title: 'Type to confirm',
+      message: 'Type "DELETE ALL" below to confirm permanent deletion of all data.',
+      confirmLabel: 'Delete all data',
+      cancelLabel: 'Cancel',
+      variant: 'danger',
+      requiredInput: {
+        placeholder: 'Type DELETE ALL',
+        expectedValue: 'DELETE ALL',
+        label: 'Type "DELETE ALL" to confirm:',
+      },
+    })
+    if (!finalConfirm) {
       toast.info('Deletion cancelled. Data is safe.')
       return
     }
