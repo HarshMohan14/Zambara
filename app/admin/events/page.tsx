@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface Event {
@@ -89,14 +90,14 @@ export default function AdminEvents() {
           maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : undefined,
         })
         if (response.success) {
-          alert('Event updated successfully!')
+          toast.success('Event updated successfully!')
           setShowForm(false)
           setEditingEvent(null)
           resetForm()
           fetchEvents()
           refreshDashboard()
         } else {
-          alert(response.error || 'Failed to update event')
+          toast.error(response.error || 'Failed to update event')
         }
       } else {
         const response = await apiClient.createEvent({
@@ -104,18 +105,18 @@ export default function AdminEvents() {
           maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : undefined,
         })
         if (response.success) {
-          alert('Event created successfully!')
+          toast.success('Event created successfully!')
           setShowForm(false)
           resetForm()
           fetchEvents()
           refreshDashboard()
         } else {
-          alert(response.error || 'Failed to create event')
+          toast.error(response.error || 'Failed to create event')
         }
       }
     } catch (error) {
       console.error('Error saving event:', error)
-      alert('Failed to save event')
+      toast.error('Failed to save event')
     }
   }
 
@@ -143,15 +144,15 @@ export default function AdminEvents() {
     try {
       const response = await apiClient.deleteEvent(id)
       if (response.success) {
-        alert('Event deleted successfully!')
+        toast.success('Event deleted successfully!')
         fetchEvents()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete event')
+        toast.error(response.error || 'Failed to delete event')
       }
     } catch (error) {
       console.error('Error deleting event:', error)
-      alert('Failed to delete event')
+      toast.error('Failed to delete event')
     }
   }
 

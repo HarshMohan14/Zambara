@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface Subscriber {
@@ -70,15 +71,15 @@ export default function AdminNewsletter() {
     try {
       const response = await apiClient.deleteNewsletterSubscriber(id)
       if (response.success) {
-        alert('Subscriber deleted successfully!')
+        toast.success('Subscriber deleted successfully!')
         fetchSubscribers()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete subscriber')
+        toast.error(response.error || 'Failed to delete subscriber')
       }
     } catch (error) {
       console.error('Error deleting subscriber:', error)
-      alert('Failed to delete subscriber')
+      toast.error('Failed to delete subscriber')
     }
   }
 

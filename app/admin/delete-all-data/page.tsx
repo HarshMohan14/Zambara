@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 export default function DeleteAllData() {
@@ -37,7 +38,7 @@ export default function DeleteAllData() {
 
     const finalConfirm = prompt('Type "DELETE ALL" to confirm:')
     if (finalConfirm !== 'DELETE ALL') {
-      alert('Deletion cancelled. Data is safe.')
+      toast.info('Deletion cancelled. Data is safe.')
       return
     }
 
@@ -57,15 +58,15 @@ export default function DeleteAllData() {
 
       if (data.success) {
         setResult(data.data)
-        alert(`✅ Successfully deleted ${data.data.totalDeleted} document(s)!`)
+        toast.success(`Successfully deleted ${data.data.totalDeleted} document(s)!`)
       } else {
         setError(data.error || 'Failed to delete data')
-        alert(`❌ Error: ${data.error || 'Failed to delete data'}`)
+        toast.error(data.error || 'Failed to delete data')
       }
     } catch (err: any) {
       const errorMsg = err?.message || 'An unexpected error occurred'
       setError(errorMsg)
-      alert(`❌ Error: ${errorMsg}`)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }

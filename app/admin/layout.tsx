@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Toaster } from 'sonner'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 
@@ -24,6 +25,21 @@ export default function AdminLayout({
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      <Toaster
+        position="top-right"
+        theme="dark"
+        richColors
+        toastOptions={{
+          className: 'admin-panel-toast',
+          style: {
+            background: 'rgba(10, 10, 10, 0.98)',
+            border: '2px solid rgba(209, 160, 88, 0.4)',
+            color: '#fff',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(209, 160, 88, 0.1)',
+            fontFamily: "'BlinkerSemiBold', sans-serif",
+          },
+        }}
+      />
     </div>
   )
 }

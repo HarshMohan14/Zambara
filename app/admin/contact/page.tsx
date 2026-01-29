@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface ContactMessage {
@@ -72,11 +73,11 @@ export default function AdminContact() {
         fetchMessages()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to update message')
+        toast.error(response.error || 'Failed to update message')
       }
     } catch (error) {
       console.error('Error updating message:', error)
-      alert('Failed to update message')
+      toast.error('Failed to update message')
     }
   }
 
@@ -88,15 +89,15 @@ export default function AdminContact() {
     try {
       const response = await apiClient.deleteContactMessage(id)
       if (response.success) {
-        alert('Message deleted successfully!')
+        toast.success('Message deleted successfully!')
         fetchMessages()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete message')
+        toast.error(response.error || 'Failed to delete message')
       }
     } catch (error) {
       console.error('Error deleting message:', error)
-      alert('Failed to delete message')
+      toast.error('Failed to delete message')
     }
   }
 

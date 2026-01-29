@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface Host {
@@ -80,30 +81,30 @@ export default function AdminHosts() {
       if (editingHost) {
         const response = await apiClient.updateHost(editingHost.id, formData)
         if (response.success) {
-          alert('Host updated successfully!')
+          toast.success('Host updated successfully!')
           setShowForm(false)
           setEditingHost(null)
           resetForm()
           fetchHosts()
           refreshDashboard()
         } else {
-          alert(response.error || 'Failed to update host')
+          toast.error(response.error || 'Failed to update host')
         }
       } else {
         const response = await apiClient.createHost(formData)
         if (response.success) {
-          alert('Host created successfully!')
+          toast.success('Host created successfully!')
           setShowForm(false)
           resetForm()
           fetchHosts()
           refreshDashboard()
         } else {
-          alert(response.error || 'Failed to create host')
+          toast.error(response.error || 'Failed to create host')
         }
       }
     } catch (error) {
       console.error('Error saving host:', error)
-      alert('Failed to save host')
+      toast.error('Failed to save host')
     }
   }
 
@@ -128,15 +129,15 @@ export default function AdminHosts() {
     try {
       const response = await apiClient.deleteHost(id)
       if (response.success) {
-        alert('Host deleted successfully!')
+        toast.success('Host deleted successfully!')
         fetchHosts()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete host')
+        toast.error(response.error || 'Failed to delete host')
       }
     } catch (error) {
       console.error('Error deleting host:', error)
-      alert('Failed to delete host')
+      toast.error('Failed to delete host')
     }
   }
 

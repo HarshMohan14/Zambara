@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface Player {
@@ -140,21 +141,21 @@ export default function AdminGames() {
     
     // Validate event and host are selected
     if (!formData.eventId || !formData.eventId.trim()) {
-      alert('Please select an event')
+      toast.warning('Please select an event')
       return
     }
     if (!formData.hostId || !formData.hostId.trim()) {
-      alert('Please select a host')
+      toast.warning('Please select a host')
       return
     }
     
     const validPlayers = formData.players.filter(p => p.name.trim().length > 0 && p.mobile.trim().length > 0)
     if (validPlayers.length < 3) {
-      alert('Please add at least 3 players with both name and mobile number')
+      toast.warning('Please add at least 3 players with both name and mobile number')
       return
     }
     if (validPlayers.length > 6) {
-      alert('Maximum 6 players allowed')
+      toast.warning('Maximum 6 players allowed')
       return
     }
 
@@ -162,7 +163,7 @@ export default function AdminGames() {
     for (let i = 0; i < validPlayers.length; i++) {
       const player = validPlayers[i]
       if (!player.mobile.match(/^[0-9]{10,15}$/)) {
-        alert(`Player ${i + 1} mobile number is invalid. Please enter 10-15 digits.`)
+        toast.warning(`Player ${i + 1} mobile number is invalid. Please enter 10-15 digits.`)
         return
       }
     }
@@ -175,14 +176,14 @@ export default function AdminGames() {
           hostId: formData.hostId,
         })
         if (response.success) {
-          alert('Game updated successfully!')
+          toast.success('Game updated successfully!')
           setShowForm(false)
           setEditingGame(null)
           resetForm()
           fetchGames()
           refreshDashboard()
         } else {
-          alert(response.error || 'Failed to update game')
+          toast.error(response.error || 'Failed to update game')
         }
       } else {
         // Create new game
@@ -195,18 +196,18 @@ export default function AdminGames() {
           })),
         })
         if (response.success) {
-          alert('Game created successfully!')
+          toast.success('Game created successfully!')
           setShowForm(false)
           resetForm()
           fetchGames()
           refreshDashboard()
         } else {
-          alert(response.error || 'Failed to create game')
+          toast.error(response.error || 'Failed to create game')
         }
       }
     } catch (error) {
       console.error('Error saving game:', error)
-      alert('Failed to save game')
+      toast.error('Failed to save game')
     }
   }
 
@@ -234,15 +235,15 @@ export default function AdminGames() {
     try {
       const response = await apiClient.deleteGame(gameId)
       if (response.success) {
-        alert('Game deleted successfully!')
+        toast.success('Game deleted successfully!')
         fetchGames()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete game')
+        toast.error(response.error || 'Failed to delete game')
       }
     } catch (error) {
       console.error('Error deleting game:', error)
-      alert('Failed to delete game')
+      toast.error('Failed to delete game')
     }
   }
 

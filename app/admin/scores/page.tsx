@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface Ranking {
@@ -110,11 +111,11 @@ export default function AdminEventRankings() {
         }
         fetchRankings()
       } else {
-        alert(res.error || 'Failed to delete')
+        toast.error(res.error || 'Failed to delete')
       }
     } catch (e) {
       console.error(e)
-      alert('Failed to delete')
+      toast.error('Failed to delete')
     }
   }
 

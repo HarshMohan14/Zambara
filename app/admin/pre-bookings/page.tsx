@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface PreBooking {
@@ -84,11 +85,11 @@ export default function AdminPreBookings() {
         fetchPreBookings()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to update pre-booking')
+        toast.error(response.error || 'Failed to update pre-booking')
       }
     } catch (error) {
       console.error('Error updating pre-booking:', error)
-      alert('Failed to update pre-booking')
+      toast.error('Failed to update pre-booking')
     }
   }
 
@@ -100,15 +101,15 @@ export default function AdminPreBookings() {
     try {
       const response = await apiClient.deletePreBooking(id)
       if (response.success) {
-        alert('Pre-booking deleted successfully!')
+        toast.success('Pre-booking deleted successfully!')
         fetchPreBookings()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete pre-booking')
+        toast.error(response.error || 'Failed to delete pre-booking')
       }
     } catch (error) {
       console.error('Error deleting pre-booking:', error)
-      alert('Failed to delete pre-booking')
+      toast.error('Failed to delete pre-booking')
     }
   }
 

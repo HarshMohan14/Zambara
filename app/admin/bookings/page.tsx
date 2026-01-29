@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 interface Booking {
@@ -84,11 +85,11 @@ export default function AdminBookings() {
         fetchBookings()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to update booking')
+        toast.error(response.error || 'Failed to update booking')
       }
     } catch (error) {
       console.error('Error updating booking:', error)
-      alert('Failed to update booking')
+      toast.error('Failed to update booking')
     }
   }
 
@@ -100,15 +101,15 @@ export default function AdminBookings() {
     try {
       const response = await apiClient.deleteBooking(id)
       if (response.success) {
-        alert('Booking deleted successfully!')
+        toast.success('Booking deleted successfully!')
         fetchBookings()
         refreshDashboard()
       } else {
-        alert(response.error || 'Failed to delete booking')
+        toast.error(response.error || 'Failed to delete booking')
       }
     } catch (error) {
       console.error('Error deleting booking:', error)
-      alert('Failed to delete booking')
+      toast.error('Failed to delete booking')
     }
   }
 
