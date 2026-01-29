@@ -324,10 +324,8 @@ export function Navigation() {
             >
               Pre-Book
             </a>
-            <a
-              href="https://zambaara.com/howtoplay"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/how-to-play"
               onClick={() => setIsMenuOpen(false)}
               className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
               style={{
@@ -347,7 +345,7 @@ export function Navigation() {
               }}
             >
               How to Play
-            </a>
+            </Link>
             <a
               href="#rankings"
               onClick={() => setIsMenuOpen(false)}

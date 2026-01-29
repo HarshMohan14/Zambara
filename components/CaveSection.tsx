@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 import { apiClient } from '@/lib/api-client'
 
@@ -252,10 +253,8 @@ export function CaveSection() {
           ref={buttonsRef}
           className="flex flex-col sm:flex-row justify-center gap-4 opacity-0"
         >
-          <a
-            href="https://zambaara.com/howtoplay"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/how-to-play"
             className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide inline-block text-center"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",
@@ -277,7 +276,7 @@ export function CaveSection() {
             }}
           >
             HOW TO PLAY
-          </a>
+          </Link>
           <button 
             onClick={() => {
               setFormData({ ...formData, pack: activeTab })

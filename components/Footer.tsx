@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 import { apiClient } from '@/lib/api-client'
 
@@ -276,10 +277,8 @@ export function Footer() {
           >
             Pre-Book
           </a>
-          <a
-            href="https://zambaara.com/howtoplay"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/how-to-play"
             className="opacity-0 transition-all duration-300 uppercase tracking-wide"
             style={{
               fontFamily: "'BlinkerRegular', sans-serif",
@@ -298,7 +297,7 @@ export function Footer() {
             }}
           >
             How to Play
-          </a>
+          </Link>
         </div>
 
         {/* Call to Action Button */}
