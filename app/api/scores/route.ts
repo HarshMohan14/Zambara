@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     const gameId = searchParams.get('gameId')
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
-    const orderBy = searchParams.get('orderBy') || 'score'
-    const order = searchParams.get('order') || 'desc'
+    const orderBy = searchParams.get('orderBy') || 'time'
+    const order = searchParams.get('order') || 'asc'
 
     const result = await getScores({
       playerName: playerName || undefined,
@@ -52,13 +52,8 @@ export async function POST(request: NextRequest) {
     const gameIdError = validateRequired(body.gameId, 'Game ID')
     if (gameIdError) return errorResponse(gameIdError)
 
-    const scoreError = validateNumber(body.score, 0, undefined, 'Score')
-    if (scoreError) return errorResponse(scoreError)
-
-    if (body.time !== undefined) {
-      const timeError = validateNumber(body.time, 0, undefined, 'Time')
-      if (timeError) return errorResponse(timeError)
-    }
+    const timeError = validateNumber(body.time, 0, undefined, 'Time')
+    if (timeError) return errorResponse(timeError)
 
     // Verify game exists
     const game = await getGameById(body.gameId)
@@ -71,12 +66,12 @@ export async function POST(request: NextRequest) {
       return errorResponse('Game is not active', 400)
     }
 
-    // Create score
     const score = await createScore({
       playerName: body.playerName,
       gameId: body.gameId,
-      score: body.score,
       time: body.time,
+      playerMobile: body.playerMobile,
+      playerId: body.playerId,
     })
 
     if (!score) {

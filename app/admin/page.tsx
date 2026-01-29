@@ -90,7 +90,7 @@ export default function AdminDashboard() {
       icon: '🎮',
     },
     {
-      title: 'Scores',
+      title: 'Completions',
       value: stats.scores,
       color: '#d1a058',
       icon: '🏆',
@@ -216,13 +216,13 @@ export default function AdminDashboard() {
               className="font-semibold text-white"
               style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
             >
-              View Scores
+              View Rankings
             </div>
             <div
               className="text-sm text-white/60 mt-1"
               style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
             >
-              Monitor player scores
+              Event rankings by time
             </div>
           </a>
           <a

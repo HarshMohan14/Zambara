@@ -9,6 +9,14 @@ export interface CreateGameRequest {
   hostId: string // Reference to host (required)
 }
 
+export interface UpdateGameRequest {
+  name?: string
+  description?: string
+  difficulty?: 'easy' | 'medium' | 'hard'
+  eventId?: string
+  hostId?: string
+}
+
 export interface CompleteGameRequest {
   winner: string // Player name who won
   // winnerTime is calculated automatically from startTime
@@ -19,8 +27,7 @@ export interface SubmitScoreRequest {
   playerMobile?: string
   playerId?: string // Combination of name_mobile for unique identification
   gameId: string
-  score: number
-  time?: number
+  time: number // Required; ranking is by time only (lower = better)
 }
 
 export interface CreateBraceletRequest {
@@ -40,12 +47,6 @@ export interface ContactRequest {
 
 export interface NewsletterRequest {
   email: string
-}
-
-export interface LeaderboardQuery {
-  gameId?: string
-  limit?: number
-  offset?: number
 }
 
 export interface CreateBookingRequest {

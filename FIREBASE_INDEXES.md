@@ -4,14 +4,6 @@ Firestore requires indexes for certain queries. When you see errors about missin
 
 ## Required Indexes
 
-### Leaderboard Collection
-
-1. **GameId Query Index** (Required for status checks)
-   - Collection: `leaderboard`
-   - Fields: `gameId` (Ascending)
-   - Click the error link in Firebase Console to create automatically
-   - **This index is required for checking if a game has leaderboard entries**
-
 ### Users Collection (Removed - No longer using user system)
 
 ~~User-related indexes removed as user system has been removed.~~

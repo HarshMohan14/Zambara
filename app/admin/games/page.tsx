@@ -23,12 +23,6 @@ interface Game {
   createdAt: string
 }
 
-interface LeaderboardStatus {
-  hasLeaderboard: boolean
-  lastUpdated: string | null
-  entryCount: number
-}
-
 const ITEMS_PER_PAGE = 12
 
 export default function AdminGames() {
@@ -40,8 +34,6 @@ export default function AdminGames() {
   const [filter, setFilter] = useState<'all' | 'running' | 'completed'>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [total, setTotal] = useState(0)
-  const [updatingLeaderboard, setUpdatingLeaderboard] = useState<string | null>(null)
-  const [leaderboardStatuses, setLeaderboardStatuses] = useState<Record<string, LeaderboardStatus>>({})
   const [events, setEvents] = useState<Array<{ id: string; name: string }>>([])
   const [hosts, setHosts] = useState<Array<{ id: string; name: string }>>([])
   const [eventsMap, setEventsMap] = useState<Record<string, string>>({})
@@ -124,30 +116,6 @@ export default function AdminGames() {
         console.log(`[fetchGames] Found ${fetchedGames.length} games, total: ${totalCount}`)
         setGames(fetchedGames)
         setTotal(totalCount)
-        
-        // Fetch leaderboard status for completed games
-        const completedGames = fetchedGames.filter((g: Game) => g.status === 'completed')
-        if (completedGames.length > 0) {
-          const statusPromises = completedGames.map(async (game: Game) => {
-            try {
-              const statusResponse = await apiClient.checkGameLeaderboardStatus(game.id)
-              if (statusResponse.success && statusResponse.data) {
-                return { gameId: game.id, status: statusResponse.data as LeaderboardStatus }
-              }
-              return { gameId: game.id, status: { hasLeaderboard: false, lastUpdated: null, entryCount: 0 } }
-            } catch (error) {
-              console.error(`Error checking leaderboard for game ${game.id}:`, error)
-              return { gameId: game.id, status: { hasLeaderboard: false, lastUpdated: null, entryCount: 0 } }
-            }
-          })
-          
-          const statuses = await Promise.all(statusPromises)
-          const statusMap: Record<string, LeaderboardStatus> = {}
-          statuses.forEach(({ gameId, status }) => {
-            statusMap[gameId] = status
-          })
-          setLeaderboardStatuses(statusMap)
-        }
       } else {
         console.error('Failed to fetch games:', response.error)
         setGames([])
@@ -159,49 +127,6 @@ export default function AdminGames() {
       setTotal(0)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const refreshLeaderboardStatus = async (gameId: string) => {
-    try {
-      const statusResponse = await apiClient.checkGameLeaderboardStatus(gameId)
-      if (statusResponse.success && statusResponse.data) {
-        const status = statusResponse.data as LeaderboardStatus
-        setLeaderboardStatuses(prev => ({
-          ...prev,
-          [gameId]: status,
-        }))
-        return status
-      }
-      return null
-    } catch (statusError: any) {
-      console.error(`Error refreshing leaderboard status for game ${gameId}:`, statusError)
-      return null
-    }
-  }
-
-  const handleUpdateLeaderboard = async (gameId: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    try {
-      setUpdatingLeaderboard(gameId)
-      const response = await apiClient.updateLeaderboard(gameId)
-      if (response.success) {
-        const data = response.data as any
-        alert(data?.entriesUpdated 
-          ? `Leaderboard updated! ${data.entriesUpdated} entries updated.`
-          : 'Leaderboard updated successfully!')
-        
-        setTimeout(async () => {
-          await refreshLeaderboardStatus(gameId)
-        }, 1000)
-      } else {
-        alert(response.error || 'Failed to update leaderboard')
-      }
-    } catch (error: any) {
-      console.error('Error updating leaderboard:', error)
-      alert(`Failed to update leaderboard: ${error.message || 'Unknown error'}`)
-    } finally {
-      setUpdatingLeaderboard(null)
     }
   }
 
@@ -620,68 +545,8 @@ export default function AdminGames() {
                     </div>
                   )}
                   {game.status === 'completed' && game.winner && (
-                    <div className="space-y-2 mb-2">
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-[#d1a058]">
-                          Winner: {game.winner}{game.winnerMobile ? ` (${game.winnerMobile})` : ''} ({game.winnerTime}s)
-                        </div>
-                        <button
-                          onClick={(e) => handleUpdateLeaderboard(game.id, e)}
-                          disabled={updatingLeaderboard === game.id}
-                          className="px-2 py-1 bg-[#d1a058]/20 border border-[#d1a058]/30 rounded text-[#d1a058] text-xs hover:bg-[#d1a058]/30 transition-all disabled:opacity-50"
-                          title="Update leaderboard for this game"
-                        >
-                          {updatingLeaderboard === game.id ? 'Updating...' : '↻ Update LB'}
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {leaderboardStatuses[game.id] !== undefined ? (
-                          leaderboardStatuses[game.id].hasLeaderboard ? (
-                            <>
-                              <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/30 rounded text-green-400 text-xs flex items-center gap-1">
-                                <span>✓</span>
-                                <span>In Leaderboard</span>
-                                {leaderboardStatuses[game.id].entryCount > 0 && (
-                                  <span className="text-green-300/60">({leaderboardStatuses[game.id].entryCount})</span>
-                                )}
-                              </span>
-                              {leaderboardStatuses[game.id].lastUpdated && (
-                                <span className="text-white/40 text-xs">
-                                  Updated: {new Date(leaderboardStatuses[game.id].lastUpdated!).toLocaleString()}
-                                </span>
-                              )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  refreshLeaderboardStatus(game.id)
-                                }}
-                                className="px-2 py-0.5 bg-[#d1a058]/20 border border-[#d1a058]/30 rounded text-[#d1a058] text-xs hover:bg-[#d1a058]/30 transition-all"
-                                title="Refresh status"
-                              >
-                                ↻
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/30 rounded text-yellow-400 text-xs">
-                                Not in Leaderboard
-                              </span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  refreshLeaderboardStatus(game.id)
-                                }}
-                                className="px-2 py-0.5 bg-[#d1a058]/20 border border-[#d1a058]/30 rounded text-[#d1a058] text-xs hover:bg-[#d1a058]/30 transition-all"
-                                title="Refresh status"
-                              >
-                                ↻
-                              </button>
-                            </>
-                          )
-                        ) : (
-                          <span className="text-white/40 text-xs">Checking status...</span>
-                        )}
-                      </div>
+                    <div className="text-xs text-[#d1a058] mb-2">
+                      Winner: {game.winner}{game.winnerMobile ? ` (${game.winnerMobile})` : ''} ({game.winnerTime}s)
                     </div>
                   )}
                   <div className="text-xs text-white/40">

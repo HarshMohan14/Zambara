@@ -349,7 +349,7 @@ export function Navigation() {
               How to Play
             </a>
             <a
-              href="#leaderboard"
+              href="#rankings"
               onClick={() => setIsMenuOpen(false)}
               className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
               style={{
@@ -368,7 +368,7 @@ export function Navigation() {
                 e.currentTarget.style.transform = 'translateX(0)'
               }}
             >
-              Leaderboard
+              Rankings
             </a>
             <a
               href="#contact"

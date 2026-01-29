@@ -115,7 +115,6 @@ After adding environment variables:
 2. Check the browser console for any errors
 3. Test key features:
    - Home page loads correctly
-   - Leaderboard displays
    - Contact form works
    - Admin panel accessible (if applicable)
 

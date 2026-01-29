@@ -6,8 +6,7 @@ import Link from 'next/link'
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: '📊' },
   { href: '/admin/games', label: 'Games', icon: '🎮' },
-  { href: '/admin/scores', label: 'Scores', icon: '🏆' },
-  { href: '/admin/leaderboard', label: 'Leaderboard', icon: '📈' },
+  { href: '/admin/scores', label: 'Rankings', icon: '🏆' },
   { href: '/admin/bracelets', label: 'Bracelets', icon: '💎' },
   { href: '/admin/events', label: 'Events', icon: '🎪' },
   { href: '/admin/hosts', label: 'Hosts', icon: '👤' },

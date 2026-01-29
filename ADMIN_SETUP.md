@@ -47,10 +47,6 @@ The admin panel includes:
 - Filter by user or game
 - Monitor player performance
 
-### Leaderboard (`/admin/leaderboard`)
-- View leaderboard rankings
-- Filter by game
-
 ### Bracelets (`/admin/bracelets`)
 - Manage achievement bracelets
 - Assign bracelets to users

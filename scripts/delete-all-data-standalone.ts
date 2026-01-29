@@ -89,7 +89,6 @@ const db = getFirestore(app)
 const collections = [
   'games',
   'scores',
-  'leaderboard',
   'bracelets',
   'userBracelets',
   'events',

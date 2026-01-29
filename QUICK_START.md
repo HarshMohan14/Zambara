@@ -82,7 +82,6 @@ All backend features are ready:
 - ✅ User registration/login
 - ✅ Game management
 - ✅ Score submission
-- ✅ Leaderboard
 - ✅ Bracelets/achievements
 - ✅ Contact form
 - ✅ Newsletter subscription

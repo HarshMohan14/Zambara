@@ -100,8 +100,7 @@ export default function GameDetail() {
       setError(null)
       const response = await apiClient.completeGame(gameId, winnerId)
       if (response.success) {
-        // Wait a moment for leaderboard to update
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         router.push('/admin/games')
       } else {
         setError(response.error || 'Failed to complete game')

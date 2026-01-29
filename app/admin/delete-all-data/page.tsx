@@ -14,7 +14,6 @@ export default function DeleteAllData() {
       'This includes:\n' +
       '- Games\n' +
       '- Scores\n' +
-      '- Leaderboard\n' +
       '- Bracelets\n' +
       '- Events\n' +
       '- Hosts\n' +
@@ -99,7 +98,6 @@ export default function DeleteAllData() {
         <ul className="list-disc list-inside text-white/70 mb-4 space-y-1" style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
           <li>Games</li>
           <li>Scores</li>
-          <li>Leaderboard</li>
           <li>Bracelets</li>
           <li>User Bracelets</li>
           <li>Events</li>

@@ -76,11 +76,6 @@ This opens a GUI to view and edit your database at `http://localhost:5555`
 - `POST /api/scores` - Submit a new score
   - Body: `{ userId, gameId, score, time? }`
 
-### Leaderboard
-
-- `GET /api/leaderboard` - Get leaderboard
-  - Query params: `gameId`, `limit`, `offset`
-
 ### Bracelets
 
 - `GET /api/bracelets` - Get all bracelets
@@ -143,7 +138,6 @@ The database includes the following models:
 - **Game** - Game definitions
 - **Score** - User scores for games
 - **Bracelet** - Achievement bracelets
-- **Leaderboard** - Leaderboard rankings
 - **Contact** - Contact form submissions
 - **Newsletter** - Newsletter subscriptions
 
@@ -180,13 +174,6 @@ const response = await fetch('/api/scores', {
     time: 120
   })
 })
-```
-
-### Get Leaderboard
-
-```typescript
-const response = await fetch('/api/leaderboard?gameId=game-id&limit=10')
-const data = await response.json()
 ```
 
 ## Development

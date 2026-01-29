@@ -4,21 +4,21 @@ import {
   errorResponse,
   serverErrorResponse,
 } from '@/lib/api-response'
-import { getDocs, deleteDoc, doc } from 'firebase/firestore'
+import { getDocs, deleteDoc, doc, collection } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import {
-  gamesCollection,
-  scoresCollection,
-  leaderboardCollection,
-  braceletsCollection,
-  userBraceletsCollection,
-  contactCollection,
-  newsletterCollection,
-  bookingsCollection,
-  preBookingsCollection,
-  eventsCollection,
-  hostsCollection,
-} from '@/lib/firestore'
+
+const COLLECTION_NAMES = [
+  'games',
+  'scores',
+  'bracelets',
+  'userBracelets',
+  'events',
+  'hosts',
+  'contact',
+  'newsletter',
+  'bookings',
+  'preBookings',
+]
 
 // POST /api/admin/delete-all-data - Delete all data from all collections
 // WARNING: This is a destructive operation!
@@ -26,19 +26,10 @@ export async function POST(request: NextRequest) {
   try {
     // TODO: Add authentication check here to ensure only admins can access this
     
-    const collections = [
-      { name: 'games', collection: gamesCollection },
-      { name: 'scores', collection: scoresCollection },
-      { name: 'leaderboard', collection: leaderboardCollection },
-      { name: 'bracelets', collection: braceletsCollection },
-      { name: 'userBracelets', collection: userBraceletsCollection },
-      { name: 'events', collection: eventsCollection },
-      { name: 'hosts', collection: hostsCollection },
-      { name: 'contact', collection: contactCollection },
-      { name: 'newsletter', collection: newsletterCollection },
-      { name: 'bookings', collection: bookingsCollection },
-      { name: 'preBookings', collection: preBookingsCollection },
-    ]
+    const collections = COLLECTION_NAMES.map((name) => ({
+      name,
+      collection: collection(db, name),
+    }))
 
     const results: Record<string, { deleted: number; error?: string }> = {}
 

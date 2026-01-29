@@ -214,28 +214,21 @@ export async function completeGame(
   
   await updateDoc(docRef, updateData)
   
-  // Add to leaderboard via score
+  // Create completion record for the winner (ranked by time only)
   try {
-    const scoreResult = await createScore({
-      playerName: winnerName,
-      playerMobile: winnerMobile,
-      playerId: winnerId,
-      gameId: gameId,
-      score: 1000, // Base score, can be adjusted
-      time: winnerTime,
-    })
-    
-    console.log('Score created:', scoreResult)
-    console.log('Winner time calculated:', winnerTime, 'seconds')
-    
-    // Ensure leaderboard is updated
-    await updateLeaderboard(gameId)
-    console.log('Leaderboard update completed for game:', gameId)
+    if (winnerTime && winnerTime > 0 && !isNaN(winnerTime)) {
+      await createScore({
+        playerName: winnerName,
+        playerMobile: winnerMobile,
+        playerId: winnerId,
+        gameId: gameId,
+        time: winnerTime,
+      })
+    }
   } catch (scoreError: any) {
-    console.error('Error creating score or updating leaderboard:', scoreError)
-    // Still return the game even if score/leaderboard update fails
+    console.error('[completeGame] Error creating score:', scoreError)
   }
-  
+
   return getGameById(gameId)
 }
 
@@ -271,15 +264,8 @@ export async function deleteGame(id: string) {
     const scoreDeletes = scoresSnapshot.docs.map((doc) => deleteDoc(doc.ref))
     await Promise.all(scoreDeletes)
     console.log(`[deleteGame] Deleted ${scoresSnapshot.size} scores for game ${id}`)
-    
-    // Delete all leaderboard entries for this game
-    const leaderboardQuery = query(leaderboardCollection, where('gameId', '==', id))
-    const leaderboardSnapshot = await getDocs(leaderboardQuery)
-    const leaderboardDeletes = leaderboardSnapshot.docs.map((doc) => deleteDoc(doc.ref))
-    await Promise.all(leaderboardDeletes)
-    console.log(`[deleteGame] Deleted ${leaderboardSnapshot.size} leaderboard entries for game ${id}`)
-    
-    // Finally, delete the game itself
+
+    // Delete the game itself
     await deleteDoc(doc(db, 'games', id))
     console.log(`[deleteGame] Successfully deleted game ${id}`)
   } catch (error: any) {
@@ -309,7 +295,7 @@ export async function getScores(params?: {
       q = query(q, where('gameId', '==', params.gameId))
     }
     
-    const orderField = params?.orderBy || 'score'
+    const orderField = params?.orderBy || 'time'
     const orderDirection = params?.order === 'asc' ? 'asc' : 'desc'
     
     let useOrderBy = false
@@ -335,14 +321,17 @@ export async function getScores(params?: {
     
     console.log(`[getScores] Fetched ${scores.length} scores for gameId: ${params?.gameId || 'all'}`)
     
-    // Sort client-side (always do this to ensure correct order)
+    // Sort client-side: time asc = lower time first (missing time last)
     scores.sort((a: any, b: any) => {
-      const aValue = a[orderField] || 0
-      const bValue = b[orderField] || 0
+      const isTimeAsc = orderField === 'time' && orderDirection === 'asc'
+      const aVal = a[orderField]
+      const bVal = b[orderField]
+      const aValue = aVal === undefined || aVal === null ? (isTimeAsc ? Infinity : 0) : Number(aVal)
+      const bValue = bVal === undefined || bVal === null ? (isTimeAsc ? Infinity : 0) : Number(bVal)
       if (orderDirection === 'asc') {
-        return aValue > bValue ? 1 : -1
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
       }
-      return aValue < bValue ? 1 : -1
+      return aValue < bValue ? 1 : aValue > bValue ? -1 : 0
     })
     
     const offset = params?.offset || 0
@@ -389,28 +378,27 @@ export async function createScore(data: {
   playerMobile?: string
   playerId?: string // Combination of name_mobile
   gameId: string
-  score: number
-  time?: number
+  time: number // Required; ranking by time only (lower = better)
 }) {
+  const timeNum = Number(data.time)
+  if (isNaN(timeNum) || timeNum < 0) {
+    throw new Error(`Invalid time value: ${data.time}. Time must be a non-negative number.`)
+  }
   const scoreData: any = {
     playerName: data.playerName,
     gameId: data.gameId,
-    score: data.score,
+    time: timeNum,
     createdAt: Timestamp.now(),
   }
+  if (data.playerMobile) scoreData.playerMobile = data.playerMobile
+  if (data.playerId) scoreData.playerId = data.playerId
   
-  // Add mobile and playerId if provided
-  if (data.playerMobile) {
-    scoreData.playerMobile = data.playerMobile
-  }
-  if (data.playerId) {
-    scoreData.playerId = data.playerId
-  }
-  
-  // Only add time if it has a value
-  if (data.time !== undefined && data.time !== null) {
-    scoreData.time = data.time
-  }
+  console.log(`[createScore] Creating record:`, {
+    playerName: scoreData.playerName,
+    gameId: scoreData.gameId,
+    time: scoreData.time,
+    playerId: scoreData.playerId,
+  })
   
   const docRef = await addDoc(scoresCollection, scoreData)
   const scoreDoc = await getDoc(docRef)
@@ -419,453 +407,129 @@ export async function createScore(data: {
     ...convertTimestamps(scoreDoc.data()),
   }
   
-  // Update leaderboard after score is created
-  try {
-    await updateLeaderboard(data.gameId)
-    console.log(`Leaderboard updated for game ${data.gameId} after score creation`)
-  } catch (error: any) {
-    console.error('Error updating leaderboard after score creation:', error)
-    // Don't fail the score creation if leaderboard update fails
-  }
-  
+  console.log(`[createScore] ✓ Record created:`, { id: createdScore.id, time: createdScore.time })
   return createdScore
 }
 
-// Leaderboard
-export const leaderboardCollection = collection(db, 'leaderboard')
-
-export async function updateLeaderboard(gameId: string) {
-  try {
-    console.log(`[Leaderboard Update] Starting update for game ${gameId}`)
-    
-    // Get the game to find its eventId
-    const game = await getGameById(gameId)
-    if (!game) {
-      return {
-        success: false,
-        message: `Game ${gameId} not found`,
-        gameId,
-        entriesUpdated: 0,
-        totalEntries: 0,
-        results: [],
-      }
-    }
-    
-    const gameData = game as any
-    const eventId = gameData.eventId
-    
-    if (!eventId) {
-      return {
-        success: false,
-        message: `Game ${gameId} does not have an eventId. Please update the game to include an event.`,
-        gameId,
-        entriesUpdated: 0,
-        totalEntries: 0,
-        results: [],
-      }
-    }
-    
-    console.log(`[Leaderboard Update] Found eventId: ${eventId} for game ${gameId}`)
-    
-    // Get all games with this eventId
-    const gamesWithEvent = await getGames({ eventId, limit: 1000 })
-    console.log(`[Leaderboard Update] Found ${gamesWithEvent.games.length} games for event ${eventId}`)
-    
-    // Get all scores for all games in this event
-    let allScores: any[] = []
-    for (const g of gamesWithEvent.games) {
-      const gId = (g as any).id
-      try {
-        const scoresData = await getScores({
-          gameId: gId,
-          limit: 1000,
-        })
-        if (scoresData && scoresData.scores && Array.isArray(scoresData.scores)) {
-          allScores = allScores.concat(scoresData.scores.map((s: any) => ({ ...s, gameId: gId })))
-        }
-      } catch (error: any) {
-        console.warn(`[Leaderboard Update] Error fetching scores for game ${gId}:`, error.message)
-      }
-    }
-    
-    console.log(`[Leaderboard Update] Found ${allScores.length} total scores for event ${eventId}`)
-    
-    if (allScores.length === 0) {
-      const completedGames = gamesWithEvent.games.filter((g: any) => g.status === 'completed')
-      if (completedGames.length === 0) {
-        return {
-          success: false,
-          message: 'No completed games found for this event. Complete games first to create scores.',
-          gameId,
-          entriesUpdated: 0,
-          totalEntries: 0,
-          results: [],
-        }
-      }
-      return {
-        success: false,
-        message: `No scores found for event ${eventId}. Found ${completedGames.length} completed game(s) but no scores.`,
-        gameId,
-        entriesUpdated: 0,
-        totalEntries: 0,
-        results: [],
-      }
-    }
-    
-    // Sort by time (ascending - lower time is better), then by playerName for consistency
-    allScores.sort((a: any, b: any) => {
-      const timeA = a.time !== undefined && a.time !== null ? Number(a.time) : Infinity
-      const timeB = b.time !== undefined && b.time !== null ? Number(b.time) : Infinity
-      if (timeA !== timeB) {
-        return timeA - timeB
-      }
-      const nameA = a.playerName || ''
-      const nameB = b.playerName || ''
-      return nameA.localeCompare(nameB)
-    })
-    
-    // Take top 10 for leaderboard
-    const topScores = allScores.slice(0, 10)
-    
-    // Use the scores for leaderboard update
-    const scoresData = {
-      scores: topScores,
-      total: topScores.length,
-    }
-    
-    // Log scores being processed
-    console.log('[Leaderboard Update] Scores to process:', scoresData.scores.map((s: any) => ({
-      player: s.playerName,
-      score: s.score,
-      time: s.time
-    })))
-    
-    // Update or create leaderboard entries sequentially to avoid race conditions
-    const results = []
-    for (let i = 0; i < scoresData.scores.length; i++) {
-      const score = scoresData.scores[i]
-      try {
-        // Create document ID: eventId_playerId
-        const playerId = (score as any).playerId || `${score.playerName}_${(score as any).playerMobile || 'unknown'}`
-        const docId = `${eventId}_${playerId}`.replace(/[^a-zA-Z0-9_]/g, '_')
-        const leaderboardRef = doc(db, 'leaderboard', docId)
-        
-        // Check if document exists to preserve createdAt
-        const existingDoc = await getDoc(leaderboardRef)
-        const updateData: any = {
-          playerName: score.playerName,
-          eventId: eventId,
-          gameId: score.gameId || gameId, // Keep gameId for reference
-          rank: i + 1,
-          time: score.time !== undefined && score.time !== null ? Number(score.time) : null,
-          updatedAt: Timestamp.now(),
-        }
-        
-        // Add score if it exists (for backward compatibility)
-        if (score.score !== undefined && score.score !== null) {
-          updateData.score = score.score
-        }
-        
-        // Add mobile and playerId if available
-        if ((score as any).playerMobile) {
-          updateData.playerMobile = (score as any).playerMobile
-        }
-        if ((score as any).playerId) {
-          updateData.playerId = (score as any).playerId
-        }
-        
-        // Add time if it exists
-        if (score.time !== undefined && score.time !== null && score.time !== '') {
-          updateData.time = score.time
-        }
-        
-        // Preserve createdAt if document already exists
-        if (!existingDoc.exists()) {
-          updateData.createdAt = Timestamp.now()
-        }
-        
-        // Use setDoc with merge to create or update
-        await setDoc(leaderboardRef, updateData, { merge: true })
-        console.log(`[Leaderboard Update] ✓ Updated entry: ${score.playerName} - Rank ${i + 1} - Score ${score.score}`)
-        results.push({ playerName: score.playerName, rank: i + 1, success: true })
-      } catch (entryError: any) {
-        console.error(`[Leaderboard Update] ✗ Error updating entry for ${score.playerName}:`, entryError)
-        console.error('Entry error details:', {
-          code: entryError.code,
-          message: entryError.message,
-          playerName: score.playerName,
-          gameId,
-        })
-        results.push({ playerName: score.playerName, rank: i + 1, success: false, error: entryError.message })
-      }
-    }
-    
-    const successCount = results.filter(r => r.success).length
-    console.log(`[Leaderboard Update] Completed for game ${gameId}: ${successCount}/${results.length} entries updated`)
-    
-    return {
-      success: true,
-      gameId,
-      entriesUpdated: successCount,
-      totalEntries: results.length,
-      results,
-    }
-  } catch (error: any) {
-    console.error('[Leaderboard Update] Fatal error:', error)
-    console.error('Error details:', {
-      code: error.code,
-      message: error.message,
-      gameId,
-      stack: error.stack,
-    })
-    throw error // Re-throw so caller knows it failed
-  }
+export async function deleteScore(id: string) {
+  const docRef = doc(db, 'scores', id)
+  await deleteDoc(docRef)
 }
 
-export async function checkGameLeaderboardStatus(gameId: string) {
-  try {
-    console.log(`[Status Check] Checking leaderboard status for game ${gameId}`)
-    const q = query(leaderboardCollection, where('gameId', '==', gameId))
-    const snapshot = await getDocs(q)
-    console.log(`[Status Check] Found ${snapshot.size} leaderboard entries for game ${gameId}`)
-    
-    if (!snapshot.empty && snapshot.size > 0) {
-      // Get the most recently updated entry
-      let latestEntry = snapshot.docs[0]
-      let latestTime = latestEntry.data().updatedAt || latestEntry.data().createdAt
-      
-      snapshot.docs.forEach((doc) => {
-        const data = doc.data()
-        const updatedAt = data.updatedAt || data.createdAt
-        if (updatedAt) {
-          const updateTime = updatedAt instanceof Timestamp ? updatedAt.toMillis() : new Date(updatedAt).getTime()
-          const latestTimeMs = latestTime instanceof Timestamp ? latestTime.toMillis() : (latestTime ? new Date(latestTime).getTime() : 0)
-          if (updateTime > latestTimeMs) {
-            latestEntry = doc
-            latestTime = updatedAt
-          }
-        }
-      })
-      
-      const entryData = latestEntry.data()
-      const lastUpdated = entryData.updatedAt || entryData.createdAt
-      const result = {
-        hasLeaderboard: true,
-        lastUpdated: lastUpdated 
-          ? (lastUpdated instanceof Timestamp 
-              ? lastUpdated.toDate().toISOString() 
-              : typeof lastUpdated === 'string' 
-                ? lastUpdated 
-                : new Date(lastUpdated).toISOString())
-          : null,
-        entryCount: snapshot.size,
-      }
-      console.log(`[Status Check] Game ${gameId} has leaderboard:`, result)
-      return result
-    }
-    
-    console.log(`[Status Check] Game ${gameId} has NO leaderboard entries`)
-    return { hasLeaderboard: false, lastUpdated: null, entryCount: 0 }
-  } catch (error: any) {
-    console.error(`[Status Check] Error checking leaderboard status for game ${gameId}:`, error)
-    console.error('Error details:', {
-      code: error.code,
-      message: error.message,
-      gameId,
-    })
-    return { hasLeaderboard: false, lastUpdated: null, entryCount: 0 }
-  }
-}
-
-export async function getLeaderboard(params?: {
-  gameId?: string
+/** Get rankings by event: all completion records for games in this event, sorted by time ascending (best first), with rank. */
+export async function getRankingsByEvent(params: {
+  eventId: string
   limit?: number
   offset?: number
-  excludeDeletedGames?: boolean // Filter out entries for deleted games
+}) {
+  const { eventId, limit = 50, offset = 0 } = params
+  const gamesSnapshot = await getDocs(
+    query(gamesCollection, where('eventId', '==', eventId))
+  )
+  const gameIds = gamesSnapshot.docs.map((d) => d.id)
+  if (gameIds.length === 0) {
+    return { rankings: [], total: 0, event: null }
+  }
+  const eventDoc = await getDoc(doc(db, 'events', eventId))
+  const event = eventDoc.exists()
+    ? { id: eventDoc.id, ...convertTimestamps(eventDoc.data()) }
+    : null
+
+  const allScores: any[] = []
+  for (const gid of gameIds) {
+    const q = query(scoresCollection, where('gameId', '==', gid))
+    const snap = await getDocs(q)
+    snap.docs.forEach((d) => {
+      allScores.push({ id: d.id, ...convertTimestamps(d.data()), gameId: gid })
+    })
+  }
+  allScores.sort((a, b) => (a.time ?? Infinity) - (b.time ?? Infinity))
+  const total = allScores.length
+  const page = allScores.slice(offset, offset + limit)
+
+  const gamesById: Record<string, any> = {}
+  for (const g of gamesSnapshot.docs) {
+    gamesById[g.id] = { id: g.id, ...convertTimestamps(g.data()) }
+  }
+
+  const rankings = page.map((s, i) => ({
+    id: s.id,
+    rank: offset + i + 1,
+    playerName: s.playerName,
+    playerMobile: s.playerMobile,
+    playerId: s.playerId,
+    gameId: s.gameId,
+    gameName: gamesById[s.gameId]?.name ?? 'Unknown',
+    time: s.time,
+    createdAt: s.createdAt,
+  }))
+
+  return { rankings, total, event }
+}
+
+export const contactCollection = collection(db, 'contact')
+
+export async function getContactMessages(params?: {
+  read?: boolean
+  limit?: number
+  offset?: number
 }) {
   try {
-    let q = query(leaderboardCollection)
-    
-    if (params?.gameId) {
-      q = query(q, where('gameId', '==', params.gameId))
+    let q = query(contactCollection)
+    if (params?.read !== undefined) {
+      q = query(q, where('read', '==', params.read))
     }
-    
-    let useOrderBy = false
-    // Try to order by rank, but fallback to client-side sorting
     try {
-      q = query(q, orderBy('rank', 'asc'))
-      useOrderBy = true
-    } catch (error: any) {
-      console.warn('[getLeaderboard] Index may be needed for orderBy, sorting client-side')
-      useOrderBy = false
-    }
-    
-    // Fetch all matching documents first for accurate total count
-    const querySnapshot = await getDocs(q)
-    let leaderboard = querySnapshot.docs.map((doc) => {
-      const data = convertTimestamps(doc.data())
-      return {
-        id: doc.id,
-        ...data,
-        // Ensure gameId is always present
-        gameId: data.gameId || null,
-      }
-    })
-    
-    console.log(`[getLeaderboard] Fetched ${leaderboard.length} leaderboard entries`)
-    
-    // Sort client-side by rank (ascending) or score (descending) if rank doesn't exist
-    if (!useOrderBy || true) { // Always sort client-side to ensure correct order
-      leaderboard.sort((a: any, b: any) => {
-        if (a.rank !== undefined && b.rank !== undefined) {
-          return a.rank - b.rank
-        }
-        // Fallback: sort by score descending
-        return (b.score || 0) - (a.score || 0)
-      })
-    }
-    
-    // Fetch game data for ALL entries first (before pagination) if we need to filter
-    // Use a cache to avoid fetching the same game multiple times
-    const gameCache: Record<string, any> = {}
-    
-    // If we need to exclude deleted games, fetch game data for all entries first
-    if (params?.excludeDeletedGames) {
-      const allEntriesWithGames = await Promise.all(
-        leaderboard.map(async (entry: any) => {
-          if (!entry.gameId) {
-            return null // Filter out entries without gameId
-          }
-          
-          // Check cache first
-          if (gameCache[entry.gameId]) {
-            const cachedGame = gameCache[entry.gameId]
-            // Filter out deleted games
-            if (cachedGame.name === 'Unknown Event') {
-              return null
-            }
-            return {
-              ...entry,
-              game: cachedGame,
-            }
-          }
-          
-          // Fetch game if not in cache
-          try {
-            const game = await getGameById(entry.gameId)
-            if (game && game.name) {
-              const gameData = {
-                id: game.id,
-                name: game.name,
-              }
-              gameCache[entry.gameId] = gameData
-              return {
-                ...entry,
-                game: gameData,
-              }
-            } else {
-              // Game not found (deleted) - filter out
-              return null
-            }
-          } catch (error: any) {
-            // Game fetch failed (deleted) - filter out
-            return null
-          }
-        })
-      )
-      
-      // Filter out null entries (deleted games)
-      leaderboard = allEntriesWithGames.filter((entry): entry is any => entry !== null)
-    }
-    
-    // Store total after filtering (if filtering was applied)
-    const total = leaderboard.length
-    
-    // Apply pagination
+      q = query(q, orderBy('createdAt', 'desc'))
+    } catch (_) {}
+    const snapshot = await getDocs(q)
+    let messages = snapshot.docs.map((d) => ({ id: d.id, ...convertTimestamps(d.data()) }))
+    const total = messages.length
     const offset = params?.offset || 0
-    const limit = params?.limit || leaderboard.length
-    const paginatedLeaderboard = leaderboard.slice(offset, offset + limit)
-    
-    // Fetch game data for paginated entries (if not already fetched)
-    const leaderboardWithDetails = await Promise.all(
-      paginatedLeaderboard.map(async (entry: any) => {
-        // If game data already exists (from filtering step), return as-is
-        if (entry.game) {
-          return entry
-        }
-        
-        if (!entry.gameId) {
-          return {
-            ...entry,
-            game: {
-              id: 'unknown',
-              name: 'Unknown Event',
-            },
-          }
-        }
-        
-        // Check cache first
-        if (gameCache[entry.gameId]) {
-          return {
-            ...entry,
-            game: gameCache[entry.gameId],
-          }
-        }
-        
-        // Fetch game if not in cache
-        try {
-          const game = await getGameById(entry.gameId)
-          if (game && game.name) {
-            const gameData = {
-              id: game.id,
-              name: game.name,
-            }
-            gameCache[entry.gameId] = gameData
-            return {
-              ...entry,
-              game: gameData,
-            }
-          } else {
-            // Game not found (deleted)
-            const gameData = {
-              id: entry.gameId,
-              name: 'Unknown Event',
-            }
-            gameCache[entry.gameId] = gameData
-            return {
-              ...entry,
-              game: gameData,
-            }
-          }
-        } catch (error: any) {
-          // If game fetch fails, return with Unknown Event
-          const gameData = {
-            id: entry.gameId,
-            name: 'Unknown Event',
-          }
-          gameCache[entry.gameId] = gameData
-          return {
-            ...entry,
-            game: gameData,
-          }
-        }
-      })
-    )
-    
-    return {
-      leaderboard: leaderboardWithDetails,
-      total: total,
-    }
+    const limitVal = params?.limit || messages.length
+    messages = messages.slice(offset, offset + limitVal)
+    return { messages, total }
   } catch (error: any) {
-    console.error('[getLeaderboard] Error fetching leaderboard:', error)
-    if (error.code === 'failed-precondition') {
-      return {
-        leaderboard: [],
-        total: 0,
-      }
-    }
-    throw error
+    console.error('[getContactMessages]', error)
+    return { messages: [], total: 0 }
   }
+}
+
+export async function createContactMessage(data: {
+  name: string
+  email: string
+  message: string
+  subject?: string
+}) {
+  const docData = {
+    ...data,
+    read: false,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  const ref = await addDoc(contactCollection, docData)
+  const snap = await getDoc(ref)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
+}
+
+export async function deleteContactMessage(id: string) {
+  const docRef = doc(db, 'contact', id)
+  await deleteDoc(docRef)
+}
+
+export async function updateContactMessage(id: string, data: { read?: boolean }) {
+  const docRef = doc(db, 'contact', id)
+  const updateData: any = {
+    updatedAt: Timestamp.now(),
+  }
+  if (data.read !== undefined) {
+    updateData.read = data.read
+  }
+  await updateDoc(docRef, updateData)
+  return getDoc(docRef).then((docSnap) => ({
+    id: docSnap.id,
+    ...convertTimestamps(docSnap.data()),
+  }))
 }
 
 // Bracelets
@@ -878,43 +542,27 @@ export async function getBracelets(params?: {
   limit?: number
   offset?: number
 }) {
-  let q = query(braceletsCollection)
-  
-  if (params?.element) {
-    q = query(q, where('element', '==', params.element))
-  }
-  if (params?.rarity) {
-    q = query(q, where('rarity', '==', params.rarity))
-  }
-  
-  q = query(q, orderBy('createdAt', 'desc'))
-  
-  if (params?.limit) {
-    q = query(q, limit(params.limit))
-  }
-  
-  const querySnapshot = await getDocs(q)
-  const bracelets = querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...convertTimestamps(doc.data()),
-  }))
-  
-  const offset = params?.offset || 0
-  const paginatedBracelets = bracelets.slice(offset)
-  
-  return {
-    bracelets: paginatedBracelets,
-    total: bracelets.length,
+  try {
+    let q = query(braceletsCollection)
+    if (params?.element) q = query(q, where('element', '==', params.element))
+    if (params?.rarity) q = query(q, where('rarity', '==', params.rarity))
+    const snapshot = await getDocs(q)
+    let bracelets = snapshot.docs.map((d) => ({ id: d.id, ...convertTimestamps(d.data()) }))
+    const total = bracelets.length
+    const offset = params?.offset || 0
+    const limitVal = params?.limit || bracelets.length
+    bracelets = bracelets.slice(offset, offset + limitVal)
+    return { bracelets, total }
+  } catch (error: any) {
+    console.error('[getBracelets]', error)
+    return { bracelets: [], total: 0 }
   }
 }
 
 export async function getBraceletById(id: string) {
   const docRef = doc(db, 'bracelets', id)
-  const docSnap = await getDoc(docRef)
-  if (docSnap.exists()) {
-    return { id: docSnap.id, ...convertTimestamps(docSnap.data()) }
-  }
-  return null
+  const snap = await getDoc(docRef)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
 }
 
 export async function createBracelet(data: {
@@ -924,147 +572,38 @@ export async function createBracelet(data: {
   image?: string
   rarity?: string
 }) {
-  const braceletData: any = {
+  const docData: any = {
     name: data.name,
-    element: data.element.toLowerCase(),
+    element: data.element,
     rarity: data.rarity || 'common',
     createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
   }
-  
-  // Only add optional fields if they have values
-  if (data.description !== undefined && data.description !== null && data.description !== '') {
-    braceletData.description = data.description
-  }
-  if (data.image !== undefined && data.image !== null && data.image !== '') {
-    braceletData.image = data.image
-  }
-  
-  const docRef = await addDoc(braceletsCollection, braceletData)
-  return getBraceletById(docRef.id)
+  if (data.description != null) docData.description = data.description
+  if (data.image != null) docData.image = data.image
+  const ref = await addDoc(braceletsCollection, docData)
+  const snap = await getDoc(ref)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
 }
 
 export async function assignBracelet(braceletId: string, playerName: string) {
-  // Check if already assigned
-  const q = query(
-    userBraceletsCollection,
-    where('playerName', '==', playerName),
-    where('braceletId', '==', braceletId),
-    limit(1)
+  const existing = await getDocs(
+    query(
+      userBraceletsCollection,
+      where('braceletId', '==', braceletId),
+      where('playerName', '==', playerName)
+    )
   )
-  const existing = await getDocs(q)
-  
   if (!existing.empty) {
     throw new Error('Player already has this bracelet')
   }
-  
-  const docRef = await addDoc(userBraceletsCollection, {
-    playerName,
+  const ref = await addDoc(userBraceletsCollection, {
     braceletId,
+    playerName,
     earnedAt: Timestamp.now(),
   })
-  
-  const docSnap = await getDoc(docRef)
-  const data = docSnap.data()
-  const bracelet = await getDoc(doc(db, 'bracelets', braceletId))
-  
-  return {
-    id: docSnap.id,
-    ...convertTimestamps(data),
-    playerName,
-    bracelet: bracelet.exists()
-      ? { id: bracelet.id, ...convertTimestamps(bracelet.data()) }
-      : null,
-  }
-}
-
-// Contact
-export const contactCollection = collection(db, 'contact')
-
-export async function getContactMessages(params?: {
-  read?: boolean
-  limit?: number
-  offset?: number
-}) {
-  try {
-    let q = query(contactCollection)
-    
-    if (params?.read !== undefined) {
-      q = query(q, where('read', '==', params.read))
-    }
-    
-    let useOrderBy = false
-    try {
-      q = query(q, orderBy('createdAt', 'desc'))
-      useOrderBy = true
-    } catch (error: any) {
-      console.warn('[getContactMessages] Index may be needed for orderBy, will sort client-side')
-      useOrderBy = false
-    }
-    
-    // Fetch all matching documents first for accurate total count
-    const querySnapshot = await getDocs(q)
-    let messages = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...convertTimestamps(doc.data()),
-    }))
-    
-    // Sort client-side if orderBy wasn't applied
-    if (!useOrderBy) {
-      messages.sort((a: any, b: any) => {
-        const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0
-        const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0
-        return bDate - aDate
-      })
-    }
-    
-    // Store total before pagination
-    const total = messages.length
-    
-    // Apply pagination
-    const offset = params?.offset || 0
-    const limit = params?.limit || messages.length
-    const paginatedMessages = messages.slice(offset, offset + limit)
-    
-    return {
-      messages: paginatedMessages,
-      total: total,
-    }
-  } catch (error: any) {
-    console.error('[getContactMessages] Error fetching contact messages:', error)
-    if (error.code === 'failed-precondition') {
-      return {
-        messages: [],
-        total: 0,
-      }
-    }
-    throw error
-  }
-}
-
-export async function createContactMessage(data: {
-  name: string
-  email: string
-  message: string
-  subject?: string
-}) {
-  const contactData: any = {
-    name: data.name,
-    email: data.email,
-    message: data.message,
-    read: false,
-    createdAt: Timestamp.now(),
-  }
-  
-  // Only add subject if it has a value
-  if (data.subject !== undefined && data.subject !== null && data.subject !== '') {
-    contactData.subject = data.subject
-  }
-  
-  const docRef = await addDoc(contactCollection, contactData)
-  return getDoc(docRef).then((docSnap) => ({
-    id: docSnap.id,
-    ...convertTimestamps(docSnap.data()),
-  }))
+  const snap = await getDoc(ref)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
 }
 
 // Newsletter
@@ -1077,147 +616,60 @@ export async function getNewsletterSubscribers(params?: {
 }) {
   try {
     let q = query(newsletterCollection)
-    
     if (params?.subscribed !== undefined) {
       q = query(q, where('subscribed', '==', params.subscribed))
     }
-    
-    let useOrderBy = false
-    try {
-      q = query(q, orderBy('createdAt', 'desc'))
-      useOrderBy = true
-    } catch (error: any) {
-      console.warn('[getNewsletterSubscribers] Index may be needed for orderBy, will sort client-side')
-      useOrderBy = false
-    }
-    
-    // Fetch all matching documents first for accurate total count
-    const querySnapshot = await getDocs(q)
-    let subscribers = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...convertTimestamps(doc.data()),
-    }))
-    
-    // Sort client-side if orderBy wasn't applied
-    if (!useOrderBy) {
-      subscribers.sort((a: any, b: any) => {
-        const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0
-        const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0
-        return bDate - aDate
-      })
-    }
-    
-    // Store total before pagination
+    const snapshot = await getDocs(q)
+    let subscribers = snapshot.docs.map((d) => ({ id: d.id, ...convertTimestamps(d.data()) }))
     const total = subscribers.length
-    
-    // Apply pagination
     const offset = params?.offset || 0
-    const limit = params?.limit || subscribers.length
-    const paginatedSubscribers = subscribers.slice(offset, offset + limit)
-    
-    return {
-      subscribers: paginatedSubscribers,
-      total: total,
-    }
+    const limitVal = params?.limit || subscribers.length
+    subscribers = subscribers.slice(offset, offset + limitVal)
+    return { subscribers, total }
   } catch (error: any) {
-    console.error('[getNewsletterSubscribers] Error fetching newsletter subscribers:', error)
-    if (error.code === 'failed-precondition') {
-      return {
-        subscribers: [],
-        total: 0,
-      }
-    }
-    throw error
+    console.error('[getNewsletterSubscribers]', error)
+    return { subscribers: [], total: 0 }
   }
-}
-
-export async function getNewsletterSubscriberByEmail(email: string) {
-  const q = query(newsletterCollection, where('email', '==', email), limit(1))
-  const querySnapshot = await getDocs(q)
-  if (!querySnapshot.empty) {
-    const doc = querySnapshot.docs[0]
-    return { id: doc.id, ...convertTimestamps(doc.data()) }
-  }
-  return null
 }
 
 export async function subscribeNewsletter(email: string) {
-  const existing = await getNewsletterSubscriberByEmail(email)
-  
-  if (existing) {
-    if (existing.subscribed) {
-      throw new Error('Email is already subscribed')
-    }
-    // Re-subscribe
-    const docRef = doc(db, 'newsletter', existing.id)
-    await updateDoc(docRef, {
-      subscribed: true,
-      updatedAt: Timestamp.now(),
-    })
-    return getDoc(docRef).then((docSnap) => ({
-      id: docSnap.id,
-      ...convertTimestamps(docSnap.data()),
-    }))
+  const normalized = email.trim().toLowerCase()
+  const existing = await getDocs(
+    query(newsletterCollection, where('email', '==', normalized))
+  )
+  if (!existing.empty) {
+    throw new Error('Email is already subscribed')
   }
-  
-  const docRef = await addDoc(newsletterCollection, {
-    email,
+  const ref = await addDoc(newsletterCollection, {
+    email: normalized,
     subscribed: true,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   })
-  return getDoc(docRef).then((docSnap) => ({
-    id: docSnap.id,
-    ...convertTimestamps(docSnap.data()),
-  }))
+  const snap = await getDoc(ref)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
 }
 
 export async function unsubscribeNewsletter(email: string) {
-  const existing = await getNewsletterSubscriberByEmail(email)
-  
-  if (!existing) {
+  const normalized = email.trim().toLowerCase()
+  const q = query(newsletterCollection, where('email', '==', normalized))
+  const snapshot = await getDocs(q)
+  if (snapshot.empty) {
     throw new Error('Email not found in newsletter list')
   }
-  
-  const docRef = doc(db, 'newsletter', existing.id)
-  await updateDoc(docRef, {
-    subscribed: false,
-    updatedAt: Timestamp.now(),
-  })
-}
-
-// Delete functions
-export async function deleteScore(id: string) {
-  await deleteDoc(doc(db, 'scores', id))
-}
-
-export async function deleteContactMessage(id: string) {
-  await deleteDoc(doc(db, 'contact', id))
+  for (const d of snapshot.docs) {
+    await updateDoc(doc(db, 'newsletter', d.id), {
+      subscribed: false,
+      updatedAt: Timestamp.now(),
+    })
+  }
+  const first = snapshot.docs[0]
+  return { id: first.id, ...convertTimestamps(first.data()) }
 }
 
 export async function deleteNewsletterSubscriber(id: string) {
-  await deleteDoc(doc(db, 'newsletter', id))
-}
-
-export async function deleteLeaderboardEntry(id: string) {
-  await deleteDoc(doc(db, 'leaderboard', id))
-}
-
-export async function updateContactMessage(id: string, data: { read?: boolean }) {
-  const docRef = doc(db, 'contact', id)
-  const updateData: any = {
-    updatedAt: Timestamp.now(),
-  }
-  
-  if (data.read !== undefined) {
-    updateData.read = data.read
-  }
-  
-  await updateDoc(docRef, updateData)
-  return getDoc(docRef).then((docSnap) => ({
-    id: docSnap.id,
-    ...convertTimestamps(docSnap.data()),
-  }))
+  const docRef = doc(db, 'newsletter', id)
+  await deleteDoc(docRef)
 }
 
 // Bookings
@@ -1583,13 +1035,18 @@ export async function getEvents(params?: {
   }
 }
 
-export async function getEvent(id: string) {
+export async function getEventById(id: string) {
   const docRef = doc(db, 'events', id)
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
     return { id: docSnap.id, ...convertTimestamps(docSnap.data()) }
   }
   return null
+}
+
+// Alias for backward compatibility
+export async function getEvent(id: string) {
+  return getEventById(id)
 }
 
 export async function createEvent(data: {

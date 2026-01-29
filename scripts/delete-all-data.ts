@@ -9,7 +9,6 @@ import { db } from '../lib/firebase'
 import {
   gamesCollection,
   scoresCollection,
-  leaderboardCollection,
   braceletsCollection,
   userBraceletsCollection,
   contactCollection,
@@ -21,7 +20,6 @@ import {
 const collections = [
   { name: 'games', collection: gamesCollection },
   { name: 'scores', collection: scoresCollection },
-  { name: 'leaderboard', collection: leaderboardCollection },
   { name: 'bracelets', collection: braceletsCollection },
   { name: 'userBracelets', collection: userBraceletsCollection },
   { name: 'contact', collection: contactCollection },

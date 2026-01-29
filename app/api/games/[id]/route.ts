@@ -6,7 +6,7 @@ import {
   notFoundResponse,
 } from '@/lib/api-response'
 import { getGameById, updateGame, deleteGame, completeGame } from '@/lib/firestore'
-import type { CreateGameRequest, CompleteGameRequest } from '@/types/api'
+import type { CreateGameRequest, UpdateGameRequest, CompleteGameRequest } from '@/types/api'
 
 // GET /api/games/[id] - Get game by ID
 export async function GET(
@@ -63,7 +63,7 @@ export async function PATCH(
     }
 
     // Regular update
-    const updateBody = body as Partial<CreateGameRequest>
+    const updateBody = body as UpdateGameRequest
 
     if (updateBody.difficulty) {
       const validDifficulties = ['easy', 'medium', 'hard']

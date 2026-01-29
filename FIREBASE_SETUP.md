@@ -90,8 +90,6 @@ Common indexes you might need:
 - `users`: `username` (ascending)
 - `scores`: `userId` (ascending), `score` (descending)
 - `scores`: `gameId` (ascending), `score` (descending)
-- `leaderboard`: `gameId` (ascending), `rank` (ascending)
-
 Firestore will prompt you to create these when needed.
 
 ## Step 7: Test Your Setup
@@ -127,7 +125,6 @@ Your Firestore database will have these collections:
 - **users** - User accounts
 - **games** - Game definitions
 - **scores** - User scores
-- **leaderboard** - Leaderboard rankings
 - **bracelets** - Achievement bracelets
 - **userBracelets** - User-bracelet relationships
 - **contact** - Contact form submissions
@@ -163,15 +160,10 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Public read access for games, leaderboard
+    // Public read access for games
     match /games/{gameId} {
       allow read: if true;
       allow write: if request.auth != null; // Only authenticated users
-    }
-    
-    match /leaderboard/{entryId} {
-      allow read: if true;
-      allow write: if false; // Only via server
     }
     
     // Scores - users can submit their own

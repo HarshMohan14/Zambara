@@ -148,39 +148,13 @@ class ApiClient {
     })
   }
 
-  // Leaderboard
-  async getLeaderboard(params?: {
-    gameId?: string
-    limit?: number
-    offset?: number
-    excludeDeleted?: boolean // For admin panel, set to false to show deleted games
-  }) {
+  // Rankings (by event, time-based; lower time = better rank)
+  async getRankings(params: { eventId: string; page?: number; pageSize?: number }) {
     const query = new URLSearchParams()
-    if (params?.gameId) query.append('gameId', params.gameId)
-    if (params?.limit) query.append('limit', params.limit.toString())
-    if (params?.offset) query.append('offset', params.offset.toString())
-    // excludeDeleted defaults to true in API, but admin can explicitly set to false
-    if (params?.excludeDeleted === false) {
-      query.append('excludeDeleted', 'false')
-    }
-    return this.request(`/leaderboard?${query.toString()}`)
-  }
-
-  async updateLeaderboard(gameId: string) {
-    return this.request('/leaderboard/update', {
-      method: 'POST',
-      body: JSON.stringify({ gameId }),
-    })
-  }
-
-  async checkGameLeaderboardStatus(gameId: string) {
-    return this.request(`/leaderboard/status?gameId=${encodeURIComponent(gameId)}`)
-  }
-
-  async deleteLeaderboardEntry(id: string) {
-    return this.request(`/leaderboard/${id}`, {
-      method: 'DELETE',
-    })
+    query.append('eventId', params.eventId)
+    if (params.page != null) query.append('page', params.page.toString())
+    if (params.pageSize != null) query.append('pageSize', params.pageSize.toString())
+    return this.request(`/rankings?${query.toString()}`)
   }
 
   // Bracelets
