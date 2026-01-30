@@ -547,7 +547,7 @@ export function Footer() {
                       color: formData.pack === '2-4' ? '#000' : '#d1a058',
                     }}
                   >
-                    2-4 PLAYERS (₹499)
+                    2-4 PLAYERS (₹799)
                   </button>
                   <button
                     type="button"
@@ -560,7 +560,7 @@ export function Footer() {
                       color: formData.pack === '5-8' ? '#000' : '#d1a058',
                     }}
                   >
-                    5-8 PLAYERS (₹799)
+                    5-8 PLAYERS (₹899)
                   </button>
                 </div>
               </div>

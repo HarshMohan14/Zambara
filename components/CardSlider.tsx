@@ -541,7 +541,7 @@ export function CardSlider() {
     }
   }, [showDetail])
 
-  // Scroll-triggered animation for section entrance
+  // Scroll-triggered animation for section entrance with popup effect
   useEffect(() => {
     if (!sectionRef.current) return
 
@@ -555,17 +555,23 @@ export function CardSlider() {
         },
       })
 
-      // Animate back card entrance
+      // Animate back card entrance with popup effect
       if (backCardRef.current && !isRevealed) {
         tl.fromTo(
           backCardRef.current,
-          { opacity: 0, scale: 0.8, rotationY: -20 },
+          { 
+            opacity: 0, 
+            scale: 0.3, 
+            rotationY: -30,
+            y: 100,
+          },
           {
             opacity: 1,
             scale: 1,
             rotationY: 0,
-            duration: 1,
-            ease: 'back.out(1.7)',
+            y: 0,
+            duration: 1.2,
+            ease: 'elastic.out(1, 0.5)',
           }
         )
       }
@@ -646,7 +652,7 @@ export function CardSlider() {
             <div className="absolute top-full mt-4 w-full flex flex-col items-center pointer-events-none">
               <div className="w-24 border-t border-[#d1a058] mb-4" style={{ opacity: 0.6 }}></div>
               <p 
-                className="text-lg md:text-xl uppercase tracking-wider font-semibold"
+                className="text-lg md:text-xl uppercase tracking-wider font-semibold animate-pulse"
                 style={{
                   fontFamily: "'BlinkerSemiBold', sans-serif",
                   color: '#d1a058',
@@ -654,7 +660,7 @@ export function CardSlider() {
                   letterSpacing: '2px',
                 }}
               >
-                CLICK TO REVEAL
+                CLICK THE CARD TO REVEAL
               </p>
             </div>
 

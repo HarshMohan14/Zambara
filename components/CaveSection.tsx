@@ -244,7 +244,7 @@ export function CaveSection() {
               textTransform: 'lowercase',
             }}
           >
-            {activeTab === '2-4' ? '₹499' : '₹799'}
+            {activeTab === '2-4' ? '₹799' : '₹899'}
           </p>
         </div>
 
@@ -483,7 +483,7 @@ export function CaveSection() {
                       color: formData.pack === '2-4' ? '#000' : '#d1a058',
                     }}
                   >
-                    2-4 PLAYERS (₹499)
+                    2-4 PLAYERS (₹799)
                   </button>
                   <button
                     type="button"
@@ -496,7 +496,7 @@ export function CaveSection() {
                       color: formData.pack === '5-8' ? '#000' : '#d1a058',
                     }}
                   >
-                    5-8 PLAYERS (₹799)
+                    5-8 PLAYERS (₹899)
                   </button>
                 </div>
               </div>
