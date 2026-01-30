@@ -7,9 +7,10 @@ import { Navigation } from '@/components/Navigation'
 
 interface LayoutProps {
   children: React.ReactNode
+  hideFooter?: boolean
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children, hideFooter = false }: LayoutProps) {
   const layoutRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function Layout({ children }: LayoutProps) {
     <div ref={layoutRef} className="min-h-screen relative z-10">
       <Navigation />
       <main className="relative z-10">{children}</main>
-      <Footer />
+      {!hideFooter && <Footer />}
     </div>
   )
 }

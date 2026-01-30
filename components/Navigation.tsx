@@ -154,20 +154,8 @@ export function Navigation() {
             />
           </div>
 
-          {/* Right side - Admin Link and Menu */}
+          {/* Right side - Menu */}
           <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="px-4 py-2 rounded-lg font-semibold uppercase transition-all duration-300 hover:scale-105"
-              style={{
-                fontFamily: "'BlinkerSemiBold', sans-serif",
-                backgroundColor: '#d1a058',
-                color: '#000',
-                boxShadow: '0 4px 15px rgba(209, 160, 88, 0.3)',
-              }}
-            >
-              Admin
-            </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-lg transition-all duration-300 hover:bg-[#d1a058]/20"

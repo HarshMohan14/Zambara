@@ -58,6 +58,17 @@ export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
           <span className="hidden sm:inline">Back to Site</span>
           <span className="sm:hidden">Home</span>
         </button>
+        <button
+          onClick={async () => {
+            await fetch('/api/admin/logout', { method: 'POST' })
+            router.push('/admin/login')
+            router.refresh()
+          }}
+          className="px-3 md:px-4 py-1.5 md:py-2 border-2 border-white/40 text-white/80 rounded-lg font-semibold uppercase transition-all hover:bg-white/10 text-xs md:text-sm"
+          style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+        >
+          Logout
+        </button>
       </div>
     </header>
   )

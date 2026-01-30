@@ -2,27 +2,35 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { generateSEOMetadata } from '@/lib/seo'
 
-// Set your YouTube video link here, or use env: NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL
-const YOUTUBE_VIDEO_URL =
-  process.env.NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL || ''
+// Video: YouTube URL (e.g. https://www.youtube.com/watch?v=...) or file in public/ (e.g. /how-to-play.mp4)
+const VIDEO_URL =
+  process.env.NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL || 'https://www.youtube.com/watch?v=kGqZHLC8GUg'
 
-// PDF path in public folder, or use env: NEXT_PUBLIC_HOW_TO_PLAY_PDF_URL for full URL
-const PDF_URL =
-  process.env.NEXT_PUBLIC_HOW_TO_PLAY_PDF_URL || '/how-to-play.pdf'
-
-function getYouTubeEmbedUrl(url: string): string | null {
-  if (!url) return null
+function isYouTubeUrl(url: string): boolean {
   try {
-    // Supports: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-    ]
-    const match = url.match(patterns[0])
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null
+    const u = new URL(url)
+    return u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com' || u.hostname === 'youtu.be'
   } catch {
-    return null
+    return false
   }
 }
+
+function getYouTubeEmbedUrl(url: string): string {
+  try {
+    const u = new URL(url)
+    if (u.hostname === 'youtu.be') {
+      return `https://www.youtube.com/embed${u.pathname}`
+    }
+    const v = u.searchParams.get('v')
+    return v ? `https://www.youtube.com/embed/${v}` : url
+  } catch {
+    return url
+  }
+}
+
+// Your PDF: put in public/ (e.g. how-to-play.pdf) or set full URL in env
+const PDF_URL =
+  process.env.NEXT_PUBLIC_HOW_TO_PLAY_PDF_URL || '/how-to-play.pdf'
 
 export const metadata: Metadata = generateSEOMetadata({
   title: 'How to Play',
@@ -33,8 +41,6 @@ export const metadata: Metadata = generateSEOMetadata({
 })
 
 export default function HowToPlayPage() {
-  const embedUrl = getYouTubeEmbedUrl(YOUTUBE_VIDEO_URL)
-
   return (
     <main className="min-h-screen relative pt-24 pb-20 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -76,7 +82,7 @@ export default function HowToPlayPage() {
           Watch the video below to learn the rules, or download the PDF guide.
         </p>
 
-        {/* Video container */}
+        {/* Video player – YouTube embed or direct video file */}
         <div
           className="relative w-full rounded-xl overflow-hidden mb-10"
           style={{
@@ -85,29 +91,23 @@ export default function HowToPlayPage() {
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
           }}
         >
-          {embedUrl ? (
+          {isYouTubeUrl(VIDEO_URL) ? (
             <iframe
-              src={embedUrl}
+              src={getYouTubeEmbedUrl(VIDEO_URL)}
               title="How to Play Zambaara"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
               className="absolute inset-0 w-full h-full"
             />
           ) : (
-            <div
-              className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center"
-              style={{
-                fontFamily: "'BlinkerRegular', sans-serif",
-                color: 'rgba(255, 255, 255, 0.7)',
-              }}
+            <video
+              src={VIDEO_URL}
+              controls
+              playsInline
+              className="absolute inset-0 w-full h-full object-contain bg-black"
             >
-              <p className="text-lg mb-2">Video coming soon</p>
-              <p className="text-sm">
-                Add your YouTube link in{' '}
-                <code className="text-[#d1a058]">NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL</code>{' '}
-                or in this page&apos;s config.
-              </p>
-            </div>
+              Your browser does not support the video tag.
+            </video>
           )}
         </div>
 
