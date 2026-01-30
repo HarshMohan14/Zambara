@@ -6,7 +6,7 @@ import { generateBreadcrumbSchema } from '@/lib/seo'
 
 // Video: YouTube URL (e.g. https://www.youtube.com/watch?v=...) or file in public/ (e.g. /how-to-play.mp4)
 const VIDEO_URL =
-  process.env.NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL || 'https://www.youtube.com/watch?v=kGqZHLC8GUg'
+  process.env.NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL || 'https://youtu.be/nxtyDh9SD-Q'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zambaara.com'
 
