@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { generateBreadcrumbSchema } from '@/lib/seo'
 
 // Video: YouTube URL (e.g. https://www.youtube.com/watch?v=...) or file in public/ (e.g. /how-to-play.mp4)
 const VIDEO_URL =
   process.env.NEXT_PUBLIC_HOW_TO_PLAY_VIDEO_URL || 'https://www.youtube.com/watch?v=kGqZHLC8GUg'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zambaara.com'
 
 function isYouTubeUrl(url: string): boolean {
   try {
@@ -32,11 +35,79 @@ function getYouTubeEmbedUrl(url: string): string {
 // PDF rulebook path
 const PDF_URL = '/Pdf rulebook.pdf'
 
+// Breadcrumb data
+const breadcrumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'How to Play', url: '/how-to-play' },
+]
+
 export default function HowToPlayPage() {
   const [activeTab, setActiveTab] = useState<'video' | 'rulebook'>('video')
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs)
 
   return (
-    <main className="min-h-screen relative pt-24 pb-20 px-4">
+    <>
+      {/* Breadcrumb Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      
+      {/* HowTo Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'HowTo',
+            name: 'How to Play Zambaara',
+            description: 'Learn how to play Zambaara - the ultimate elemental card game. Master the elements and become the Zampion.',
+            image: `${SITE_URL}/og-image.jpg`,
+            totalTime: 'PT30M',
+            estimatedCost: {
+              '@type': 'MonetaryAmount',
+              currency: 'INR',
+              value: '799',
+            },
+            supply: [
+              { '@type': 'HowToSupply', name: 'Zambaara Card Deck' },
+              { '@type': 'HowToSupply', name: 'Bracelets' },
+            ],
+            tool: [
+              { '@type': 'HowToTool', name: '2-8 Players' },
+            ],
+            step: [
+              {
+                '@type': 'HowToStep',
+                name: 'Setup',
+                text: 'Distribute cards equally among all players and place bracelets in the center.',
+              },
+              {
+                '@type': 'HowToStep',
+                name: 'Learn the Elements',
+                text: 'Understand the elemental cycle: Lava beats Wind, Wind beats Rain, Rain beats Lava, Mountain blocks all.',
+              },
+              {
+                '@type': 'HowToStep',
+                name: 'Play Cards',
+                text: 'Take turns playing cards strategically to win rounds and collect bracelets.',
+              },
+              {
+                '@type': 'HowToStep',
+                name: 'Use Special Cards',
+                text: 'Deploy Meteor, Lightning, Freeze, or Reverse cards at key moments to turn the tide.',
+              },
+              {
+                '@type': 'HowToStep',
+                name: 'Win',
+                text: 'Collect all bracelets to become the Zampion!',
+              },
+            ],
+          }),
+        }}
+      />
+
+      <main className="min-h-screen relative pt-24 pb-20 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Back link */}
         <Link
@@ -380,5 +451,6 @@ export default function HowToPlayPage() {
         }
       `}</style>
     </main>
+    </>
   )
 }
