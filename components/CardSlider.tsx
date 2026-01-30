@@ -543,38 +543,37 @@ export function CardSlider() {
 
   // Scroll-triggered animation for section entrance with popup effect
   useEffect(() => {
-    if (!sectionRef.current) return
+    if (!sectionRef.current || !backCardRef.current || isRevealed) return
 
     const ctx = gsap.context(() => {
+      // Animate back card entrance with dramatic popup effect
       const tl = createTimeline({
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 80%',
-          end: 'bottom 20%',
-          toggleActions: 'play none none reverse',
+          start: 'top 85%',
+          toggleActions: 'play none none none',
         },
       })
 
-      // Animate back card entrance with popup effect
-      if (backCardRef.current && !isRevealed) {
-        tl.fromTo(
-          backCardRef.current,
-          { 
-            opacity: 0, 
-            scale: 0.3, 
-            rotationY: -30,
-            y: 100,
-          },
-          {
-            opacity: 1,
-            scale: 1,
-            rotationY: 0,
-            y: 0,
-            duration: 1.2,
-            ease: 'elastic.out(1, 0.5)',
-          }
-        )
-      }
+      tl.fromTo(
+        backCardRef.current,
+        {
+          opacity: 0,
+          scale: 0.2,
+          rotationY: -45,
+          rotationX: 20,
+          y: 150,
+        },
+        {
+          opacity: 1,
+          scale: 1,
+          rotationY: 0,
+          rotationX: 0,
+          y: 0,
+          duration: 1.2,
+          ease: 'elastic.out(1, 0.6)',
+        }
+      )
     }, sectionRef)
 
     return () => {
@@ -617,7 +616,7 @@ export function CardSlider() {
         {!isRevealed && (
           <div 
             ref={revealContainerRef}
-            className="relative w-full min-h-[500px] flex justify-center items-center overflow-visible"
+            className="relative w-full min-h-[600px] flex flex-col justify-center items-center overflow-visible"
             style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}
           >
             {/* Back Card - Shown initially */}
@@ -629,9 +628,10 @@ export function CardSlider() {
                 width: '300px',
                 height: '438px',
                 transformStyle: 'preserve-3d',
-                opacity: isAnimating ? 0 : 1,
+                opacity: isAnimating ? 0 : undefined,
                 visibility: isAnimating ? 'hidden' : 'visible',
                 pointerEvents: isAnimating ? 'none' : 'auto',
+                animation: 'cardBounce 2s ease-in-out infinite',
               }}
             >
               <Image
@@ -648,21 +648,51 @@ export function CardSlider() {
               />
             </div>
             
-            {/* Click hint - Positioned below the back card */}
-            <div className="absolute top-full mt-4 w-full flex flex-col items-center pointer-events-none">
-              <div className="w-24 border-t border-[#d1a058] mb-4" style={{ opacity: 0.6 }}></div>
-              <p 
-                className="text-lg md:text-xl uppercase tracking-wider font-semibold animate-pulse"
-                style={{
-                  fontFamily: "'BlinkerSemiBold', sans-serif",
-                  color: '#d1a058',
-                  textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(209, 160, 88, 0.2)',
-                  letterSpacing: '2px',
-                }}
-              >
-                CLICK THE CARD TO REVEAL
-              </p>
-            </div>
+            {/* Click hint - Positioned below the back card, hidden when animating */}
+            {!isAnimating && (
+              <div className="mt-8 flex flex-col items-center pointer-events-none">
+                {/* Decorative line */}
+                <div 
+                  className="w-32 h-px mb-5"
+                  style={{ 
+                    background: 'linear-gradient(90deg, transparent, #d1a058, transparent)',
+                    boxShadow: '0 0 10px rgba(209, 160, 88, 0.5)',
+                  }}
+                ></div>
+                
+                {/* Click text with glow animation */}
+                <div 
+                  className="relative px-8 py-3 rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(209, 160, 88, 0.15) 0%, rgba(0, 0, 0, 0.8) 100%)',
+                    border: '1px solid rgba(209, 160, 88, 0.4)',
+                    boxShadow: '0 0 20px rgba(209, 160, 88, 0.2), inset 0 0 15px rgba(209, 160, 88, 0.1)',
+                    animation: 'pulse 2s ease-in-out infinite',
+                  }}
+                >
+                  <p 
+                    className="text-lg md:text-xl uppercase tracking-wider font-semibold relative z-10"
+                    style={{
+                      fontFamily: "'BlinkerSemiBold', sans-serif",
+                      color: '#d1a058',
+                      textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.4)',
+                      letterSpacing: '3px',
+                    }}
+                  >
+                    CLICK THE CARD TO REVEAL
+                  </p>
+                </div>
+                
+                {/* Bottom decorative line */}
+                <div 
+                  className="w-32 h-px mt-5"
+                  style={{ 
+                    background: 'linear-gradient(90deg, transparent, #d1a058, transparent)',
+                    boxShadow: '0 0 10px rgba(209, 160, 88, 0.5)',
+                  }}
+                ></div>
+              </div>
+            )}
 
             {/* Reveal Cards - Hidden initially, appear from behind back card */}
             <div className="absolute inset-0 pointer-events-none overflow-visible flex items-center justify-center">
@@ -964,6 +994,26 @@ export function CardSlider() {
         </div>,
         document.body
       )}
+
+      {/* CSS Keyframes for animations */}
+      <style jsx>{`
+        @keyframes cardBounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+        }
+        @keyframes pulse {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(209, 160, 88, 0.2), inset 0 0 15px rgba(209, 160, 88, 0.1);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(209, 160, 88, 0.4), inset 0 0 20px rgba(209, 160, 88, 0.2);
+          }
+        }
+      `}</style>
     </section>
   )
 }
