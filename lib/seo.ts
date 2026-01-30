@@ -27,7 +27,7 @@ interface SEOProps {
   description?: string
   image?: string
   url?: string
-  type?: 'website' | 'article' | 'product' | 'game'
+  type?: 'website' | 'article'
   noindex?: boolean
   keywords?: string[]
   publishedTime?: string
@@ -59,7 +59,7 @@ export function generateSEOMetadata({
     publisher: SITE_NAME,
     metadataBase: new URL(SITE_URL),
     openGraph: {
-      type: type === 'game' ? 'website' : type,
+      type: type,
       url: fullUrl,
       siteName: SITE_NAME,
       title: fullTitle,
@@ -71,7 +71,6 @@ export function generateSEOMetadata({
           width: 1200,
           height: 630,
           alt: title || SITE_NAME,
-          type: 'image/jpeg',
         },
       ],
       ...(publishedTime && { publishedTime }),
