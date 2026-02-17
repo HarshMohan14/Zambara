@@ -57,6 +57,52 @@ body::before {
   z-index: 0;
 }
 
+/* Beach Battle page — override body background with ocean-war image.
+   The fixed bg stays pinned to the viewport; all content scrolls over it. */
+body.beach-battle-bg {
+  background-image: url('/ocean-war-bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #000;
+}
+body.beach-battle-bg::before {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 5, 15, 0.5) 20%,
+    rgba(0, 8, 20, 0.45) 50%,
+    rgba(0, 5, 15, 0.5) 80%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+}
+
+/* iOS Safari fallback — background-attachment:fixed is broken on iOS.
+   Use a pseudo-element with position:fixed + will-change for GPU layer. */
+@supports (-webkit-touch-callout: none) {
+  body.beach-battle-bg {
+    background-image: none !important;
+    background-color: #000;
+  }
+  body.beach-battle-bg::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/ocean-war-bg.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    z-index: -1;
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

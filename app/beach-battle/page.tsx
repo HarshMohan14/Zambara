@@ -7,6 +7,7 @@ import { QRRegistrationSection } from '@/components/beach-battle/QRRegistrationS
 import { BracketSection } from '@/components/beach-battle/BracketSection'
 import { FinalCTASection } from '@/components/beach-battle/FinalCTASection'
 import { BeachBattleFooter } from '@/components/beach-battle/BeachBattleFooter'
+import { BeachBattleBackground } from '@/components/beach-battle/BeachBattleBackground'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zambaara.com'
 
@@ -89,58 +90,22 @@ export default function BeachBattlePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
       />
 
-      {/*
-        Unified ocean-war background approach:
-        - Background image applied on a wrapper <div> (Layout already renders <main>)
-        - No background-attachment:fixed (broken on iOS/mobile)
-        - backgroundSize: cover ensures the image fills the viewport width
-        - Overlay div below content for darkening + teal glow
-        - All sections use transparent overlays so the image shows through
-      */}
-      <div
-        className="min-h-screen overflow-x-hidden relative"
-        style={{
-          backgroundColor: '#000',
-          backgroundImage: 'url(/ocean-war-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center top',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        {/* Dark overlay for text readability */}
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          aria-hidden="true"
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,5,15,0.5) 20%, rgba(0,8,20,0.45) 50%, rgba(0,5,15,0.5) 80%, rgba(0,0,0,0.6) 100%)',
-            }}
-          />
-          {/* Bioluminescent teal ambient glow */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse at 50% 40%, rgba(6, 182, 212, 0.06) 0%, transparent 55%)',
-            }}
-          />
-        </div>
+      {/* Adds beach-battle-bg class to <body> — swaps default bg for ocean-war-bg.jpg.
+          The image is fixed to the viewport via CSS in globals.css;
+          all content below scrolls over it. Cleaned up on unmount. */}
+      <BeachBattleBackground />
 
-        {/* Section 1: Cinematic Hero with 3D water-droplet video */}
-        <div className="relative z-[1]">
-          <BeachHero />
-        </div>
+      <div className="min-h-screen overflow-x-hidden relative">
+        {/* Section 1: Cinematic Hero with video */}
+        <BeachHero />
 
-        {/* All post-hero sections sit above the overlay */}
-        <div className="relative z-[1]">
-          <TribesSection />
-          <BattleWorksSection />
-          <QRRegistrationSection />
-          <BracketSection />
-          <FinalCTASection />
-          <BeachBattleFooter />
-        </div>
+        {/* Remaining sections — all transparent, bg shows through */}
+        <TribesSection />
+        <BattleWorksSection />
+        <QRRegistrationSection />
+        <BracketSection />
+        <FinalCTASection />
+        <BeachBattleFooter />
       </div>
     </>
   )
