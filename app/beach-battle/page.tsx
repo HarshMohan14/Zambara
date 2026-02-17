@@ -6,6 +6,7 @@ import { BattleWorksSection } from '@/components/beach-battle/BattleWorksSection
 import { QRRegistrationSection } from '@/components/beach-battle/QRRegistrationSection'
 import { BracketSection } from '@/components/beach-battle/BracketSection'
 import { FinalCTASection } from '@/components/beach-battle/FinalCTASection'
+import { BeachBattleFooter } from '@/components/beach-battle/BeachBattleFooter'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zambaara.com'
 
@@ -92,23 +93,26 @@ export default function BeachBattlePage() {
         className="min-h-screen overflow-x-hidden"
         style={{ background: '#000' }}
       >
-        {/* Section 1: Cinematic Hero */}
+        {/* Section 1: Cinematic Hero with 3D water droplet video */}
         <BeachHero />
 
-        {/* Section 2: The Four Tribes */}
+        {/* Section 2: The Four Tribes - click-to-reveal mechanic */}
         <TribesSection />
 
-        {/* Section 3: How The Battle Works */}
+        {/* Section 3: How The Battle Works - mobile-first grid */}
         <BattleWorksSection />
 
-        {/* Section 4: QR Registration */}
+        {/* Section 4: QR Registration + tribal badge download */}
         <QRRegistrationSection />
 
-        {/* Section 5: Live Bracket */}
+        {/* Section 5: Tournament Bracket - 16 -> 4 -> 1 + Hall of Fame */}
         <BracketSection />
 
-        {/* Section 6: Final CTA */}
+        {/* Section 6: Final CTA with tribal wave animation */}
         <FinalCTASection />
+
+        {/* Beach Battle Footer - intense tribal clash atmosphere */}
+        <BeachBattleFooter />
       </main>
     </>
   )
