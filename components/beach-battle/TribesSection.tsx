@@ -15,78 +15,81 @@ interface TribeData {
   description: string
   element: string
   cardImage: string
-  particleColor: string
+  sealIcon: string
+  sealColor: string
 }
 
 const tribes: TribeData[] = [
   {
     name: 'Lava',
-    icon: '\uD83D\uDD25',
+    icon: '🔥',
     title: 'Bearer of the Flame',
     color: '#ef4444',
     glowColor: 'rgba(239, 68, 68, 0.6)',
-    bgGradient: 'linear-gradient(145deg, rgba(127, 29, 29, 0.7) 0%, rgba(239, 68, 68, 0.15) 40%, rgba(0,0,0,0.95) 100%)',
-    borderColor: 'rgba(239, 68, 68, 0.4)',
+    bgGradient: 'linear-gradient(145deg, rgba(127, 29, 29, 0.85) 0%, rgba(239, 68, 68, 0.2) 40%, rgba(0,0,0,0.95) 100%)',
+    borderColor: 'rgba(239, 68, 68, 0.5)',
     description: 'From the depths of volcanic fury, the Lava tribe channels raw destructive force. Their fire consumes all that stands before them.',
     element: 'fire',
     cardImage: '/Cards Png/Lava.png',
-    particleColor: '#ef4444',
+    sealIcon: '🌋',
+    sealColor: '#dc2626',
   },
   {
     name: 'Rain',
-    icon: '\uD83C\uDF27\uFE0F',
+    icon: '🌧️',
     title: 'Child of the Storm',
     color: '#3b82f6',
     glowColor: 'rgba(59, 130, 246, 0.6)',
-    bgGradient: 'linear-gradient(145deg, rgba(30, 58, 138, 0.7) 0%, rgba(59, 130, 246, 0.15) 40%, rgba(0,0,0,0.95) 100%)',
-    borderColor: 'rgba(59, 130, 246, 0.4)',
+    bgGradient: 'linear-gradient(145deg, rgba(30, 58, 138, 0.85) 0%, rgba(59, 130, 246, 0.2) 40%, rgba(0,0,0,0.95) 100%)',
+    borderColor: 'rgba(59, 130, 246, 0.5)',
     description: 'Born from the tempest above the ocean, Rain warriors command the downpour. They douse flames and erode mountains.',
     element: 'water',
     cardImage: '/Cards Png/Rain.png',
-    particleColor: '#3b82f6',
+    sealIcon: '⚡',
+    sealColor: '#2563eb',
   },
   {
     name: 'Wind',
-    icon: '\uD83C\uDF2C\uFE0F',
+    icon: '🌬️',
     title: 'Walker of the Sky',
     color: '#f0f0f0',
     glowColor: 'rgba(240, 240, 240, 0.45)',
-    bgGradient: 'linear-gradient(145deg, rgba(160, 160, 160, 0.25) 0%, rgba(240, 240, 240, 0.08) 40%, rgba(0,0,0,0.95) 100%)',
-    borderColor: 'rgba(240, 240, 240, 0.3)',
+    bgGradient: 'linear-gradient(145deg, rgba(160, 160, 160, 0.35) 0%, rgba(240, 240, 240, 0.1) 40%, rgba(0,0,0,0.95) 100%)',
+    borderColor: 'rgba(240, 240, 240, 0.35)',
     description: 'Unseen and untouchable, the Wind tribe bends the battlefield itself. Their gusts redirect fate and scatter strategy.',
     element: 'air',
     cardImage: '/Cards Png/Wind.png',
-    particleColor: '#e0e0e0',
+    sealIcon: '🌀',
+    sealColor: '#d4d4d4',
   },
   {
     name: 'Mountain',
-    icon: '\uD83C\uDFD4\uFE0F',
+    icon: '🏔️',
     title: 'Keeper of Stone',
     color: '#1a1a1a',
-    glowColor: 'rgba(60, 60, 60, 0.6)',
-    bgGradient: 'linear-gradient(145deg, rgba(20, 20, 20, 0.9) 0%, rgba(50, 50, 50, 0.15) 40%, rgba(0,0,0,0.95) 100%)',
-    borderColor: 'rgba(80, 80, 80, 0.4)',
+    glowColor: 'rgba(80, 80, 80, 0.6)',
+    bgGradient: 'linear-gradient(145deg, rgba(20, 20, 20, 0.95) 0%, rgba(60, 60, 60, 0.2) 40%, rgba(0,0,0,0.95) 100%)',
+    borderColor: 'rgba(100, 100, 100, 0.4)',
     description: 'Immovable and ancient, the Mountain tribe endures all. They are the shield against chaos, the wall that never breaks.',
     element: 'earth',
     cardImage: '/Cards Png/Mountain.png',
-    particleColor: '#555555',
+    sealIcon: '⛰️',
+    sealColor: '#525252',
   },
 ]
 
 export function TribesSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const backCardRef = useRef<HTMLDivElement>(null)
-  const revealContainerRef = useRef<HTMLDivElement>(null)
-  const cardRevealRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [phase, setPhase] = useState<'back' | 'revealing' | 'slider'>('back')
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [expandedCard, setExpandedCard] = useState<number | null>(null)
-  const [touchStart, setTouchStart] = useState<number | null>(null)
-  const [touchEnd, setTouchEnd] = useState<number | null>(null)
-  const revealContextRef = useRef<gsap.Context | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const sealRefs = useRef<(HTMLDivElement | null)[]>([])
+  const cardFaceRefs = useRef<(HTMLDivElement | null)[]>([])
+  const particleRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [revealedCards, setRevealedCards] = useState<boolean[]>([false, false, false, false])
+  const [allRevealed, setAllRevealed] = useState(false)
+  const revealingRef = useRef<boolean[]>([false, false, false, false])
 
-  // Scroll trigger for section entrance
+  // Scroll entrance animations
   useEffect(() => {
     if (!sectionRef.current) return
     const ctx = gsap.context(() => {
@@ -99,135 +102,162 @@ export function TribesSection() {
           }
         )
       }
-      if (backCardRef.current && phase === 'back') {
-        gsap.fromTo(backCardRef.current,
-          { opacity: 0, scale: 0.2, rotationY: -45, y: 120 },
+
+      // Stagger the sealed cards into view
+      if (gridRef.current) {
+        const cards = gridRef.current.querySelectorAll('.tribe-card-wrapper')
+        gsap.fromTo(cards,
+          { opacity: 0, y: 50, scale: 0.85 },
           {
-            opacity: 1, scale: 1, rotationY: 0, y: 0,
-            duration: 1.4, ease: 'elastic.out(1, 0.5)',
-            scrollTrigger: { trigger: backCardRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.8, stagger: 0.15, ease: 'back.out(1.3)',
+            scrollTrigger: { trigger: gridRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
           }
         )
       }
     }, sectionRef)
     return () => { ctx.revert() }
-  }, [phase])
+  }, [])
 
-  const handleReveal = useCallback(() => {
-    if (phase !== 'back') return
-    setPhase('revealing')
+  // Floating seal animation
+  useEffect(() => {
+    sealRefs.current.forEach((seal, i) => {
+      if (!seal || revealedCards[i]) return
+      gsap.to(seal, {
+        y: -4, rotation: 2,
+        duration: 2 + i * 0.3,
+        repeat: -1, yoyo: true,
+        ease: 'sine.inOut',
+      })
+    })
+  }, [revealedCards])
 
-    if (revealContextRef.current) revealContextRef.current.revert()
-    if (!backCardRef.current || !revealContainerRef.current) return
+  // Water-droplet wipe reveal animation for individual card
+  const revealCard = useCallback((index: number) => {
+    if (revealedCards[index] || revealingRef.current[index]) return
+    revealingRef.current[index] = true
 
-    const ctx = gsap.context(() => {
-      const tl = createTimeline()
-      const cardEls = cardRevealRefs.current.filter(Boolean) as HTMLDivElement[]
-      if (cardEls.length === 0) return
+    const seal = sealRefs.current[index]
+    const cardFace = cardFaceRefs.current[index]
+    const particleContainer = particleRefs.current[index]
+    const tribe = tribes[index]
 
-      // Step 1: Flip & hide back card
-      if (backCardRef.current) {
-        tl.to(backCardRef.current, {
-          rotationY: 90, opacity: 0, scale: 0.7,
-          duration: 0.5, ease: 'power3.in',
-          onComplete: () => {
-            if (backCardRef.current) {
-              gsap.set(backCardRef.current, { visibility: 'hidden', pointerEvents: 'none' })
-            }
-          },
-        }, 0)
-      }
+    if (!seal || !cardFace || !particleContainer) return
 
-      // Step 2: Set cards to center, hidden
-      cardEls.forEach((card) => {
-        gsap.set(card, {
-          opacity: 0, scale: 0.5, rotationY: -120,
-          visibility: 'hidden', y: 0,
+    const tl = createTimeline({
+      onComplete: () => {
+        setRevealedCards(prev => {
+          const next = [...prev]
+          next[index] = true
+          // Check if all revealed
+          if (next.every(Boolean)) setAllRevealed(true)
+          return next
         })
-      })
+        revealingRef.current[index] = false
+      }
+    })
 
-      // Step 3: Reveal each tribe card one by one with dramatic flip + color explosion
-      tribes.forEach((tribe, i) => {
-        const card = cardEls[i]
-        if (!card) return
-        const startAt = 0.5 + i * 0.3
+    // Step 1: Seal crack & vibrate
+    tl.to(seal, {
+      scale: 1.1, duration: 0.15, ease: 'power2.out',
+    })
+    tl.to(seal, {
+      x: 3, duration: 0.04, repeat: 6, yoyo: true, ease: 'none',
+    })
 
-        tl.to(card, {
-          visibility: 'visible', opacity: 1, scale: 1, rotationY: 0,
-          duration: 0.7, ease: 'back.out(1.6)',
-        }, startAt)
+    // Step 2: Spawn water-droplet burst particles
+    tl.call(() => {
+      const count = 18
+      for (let i = 0; i < count; i++) {
+        const drop = document.createElement('div')
+        const size = Math.random() * 8 + 3
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5
+        const dist = Math.random() * 80 + 40
+        drop.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size * 1.3}px;
+          background: radial-gradient(ellipse at 35% 25%,
+            ${tribe.color}cc,
+            ${tribe.color}60,
+            transparent 80%);
+          border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          z-index: 50;
+          box-shadow: 0 0 ${size * 2}px ${tribe.glowColor};
+        `
+        particleContainer.appendChild(drop)
 
-        // Color burst glow
-        tl.fromTo(card,
-          { boxShadow: `0 0 0px ${tribe.glowColor}` },
-          {
-            boxShadow: `0 0 80px ${tribe.glowColor}, 0 0 150px ${tribe.glowColor}`,
-            duration: 0.35, ease: 'power2.out',
-          }, startAt + 0.2
-        )
-        tl.to(card, {
-          boxShadow: `0 0 25px ${tribe.glowColor.replace('0.6', '0.15')}`,
-          duration: 0.5, ease: 'power2.out',
-        }, startAt + 0.55)
-      })
+        gsap.to(drop, {
+          x: Math.cos(angle) * dist,
+          y: Math.sin(angle) * dist,
+          opacity: 0,
+          scale: 0.3,
+          duration: 0.7 + Math.random() * 0.4,
+          ease: 'power2.out',
+          onComplete: () => drop.remove(),
+        })
+      }
+    }, [], '-=0.15')
 
-      // Step 4: After all cards revealed, transition to slider
-      const revealEnd = 0.5 + tribes.length * 0.3 + 0.7
-      tl.call(() => {
-        setPhase('slider')
-        setCurrentIndex(0)
-        setExpandedCard(null)
-      }, [], revealEnd + 0.4)
+    // Step 3: Seal shatter & dissolve
+    tl.to(seal, {
+      scale: 1.8, opacity: 0, filter: 'blur(10px)',
+      duration: 0.45, ease: 'power3.out',
+    }, '-=0.5')
 
-    }, revealContainerRef)
-    revealContextRef.current = ctx
-  }, [phase])
+    // Step 4: Card face reveal - water-droplet wipe effect
+    tl.fromTo(cardFace,
+      {
+        clipPath: 'circle(0% at 50% 50%)',
+        opacity: 0,
+        scale: 0.95,
+      },
+      {
+        clipPath: 'circle(75% at 50% 50%)',
+        opacity: 1,
+        scale: 1,
+        duration: 0.7,
+        ease: 'power3.out',
+      },
+      '-=0.3'
+    )
 
-  // Touch handlers for mobile swipe on slider
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (phase !== 'slider') return
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
-  }
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (phase !== 'slider') return
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-  const handleTouchEnd = () => {
-    if (phase !== 'slider' || !touchStart || !touchEnd) return
-    const dist = touchStart - touchEnd
-    if (Math.abs(dist) > 50) {
-      if (dist > 0) setCurrentIndex(p => Math.min(p + 1, tribes.length - 1))
-      else setCurrentIndex(p => Math.max(p - 1, 0))
-    }
-    setExpandedCard(null)
-  }
+    // Step 5: Color burst glow on the card
+    tl.fromTo(cardFace,
+      { boxShadow: `0 0 0px ${tribe.glowColor}` },
+      {
+        boxShadow: `0 0 60px ${tribe.glowColor}, 0 0 120px ${tribe.glowColor}`,
+        duration: 0.3, ease: 'power2.out',
+      },
+      '-=0.4'
+    )
+    tl.to(cardFace, {
+      boxShadow: `0 0 20px ${tribe.glowColor.replace('0.6', '0.15')}`,
+      duration: 0.6, ease: 'power2.inOut',
+    })
 
-  const handleCardTap = (index: number) => {
-    if (phase !== 'slider') return
-    if (currentIndex !== index) {
-      setCurrentIndex(index)
-      setExpandedCard(null)
-    } else {
-      setExpandedCard(expandedCard === index ? null : index)
-    }
-  }
+  }, [revealedCards])
 
-  // Get text colors that work for Mountain's black theme
-  const getTextColor = (tribe: TribeData, variant: 'name' | 'title' | 'glow') => {
+  // Reveal all tribes at once
+  const revealAll = useCallback(() => {
+    tribes.forEach((_, i) => {
+      setTimeout(() => revealCard(i), i * 250)
+    })
+  }, [revealCard])
+
+  // Text color helpers for dark tribes
+  const getTextColor = (tribe: TribeData, variant: 'name' | 'title' | 'desc') => {
     if (tribe.name === 'Mountain') {
-      if (variant === 'name') return '#c8c8c8'
-      if (variant === 'title') return 'rgba(180, 180, 180, 0.7)'
-      return 'rgba(150, 150, 150, 0.5)'
+      return variant === 'name' ? '#c8c8c8' : variant === 'title' ? 'rgba(180,180,180,0.7)' : 'rgba(200,200,200,0.55)'
     }
     if (tribe.name === 'Wind') {
-      if (variant === 'name') return '#e8e8e8'
-      if (variant === 'title') return 'rgba(220, 220, 220, 0.7)'
-      return 'rgba(240, 240, 240, 0.3)'
+      return variant === 'name' ? '#e8e8e8' : variant === 'title' ? 'rgba(220,220,220,0.7)' : 'rgba(230,230,230,0.55)'
     }
-    if (variant === 'name') return tribe.color
-    if (variant === 'title') return `${tribe.color}bb`
-    return tribe.glowColor
+    return variant === 'name' ? tribe.color : variant === 'title' ? `${tribe.color}bb` : 'rgba(255,255,255,0.6)'
   }
 
   return (
@@ -240,16 +270,27 @@ export function TribesSection() {
         background: 'linear-gradient(180deg, #000 0%, #050a14 30%, #0a1222 50%, #050a14 70%, #000 100%)',
       }}
     >
-      {/* Tribe-colored ambient glows */}
+      {/* Ocean mist ambient layers */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 -left-20 w-60 h-60 sm:w-80 sm:h-80 rounded-full opacity-[0.06]"
+        {/* Fog layers */}
+        <div className="absolute top-0 left-0 right-0 h-32 opacity-[0.04]"
+          style={{ background: 'linear-gradient(to bottom, rgba(148, 216, 240, 0.2), transparent)' }} />
+        <div className="absolute bottom-0 left-0 right-0 h-32 opacity-[0.03]"
+          style={{ background: 'linear-gradient(to top, rgba(148, 216, 240, 0.15), transparent)' }} />
+        {/* Tribe-colored ambient glows */}
+        <div className="absolute top-1/4 -left-20 w-52 h-52 sm:w-72 sm:h-72 rounded-full opacity-[0.05]"
           style={{ background: 'radial-gradient(circle, #ef4444, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="absolute top-1/3 -right-20 w-60 h-60 sm:w-80 sm:h-80 rounded-full opacity-[0.06]"
+        <div className="absolute top-1/4 -right-20 w-52 h-52 sm:w-72 sm:h-72 rounded-full opacity-[0.05]"
           style={{ background: 'radial-gradient(circle, #3b82f6, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="absolute bottom-1/4 left-1/4 w-60 h-60 sm:w-80 sm:h-80 rounded-full opacity-[0.04]"
+        <div className="absolute bottom-1/4 -left-20 w-52 h-52 sm:w-72 sm:h-72 rounded-full opacity-[0.03]"
           style={{ background: 'radial-gradient(circle, #e0e0e0, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="absolute bottom-1/3 right-1/4 w-60 h-60 sm:w-80 sm:h-80 rounded-full opacity-[0.05]"
+        <div className="absolute bottom-1/4 -right-20 w-52 h-52 sm:w-72 sm:h-72 rounded-full opacity-[0.04]"
           style={{ background: 'radial-gradient(circle, #555, transparent 70%)', filter: 'blur(60px)' }} />
+        {/* Wet-sand texture overlay */}
+        <div className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394d8f0' fill-opacity='0.4'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3Ccircle cx='31' cy='31' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -269,266 +310,245 @@ export function TribesSection() {
           </h2>
           <p className="text-xs sm:text-sm text-white/35 max-w-xs sm:max-w-md mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-            {phase === 'back' ? 'Tap the card to unleash the elemental tribes' : 'Swipe to explore each tribe'}
+            Each seal hides a tribe. Tap to break the seal and reveal your warriors.
           </p>
           <div className="flex justify-center mt-4">
             <div className="w-16 sm:w-20 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent)' }} />
           </div>
         </div>
 
-        {/* Phase 1: Back Card (click to reveal) */}
-        {phase !== 'slider' && (
-          <div ref={revealContainerRef}
-            className="relative w-full flex flex-col items-center justify-center"
-            style={{ minHeight: '450px', perspective: '2000px' }}>
-
-            {/* Back Card */}
-            <div ref={backCardRef}
-              className="relative cursor-pointer z-50"
-              onClick={handleReveal}
-              style={{
-                width: '200px', height: '292px',
-                transformStyle: 'preserve-3d',
-                animation: phase === 'back' ? 'tribeFloat 2.5s ease-in-out infinite' : 'none',
-              }}>
-              {/* Use actual Back Card image */}
-              <Image
-                src="/Cards Png/Back Card.png"
-                alt="Tap to reveal tribes"
-                width={200}
-                height={292}
-                className="w-full h-full object-contain"
-                style={{
-                  filter: 'drop-shadow(0 10px 30px rgba(6, 182, 212, 0.15))',
-                }}
-                priority
-              />
-            </div>
-
-            {/* Tap hint */}
-            {phase === 'back' && (
-              <div className="mt-6 sm:mt-8 flex flex-col items-center">
-                <div className="w-20 sm:w-24 h-px mb-4" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent)' }} />
-                <div className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg"
+        {/* 2x2 Grid of Sealed Cards */}
+        <div ref={gridRef} className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 max-w-sm sm:max-w-lg md:max-w-2xl mx-auto mb-8 sm:mb-10">
+          {tribes.map((tribe, index) => {
+            const isRevealed = revealedCards[index]
+            return (
+              <div key={tribe.name}
+                className="tribe-card-wrapper relative"
+                style={{ perspective: '1200px', opacity: 0 }}>
+                <div
+                  className="relative w-full rounded-2xl overflow-hidden cursor-pointer group"
+                  onClick={() => revealCard(index)}
                   style={{
-                    background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(0,0,0,0.7) 100%)',
-                    border: '1px solid rgba(6, 182, 212, 0.3)',
-                    animation: 'tribePulse 2.5s ease-in-out infinite',
-                  }}>
-                  <p className="text-xs sm:text-sm uppercase tracking-[0.2em]"
-                    style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.8)', textShadow: '0 0 15px rgba(6, 182, 212, 0.3)' }}>
-                    Tap to Reveal the Tribes
-                  </p>
-                </div>
-                <div className="w-20 sm:w-24 h-px mt-4" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent)' }} />
-              </div>
-            )}
-
-            {/* Hidden tribe cards for reveal animation */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible"
-              style={{ perspective: '1500px' }}>
-              {tribes.map((tribe, index) => (
-                <div key={tribe.name}
-                  ref={(el) => { cardRevealRefs.current[index] = el }}
-                  className="absolute rounded-2xl overflow-hidden"
-                  style={{
-                    width: '200px', height: '292px',
-                    opacity: 0, visibility: 'hidden',
+                    aspectRatio: '3 / 4',
+                    minHeight: '180px',
                     transformStyle: 'preserve-3d',
-                    background: tribe.bgGradient,
-                    border: `2px solid ${tribe.borderColor}`,
-                  }}>
-                  <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                    <div className="text-5xl mb-2" style={{ filter: `drop-shadow(0 0 15px ${tribe.glowColor})` }}>{tribe.icon}</div>
-                    <h3 className="text-xl uppercase font-bold mb-1"
-                      style={{ fontFamily: "'TheWalkyrDemo', serif", color: getTextColor(tribe, 'name'), textShadow: `0 0 20px ${tribe.glowColor}` }}>
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={isRevealed ? `${tribe.name} tribe revealed` : `Tap to reveal ${tribe.name} tribe`}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') revealCard(index) }}
+                >
+                  {/* Particle container for burst effect */}
+                  <div ref={(el) => { particleRefs.current[index] = el }}
+                    className="absolute inset-0 z-50 pointer-events-none overflow-visible" />
+
+                  {/* SEALED STATE: Back card with wax seal */}
+                  <div ref={(el) => { sealRefs.current[index] = el }}
+                    className="absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl transition-all duration-300"
+                    style={{
+                      background: 'linear-gradient(145deg, #0c1a2e 0%, #06101c 50%, #0a0a14 100%)',
+                      border: `1.5px solid rgba(6, 182, 212, 0.12)`,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03)',
+                      opacity: isRevealed ? 0 : 1,
+                      pointerEvents: isRevealed ? 'none' : 'auto',
+                    }}>
+                    {/* Decorative card back pattern */}
+                    <div className="absolute inset-3 sm:inset-4 rounded-xl pointer-events-none"
+                      style={{
+                        border: '1px solid rgba(6, 182, 212, 0.06)',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2306b6d4' fill-opacity='0.03'%3E%3Cpath d='M20 0L0 20h40z'/%3E%3Cpath d='M20 40L0 20h40z'/%3E%3C/g%3E%3C/svg%3E")`,
+                      }} />
+
+                    {/* Wax seal */}
+                    <div className="relative mb-2 sm:mb-3">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center relative"
+                        style={{
+                          background: `radial-gradient(circle at 40% 35%, ${tribe.sealColor}cc, ${tribe.sealColor}88, ${tribe.sealColor}44)`,
+                          boxShadow: `0 4px 20px ${tribe.glowColor.replace('0.6', '0.3')}, inset 0 2px 4px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.3)`,
+                          border: `2px solid ${tribe.color}40`,
+                        }}>
+                        {/* Seal symbol */}
+                        <span className="text-2xl sm:text-3xl"
+                          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+                          {tribe.sealIcon}
+                        </span>
+                        {/* Seal wax drip decorations */}
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+                          style={{ background: `${tribe.sealColor}60` }} />
+                      </div>
+                    </div>
+
+                    {/* Mystery label */}
+                    <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] mb-1"
+                      style={{
+                        fontFamily: "'BlinkerSemiBold', sans-serif",
+                        color: `${tribe.name === 'Mountain' ? 'rgba(150,150,150,0.5)' : tribe.color + '60'}`,
+                      }}>
+                      ✦ Sealed ✦
+                    </p>
+
+                    {/* Tap hint - pulses */}
+                    <p className="text-[8px] sm:text-[9px] uppercase tracking-wider mt-2"
+                      style={{
+                        fontFamily: "'BlinkerRegular', sans-serif",
+                        color: 'rgba(6, 182, 212, 0.35)',
+                        animation: 'tribePulse 2.5s ease-in-out infinite',
+                      }}>
+                      Tap to break seal
+                    </p>
+
+                    {/* Hover/active feedback */}
+                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(circle at 50% 50%, ${tribe.glowColor.replace('0.6', '0.06')}, transparent 60%)`,
+                        border: `1.5px solid ${tribe.borderColor.replace('0.5', '0.15')}`,
+                      }} />
+                  </div>
+
+                  {/* REVEALED STATE: Tribe card face */}
+                  <div ref={(el) => { cardFaceRefs.current[index] = el }}
+                    className="absolute inset-0 z-20 rounded-2xl flex flex-col items-center justify-center p-3 sm:p-5"
+                    style={{
+                      background: tribe.bgGradient,
+                      border: `2px solid ${tribe.borderColor}`,
+                      clipPath: isRevealed ? 'circle(75% at 50% 50%)' : 'circle(0% at 50% 50%)',
+                      opacity: isRevealed ? 1 : 0,
+                    }}>
+                    {/* Ambient glow */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none"
+                      style={{ background: `radial-gradient(ellipse at 50% 30%, ${tribe.glowColor}, transparent 70%)` }} />
+
+                    {/* Tribe card image */}
+                    <div className="relative w-16 h-24 sm:w-24 sm:h-32 md:w-28 md:h-36 mb-2 sm:mb-3"
+                      style={{
+                        filter: `drop-shadow(0 0 12px ${tribe.glowColor})`,
+                      }}>
+                      <Image
+                        src={tribe.cardImage}
+                        alt={`${tribe.name} card`}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 64px, 112px"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    {/* Tribe name */}
+                    <h3 className="text-lg sm:text-2xl md:text-3xl uppercase font-bold mb-0.5 relative z-10"
+                      style={{
+                        fontFamily: "'TheWalkyrDemo', serif",
+                        color: getTextColor(tribe, 'name'),
+                        textShadow: `0 0 20px ${tribe.glowColor}`,
+                      }}>
                       {tribe.name}
                     </h3>
-                    <p className="text-[10px] uppercase tracking-[0.15em] italic"
-                      style={{ fontFamily: "'BlinkerRegular', sans-serif", color: getTextColor(tribe, 'title') }}>
+
+                    {/* Title */}
+                    <p className="text-[8px] sm:text-[10px] uppercase tracking-[0.15em] italic relative z-10"
+                      style={{
+                        fontFamily: "'BlinkerRegular', sans-serif",
+                        color: getTextColor(tribe, 'title'),
+                      }}>
                       {tribe.title}
                     </p>
+
+                    {/* Element indicator */}
+                    <div className="flex gap-1 mt-2">
+                      {[0, 1, 2].map((d) => (
+                        <div key={d} className="w-1 h-1 rounded-full"
+                          style={{
+                            background: tribe.name === 'Mountain' ? '#888' : tribe.color,
+                            boxShadow: `0 0 4px ${tribe.glowColor.replace('0.6', '0.3')}`,
+                          }} />
+                      ))}
+                    </div>
+
+                    {/* Bottom glow */}
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${tribe.name === 'Mountain' ? '#888' : tribe.color}, transparent)`,
+                      }} />
                   </div>
                 </div>
-              ))}
-            </div>
+
+                {/* Tribe name below card when revealed */}
+                <div className="text-center mt-2 transition-all duration-500"
+                  style={{ opacity: isRevealed ? 1 : 0, transform: isRevealed ? 'translateY(0)' : 'translateY(8px)' }}>
+                  <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider"
+                    style={{
+                      fontFamily: "'BlinkerSemiBold', sans-serif",
+                      color: getTextColor(tribe, 'name'),
+                      textShadow: `0 0 10px ${tribe.glowColor.replace('0.6', '0.2')}`,
+                    }}>
+                    {tribe.icon} {tribe.name}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Reveal All CTA */}
+        {!allRevealed && (
+          <div className="flex justify-center">
+            <button
+              onClick={revealAll}
+              className="px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl font-semibold uppercase tracking-wider text-xs sm:text-sm transition-all duration-500 relative overflow-hidden group active:scale-95"
+              style={{
+                fontFamily: "'BlinkerSemiBold', sans-serif",
+                background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(14, 116, 144, 0.25) 100%)',
+                border: '1.5px solid rgba(6, 182, 212, 0.35)',
+                color: '#e0f2fe',
+                boxShadow: '0 0 25px rgba(6, 182, 212, 0.08)',
+                minHeight: '48px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 45px rgba(6, 182, 212, 0.2)'
+                e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.6)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 25px rgba(6, 182, 212, 0.08)'
+                e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.35)'
+              }}
+              aria-label="Reveal all four tribes"
+            >
+              <span className="relative z-10">✦ Reveal All Tribes</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            </button>
           </div>
         )}
 
-        {/* Phase 2: Interactive Tribe Cards Slider */}
-        {phase === 'slider' && (
-          <div className="relative"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}>
-
-            {/* Cards container */}
-            <div className="relative overflow-hidden" style={{ minHeight: '520px' }}>
-              <div className="flex transition-transform duration-500 ease-out"
-                style={{ transform: `translateX(calc(-${currentIndex * 100}%))` }}>
-                {tribes.map((tribe, index) => {
-                  const isExpanded = expandedCard === index
-                  const isCurrent = currentIndex === index
-                  return (
-                    <div key={tribe.name}
-                      className="w-full flex-shrink-0 px-3 sm:px-4">
-                      <div
-                        className="relative mx-auto rounded-2xl overflow-hidden cursor-pointer transition-all duration-500"
-                        onClick={() => handleCardTap(index)}
-                        style={{
-                          maxWidth: '340px',
-                          background: tribe.bgGradient,
-                          border: `2px solid ${isExpanded ? tribe.color : tribe.borderColor}`,
-                          boxShadow: isExpanded
-                            ? `0 0 60px ${tribe.glowColor}, 0 20px 60px rgba(0,0,0,0.5), inset 0 0 50px ${tribe.glowColor.replace('0.6', '0.06')}`
-                            : isCurrent
-                            ? `0 0 30px ${tribe.glowColor.replace('0.6', '0.2')}, 0 10px 40px rgba(0,0,0,0.4)`
-                            : '0 4px 20px rgba(0,0,0,0.4)',
-                          transform: isExpanded ? 'scale(1.02)' : 'scale(1)',
-                        }}>
-
-                        {/* Card top section */}
-                        <div className="relative p-5 sm:p-7 text-center">
-                          {/* Ambient card glow */}
-                          <div className="absolute inset-0 opacity-20 pointer-events-none"
-                            style={{ background: `radial-gradient(ellipse at 50% 30%, ${tribe.glowColor}, transparent 70%)` }} />
-
-                          {/* Card image preview */}
-                          <div className="relative w-28 h-40 sm:w-32 sm:h-44 mx-auto mb-4 transition-all duration-500"
-                            style={{
-                              filter: isExpanded
-                                ? `drop-shadow(0 0 20px ${tribe.glowColor})`
-                                : `drop-shadow(0 0 8px ${tribe.glowColor.replace('0.6', '0.15')})`,
-                              transform: isExpanded ? 'scale(1.1)' : 'scale(1)',
-                            }}>
-                            <Image
-                              src={tribe.cardImage}
-                              alt={`${tribe.name} card`}
-                              fill
-                              className="object-contain"
-                              sizes="130px"
-                            />
-                          </div>
-
-                          {/* Tribe name */}
-                          <h3 className="text-2xl sm:text-3xl uppercase font-bold mb-1 relative z-10 transition-all duration-500"
-                            style={{
-                              fontFamily: "'TheWalkyrDemo', serif",
-                              color: getTextColor(tribe, 'name'),
-                              textShadow: isExpanded ? `0 0 30px ${getTextColor(tribe, 'glow')}` : '0 2px 8px rgba(0,0,0,0.6)',
-                            }}>
-                            {tribe.name}
-                          </h3>
-
-                          {/* Title */}
-                          <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] italic mb-3 relative z-10 transition-all duration-500"
-                            style={{
-                              fontFamily: "'BlinkerRegular', sans-serif",
-                              color: getTextColor(tribe, 'title'),
-                            }}>
-                            {tribe.title}
-                          </p>
-
-                          {/* Element indicator dots */}
-                          <div className="flex justify-center gap-1 mb-3">
-                            {[0,1,2].map((dot) => (
-                              <div key={dot} className="w-1 h-1 rounded-full transition-all duration-500"
-                                style={{
-                                  background: isExpanded
-                                    ? (tribe.name === 'Mountain' ? '#888' : tribe.color)
-                                    : 'rgba(255,255,255,0.15)',
-                                  boxShadow: isExpanded ? `0 0 6px ${tribe.glowColor.replace('0.6', '0.4')}` : 'none',
-                                }} />
-                            ))}
-                          </div>
-
-                          {/* Description - expands on tap */}
-                          <div className="overflow-hidden transition-all duration-500 relative z-10"
-                            style={{ maxHeight: isExpanded ? '200px' : '0px', opacity: isExpanded ? 1 : 0 }}>
-                            <div className="w-12 h-px mx-auto mb-3 transition-all duration-500"
-                              style={{
-                                background: `linear-gradient(90deg, transparent, ${tribe.name === 'Mountain' ? 'rgba(150,150,150,0.5)' : tribe.color}, transparent)`,
-                              }} />
-                            <p className="text-xs sm:text-sm leading-relaxed pb-2"
-                              style={{
-                                fontFamily: "'BlinkerRegular', sans-serif",
-                                color: 'rgba(255,255,255,0.65)',
-                              }}>
-                              {tribe.description}
-                            </p>
-                          </div>
-
-                          {/* Tap hint when not expanded */}
-                          {!isExpanded && isCurrent && (
-                            <p className="text-[9px] uppercase tracking-[0.15em] mt-1"
-                              style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.2)', animation: 'tribePulse 2s ease-in-out infinite' }}>
-                              Tap to learn more
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Bottom glow bar */}
-                        <div className="absolute bottom-0 left-0 right-0 h-[2px] transition-all duration-700"
-                          style={{
-                            background: isExpanded
-                              ? `linear-gradient(90deg, transparent, ${tribe.name === 'Mountain' ? '#888' : tribe.color}, transparent)`
-                              : 'transparent',
-                            boxShadow: isExpanded ? `0 0 20px ${tribe.glowColor}` : 'none',
-                          }} />
-                      </div>
-                    </div>
-                  )
-                })}
+        {/* Description cards after reveal */}
+        {allRevealed && (
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-sm sm:max-w-lg md:max-w-2xl mx-auto">
+            {tribes.map((tribe) => (
+              <div key={tribe.name + '-desc'}
+                className="rounded-xl p-3 sm:p-4 transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(6, 30, 50, 0.4) 0%, rgba(0,0,0,0.7) 100%)',
+                  border: `1px solid ${tribe.borderColor.replace('0.5', '0.15').replace('0.4', '0.12').replace('0.35', '0.12')}`,
+                }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{tribe.icon}</span>
+                  <h4 className="text-sm sm:text-base font-bold uppercase"
+                    style={{ fontFamily: "'TheWalkyrDemo', serif", color: getTextColor(tribe, 'name') }}>
+                    {tribe.name}
+                  </h4>
+                </div>
+                <p className="text-[10px] sm:text-xs leading-relaxed"
+                  style={{ fontFamily: "'BlinkerRegular', sans-serif", color: getTextColor(tribe, 'desc') }}>
+                  {tribe.description}
+                </p>
               </div>
-            </div>
-
-            {/* Navigation dots - tribe-colored */}
-            <div className="flex justify-center gap-3 mt-5">
-              {tribes.map((tribe, index) => (
-                <button key={tribe.name}
-                  onClick={() => { setCurrentIndex(index); setExpandedCard(null) }}
-                  className="transition-all duration-300 rounded-full"
-                  style={{
-                    width: currentIndex === index ? '28px' : '10px',
-                    height: '10px',
-                    background: currentIndex === index
-                      ? (tribe.name === 'Mountain' ? '#888' : (tribe.name === 'Wind' ? '#ccc' : tribe.color))
-                      : 'rgba(255,255,255,0.15)',
-                    boxShadow: currentIndex === index ? `0 0 12px ${tribe.glowColor}` : 'none',
-                  }}
-                  aria-label={`Go to ${tribe.name} tribe`} />
-              ))}
-            </div>
-
-            {/* Desktop arrow buttons */}
-            <button onClick={() => { setCurrentIndex(p => Math.max(p - 1, 0)); setExpandedCard(null) }}
-              className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 w-11 h-11 items-center justify-center rounded-full bg-black/60 border border-white/15 text-white/50 hover:text-white hover:border-white/30 transition-all"
-              disabled={currentIndex === 0} aria-label="Previous tribe">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            <button onClick={() => { setCurrentIndex(p => Math.min(p + 1, tribes.length - 1)); setExpandedCard(null) }}
-              className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 w-11 h-11 items-center justify-center rounded-full bg-black/60 border border-white/15 text-white/50 hover:text-white hover:border-white/30 transition-all"
-              disabled={currentIndex === tribes.length - 1} aria-label="Next tribe">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-            </button>
-
-            {/* Swipe hint mobile */}
-            <p className="text-center mt-3 text-[10px] uppercase tracking-wider md:hidden"
-              style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.3)' }}>
-              \u2190 Swipe to explore \u2192
-            </p>
+            ))}
           </div>
         )}
       </div>
 
       <style jsx>{`
-        @keyframes tribeFloat {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(0.5deg); }
-        }
         @keyframes tribePulse {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.8; }
         }
       `}</style>
     </section>
