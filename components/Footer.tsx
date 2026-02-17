@@ -298,6 +298,27 @@ export function Footer() {
           >
             How to Play
           </Link>
+          <Link
+            href="/beach-battle"
+            className="opacity-0 transition-all duration-300 uppercase tracking-wide"
+            style={{
+              fontFamily: "'BlinkerRegular', sans-serif",
+              color: '#06b6d4',
+              fontSize: '14px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#22d3ee'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.textShadow = '0 0 10px rgba(6, 182, 212, 0.5)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#06b6d4'
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.textShadow = 'none'
+            }}
+          >
+            Beach Battle
+          </Link>
         </div>
 
         {/* Call to Action Button */}
