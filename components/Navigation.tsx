@@ -334,6 +334,28 @@ export function Navigation() {
             >
               How to Play
             </Link>
+            <Link
+              href="/beach-battle"
+              onClick={() => setIsMenuOpen(false)}
+              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
+              style={{
+                fontFamily: "'TheWalkyrDemo', serif",
+                color: '#06b6d4',
+                border: '2px solid transparent',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(6, 182, 212, 0.1)'
+                e.currentTarget.style.borderColor = '#06b6d4'
+                e.currentTarget.style.transform = 'translateX(8px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.borderColor = 'transparent'
+                e.currentTarget.style.transform = 'translateX(0)'
+              }}
+            >
+              Beach Battle
+            </Link>
             <a
               href="#rankings"
               onClick={() => setIsMenuOpen(false)}
