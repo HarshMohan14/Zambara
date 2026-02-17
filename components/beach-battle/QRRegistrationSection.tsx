@@ -295,15 +295,13 @@ export function QRRegistrationSection() {
       id="qr-register"
       aria-label="QR Registration"
       className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #000 0%, #041020 40%, #08192e 60%, #041020 80%, #000 100%)' }}
     >
-      {/* Mystical mist ambient */}
+      {/* Subtle section overlay — transparent, unified bg shows through */}
       <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.45]"
+          style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%)' }} />
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-60 h-60 sm:w-72 sm:h-72 md:w-[500px] md:h-[500px] rounded-full opacity-[0.08]"
           style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.25), transparent 60%)', filter: 'blur(80px)' }} />
-        {/* Fog effects */}
-        <div className="absolute top-0 left-0 right-0 h-24 opacity-[0.03]"
-          style={{ background: 'linear-gradient(to bottom, rgba(148,216,240,0.15), transparent)' }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">

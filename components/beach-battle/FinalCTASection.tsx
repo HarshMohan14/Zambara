@@ -120,14 +120,13 @@ export function FinalCTASection() {
         ref={sectionRef}
         className="relative w-full min-h-[55vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden"
         aria-label="Final Call to Action"
-        style={{ background: 'linear-gradient(180deg, #000 0%, #020810 30%, #061420 50%, #020810 80%, #000 100%)' }}
       >
         <canvas ref={waveCanvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
 
-        {/* Cinematic fog */}
+        {/* Subtle overlay for depth — no opaque bg */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 right-0 h-32 opacity-[0.04]"
-            style={{ background: 'linear-gradient(to bottom, rgba(148,216,240,0.15), transparent)' }} />
+          <div className="absolute inset-0 opacity-[0.4]"
+            style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.5) 100%)' }} />
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] opacity-[0.08]"
             style={{ background: 'radial-gradient(ellipse at bottom, rgba(6, 182, 212, 0.35), transparent 70%)', filter: 'blur(60px)' }} />
         </div>

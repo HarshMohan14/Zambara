@@ -163,9 +163,6 @@ export function BeachBattleFooter() {
     <footer
       ref={footerRef}
       className="relative w-full py-12 sm:py-16 md:py-20 overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #000 0%, #060810 25%, #0a0c14 50%, #080610 75%, #040308 100%)',
-      }}
     >
       {/* Stormy ocean canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
@@ -179,8 +176,8 @@ export function BeachBattleFooter() {
         ))}
       </div>
 
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 pointer-events-none" />
+      {/* Dark overlay for readability against unified bg */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 pointer-events-none" />
 
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

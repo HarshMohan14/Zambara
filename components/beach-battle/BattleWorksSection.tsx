@@ -52,21 +52,18 @@ export function BattleWorksSection() {
   return (
     <section
       ref={sectionRef}
+      id="battle-works"
       className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
       aria-label="How The Battle Works"
-      style={{ background: 'linear-gradient(180deg, #000 0%, #020a14 40%, #071524 60%, #020a14 80%, #000 100%)' }}
     >
-      {/* Ocean-war ambient */}
+      {/* Subtle section overlay — transparent, unified bg shows through */}
       <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.45]"
+          style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%)' }} />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent)' }} />
         <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent)' }} />
         <div className="absolute top-1/2 left-0 w-full h-52 -translate-y-1/2 opacity-[0.04]"
           style={{ background: 'radial-gradient(ellipse at center, rgba(6, 182, 212, 0.3), transparent 70%)', filter: 'blur(50px)' }} />
-        {/* Wet-sand texture */}
-        <div className="absolute inset-0 opacity-[0.01]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394d8f0' fill-opacity='0.3'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3Ccircle cx='31' cy='31' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">

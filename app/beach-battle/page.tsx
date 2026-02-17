@@ -89,31 +89,59 @@ export default function BeachBattlePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
       />
 
-      <main
-        className="min-h-screen overflow-x-hidden"
-        style={{ background: '#000' }}
+      {/*
+        Unified ocean-war background approach:
+        - Background image applied on a wrapper <div> (Layout already renders <main>)
+        - No background-attachment:fixed (broken on iOS/mobile)
+        - backgroundSize: cover ensures the image fills the viewport width
+        - Overlay div below content for darkening + teal glow
+        - All sections use transparent overlays so the image shows through
+      */}
+      <div
+        className="min-h-screen overflow-x-hidden relative"
+        style={{
+          backgroundColor: '#000',
+          backgroundImage: 'url(/ocean-war-bg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+        }}
       >
-        {/* Section 1: Cinematic Hero with 3D water-droplet video — DO NOT MODIFY */}
-        <BeachHero />
+        {/* Dark overlay for text readability */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,5,15,0.5) 20%, rgba(0,8,20,0.45) 50%, rgba(0,5,15,0.5) 80%, rgba(0,0,0,0.6) 100%)',
+            }}
+          />
+          {/* Bioluminescent teal ambient glow */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse at 50% 40%, rgba(6, 182, 212, 0.06) 0%, transparent 55%)',
+            }}
+          />
+        </div>
 
-        {/* Section 2: The Four Tribes — 2×2 sealed card grid, tap-to-reveal GSAP animation */}
-        <TribesSection />
+        {/* Section 1: Cinematic Hero with 3D water-droplet video */}
+        <div className="relative z-[1]">
+          <BeachHero />
+        </div>
 
-        {/* Section 3: How The Battle Works — mobile-first ocean-war grid */}
-        <BattleWorksSection />
-
-        {/* Section 4: QR Registration + tribal badge download & Instagram preview */}
-        <QRRegistrationSection />
-
-        {/* Section 5: Tournament Bracket — 16 → 4 → 1 timeline + Hall of Fame carousel */}
-        <BracketSection />
-
-        {/* Section 6: Final CTA — tribal wave animation + sticky Register mini-CTA */}
-        <FinalCTASection />
-
-        {/* Beach Battle Footer — stormy ocean-war, tribal silhouettes, mist, rune links */}
-        <BeachBattleFooter />
-      </main>
+        {/* All post-hero sections sit above the overlay */}
+        <div className="relative z-[1]">
+          <TribesSection />
+          <BattleWorksSection />
+          <QRRegistrationSection />
+          <BracketSection />
+          <FinalCTASection />
+          <BeachBattleFooter />
+        </div>
+      </div>
     </>
   )
 }
