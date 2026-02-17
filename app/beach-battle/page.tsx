@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { generateSEOMetadata, generateBreadcrumbSchema } from '@/lib/seo'
+import { generateBreadcrumbSchema } from '@/lib/seo'
 import { BeachHero } from '@/components/beach-battle/BeachHero'
 import { TribesSection } from '@/components/beach-battle/TribesSection'
 import { BattleWorksSection } from '@/components/beach-battle/BattleWorksSection'
@@ -93,25 +93,25 @@ export default function BeachBattlePage() {
         className="min-h-screen overflow-x-hidden"
         style={{ background: '#000' }}
       >
-        {/* Section 1: Cinematic Hero with 3D water droplet video */}
+        {/* Section 1: Cinematic Hero with 3D water-droplet video — DO NOT MODIFY */}
         <BeachHero />
 
-        {/* Section 2: The Four Tribes - click-to-reveal mechanic */}
+        {/* Section 2: The Four Tribes — 2×2 sealed card grid, tap-to-reveal GSAP animation */}
         <TribesSection />
 
-        {/* Section 3: How The Battle Works - mobile-first grid */}
+        {/* Section 3: How The Battle Works — mobile-first ocean-war grid */}
         <BattleWorksSection />
 
-        {/* Section 4: QR Registration + tribal badge download */}
+        {/* Section 4: QR Registration + tribal badge download & Instagram preview */}
         <QRRegistrationSection />
 
-        {/* Section 5: Tournament Bracket - 16 -> 4 -> 1 + Hall of Fame */}
+        {/* Section 5: Tournament Bracket — 16 → 4 → 1 timeline + Hall of Fame carousel */}
         <BracketSection />
 
-        {/* Section 6: Final CTA with tribal wave animation */}
+        {/* Section 6: Final CTA — tribal wave animation + sticky Register mini-CTA */}
         <FinalCTASection />
 
-        {/* Beach Battle Footer - intense tribal clash atmosphere */}
+        {/* Beach Battle Footer — stormy ocean-war, tribal silhouettes, mist, rune links */}
         <BeachBattleFooter />
       </main>
     </>

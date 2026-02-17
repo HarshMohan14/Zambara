@@ -12,14 +12,14 @@ interface BattleStep {
 }
 
 const steps: BattleStep[] = [
-  { icon: '\uD83C\uDF0A', label: 'Warriors Enter', value: '16', detail: 'Players seated across 4 elemental tables', color: '#0891b2' },
-  { icon: '\u2694\uFE0F', label: 'Per Table', value: '4 vs 4', detail: 'Head-to-head tribal showdowns', color: '#06b6d4' },
-  { icon: '\u23F1\uFE0F', label: 'Round Time', value: '3 min', detail: 'Fast-paced, high-stakes decisions', color: '#22d3ee' },
-  { icon: '\uD83D\uDC8E', label: 'Bracelets to Win', value: '4', detail: 'Collect 4 bracelets to advance', color: '#0e7490' },
-  { icon: '\uD83D\uDD25', label: 'Survivors Rise', value: '4', detail: 'One warrior per table qualifies', color: '#ef4444' },
-  { icon: '\uD83D\uDC51', label: 'Zampion Clash', value: 'Top 4', detail: 'The ultimate final showdown', color: '#fbbf24' },
-  { icon: '\uD83C\uDFC6', label: 'Champion Rises', value: '1', detail: 'The Zampion of the Tides is crowned', color: '#fbbf24' },
-  { icon: '\uD83C\uDF1F', label: 'Grand Prize', value: '\u20B91000+', detail: 'Robe + Ocean Bracelet + Cash', color: '#d1a058' },
+  { icon: '🌊', label: 'Warriors Enter', value: '16', detail: 'Players seated across 4 elemental tables', color: '#0891b2' },
+  { icon: '⚔️', label: 'Per Table', value: '4 vs 4', detail: 'Head-to-head tribal showdowns', color: '#06b6d4' },
+  { icon: '⏱️', label: 'Round Time', value: '3 min', detail: 'Fast-paced, high-stakes decisions', color: '#22d3ee' },
+  { icon: '💎', label: 'Bracelets', value: '4', detail: 'Collect 4 bracelets to advance', color: '#0e7490' },
+  { icon: '🔥', label: 'Survivors', value: '4', detail: 'One warrior per table qualifies', color: '#ef4444' },
+  { icon: '👑', label: 'Zampion Clash', value: 'Top 4', detail: 'The ultimate final showdown', color: '#fbbf24' },
+  { icon: '🏆', label: 'Champion', value: '1', detail: 'The Zampion of the Tides is crowned', color: '#fbbf24' },
+  { icon: '🌟', label: 'Grand Prize', value: '₹1000+', detail: 'Robe + Ocean Bracelet + Cash', color: '#d1a058' },
 ]
 
 export function BattleWorksSection() {
@@ -34,13 +34,15 @@ export function BattleWorksSection() {
       if (titleRef.current) {
         gsap.fromTo(titleRef.current,
           { opacity: 0, y: 40, filter: 'blur(6px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power3.out', scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none reverse' } }
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power3.out',
+            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none reverse' } }
         )
       }
       if (gridRef.current) {
         gsap.fromTo(Array.from(gridRef.current.children),
           { opacity: 0, y: 40, scale: 0.92 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.07, ease: 'power3.out', scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none reverse' } }
+          { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.07, ease: 'power3.out',
+            scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none reverse' } }
         )
       }
     }, sectionRef)
@@ -54,12 +56,17 @@ export function BattleWorksSection() {
       aria-label="How The Battle Works"
       style={{ background: 'linear-gradient(180deg, #000 0%, #020a14 40%, #071524 60%, #020a14 80%, #000 100%)' }}
     >
-      {/* Ambient */}
+      {/* Ocean-war ambient */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent)' }} />
         <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent)' }} />
         <div className="absolute top-1/2 left-0 w-full h-52 -translate-y-1/2 opacity-[0.04]"
           style={{ background: 'radial-gradient(ellipse at center, rgba(6, 182, 212, 0.3), transparent 70%)', filter: 'blur(50px)' }} />
+        {/* Wet-sand texture */}
+        <div className="absolute inset-0 opacity-[0.01]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394d8f0' fill-opacity='0.3'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3Ccircle cx='31' cy='31' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -76,7 +83,7 @@ export function BattleWorksSection() {
           </h2>
           <p className="text-xs sm:text-sm text-white/30 max-w-xs sm:max-w-md mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-            From 16 warriors to 1 Zampion \u2014 the path demands everything
+            From 16 warriors to 1 Zampion — the path demands everything
           </p>
           <div className="flex justify-center mt-4">
             <div className="w-16 sm:w-20 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent)' }} />
@@ -101,6 +108,12 @@ export function BattleWorksSection() {
                     boxShadow: isActive ? `0 0 30px ${step.color}10, 0 8px 20px rgba(0,0,0,0.25)` : '0 4px 15px rgba(0,0,0,0.2)',
                     transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
                   }}>
+                  {/* Glassmorphism overlay on active */}
+                  {isActive && (
+                    <div className="absolute inset-0 rounded-xl pointer-events-none"
+                      style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(1px)' }} />
+                  )}
+
                   {/* Step number */}
                   <div className="absolute top-2 right-2 text-[8px] sm:text-[9px] font-bold"
                     style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: isActive ? `${step.color}40` : 'rgba(6, 182, 212, 0.2)' }}>
