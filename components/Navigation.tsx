@@ -1,14 +1,77 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { gsap, createTimeline, ScrollTrigger } from '@/lib/gsap'
 import Link from 'next/link'
+
+// Navigation links configuration
+// `homeHref` is used on the homepage (hash anchors)
+// `globalHref` is used on other pages (full paths)
+interface NavLink {
+  label: string
+  homeHref: string
+  globalHref: string
+  isPage?: boolean // true = uses Next.js Link for client-side navigation
+  highlight?: 'gold' | 'teal'
+}
+
+const NAV_LINKS: NavLink[] = [
+  { label: 'Home', homeHref: '#hero', globalHref: '/', isPage: true },
+  { label: 'Game Cards', homeHref: '#cards', globalHref: '/#cards' },
+  { label: 'Battle Pack', homeHref: '#battle-pack', globalHref: '/#battle-pack' },
+  { label: 'Pre-Book', homeHref: '#cave', globalHref: '/#cave' },
+  { label: 'How to Play', homeHref: '/how-to-play', globalHref: '/how-to-play', isPage: true },
+  { label: 'Beach Battle', homeHref: '/beach-battle', globalHref: '/beach-battle', isPage: true, highlight: 'teal' },
+  { label: 'Rankings', homeHref: '#rankings', globalHref: '/#rankings' },
+  { label: 'Contact', homeHref: '#contact', globalHref: '/#contact' },
+]
+
+// Beach Battle page-specific links (shown when on /beach-battle)
+const BEACH_BATTLE_LINKS: NavLink[] = [
+  { label: 'Home', homeHref: '/', globalHref: '/', isPage: true },
+  { label: 'The Tribes', homeHref: '#tribes', globalHref: '#tribes' },
+  { label: 'How It Works', homeHref: '#battle-works', globalHref: '#battle-works' },
+  { label: 'Register', homeHref: '#qr-register', globalHref: '#qr-register', highlight: 'teal' },
+  { label: 'Tournament', homeHref: '#bracket', globalHref: '#bracket' },
+  { label: 'How to Play', homeHref: '/how-to-play', globalHref: '/how-to-play', isPage: true },
+  { label: 'Game Cards', homeHref: '/#cards', globalHref: '/#cards' },
+]
 
 export function Navigation() {
   const navRef = useRef<HTMLElement>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const sideNavRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
+
+  const isBeachBattle = pathname === '/beach-battle'
+  const isHomePage = pathname === '/'
+
+  // Choose the right link set based on current page
+  const links = isBeachBattle ? BEACH_BATTLE_LINKS : NAV_LINKS
+
+  // Resolve the correct href based on current page
+  const getHref = (link: NavLink) => {
+    if (isHomePage) return link.homeHref
+    return link.globalHref
+  }
+
+  // Determine highlight color
+  const getLinkColor = (link: NavLink) => {
+    if (link.highlight === 'teal') return '#06b6d4'
+    return '#d1a058'
+  }
+
+  const getLinkHoverBg = (link: NavLink) => {
+    if (link.highlight === 'teal') return 'rgba(6, 182, 212, 0.1)'
+    return 'rgba(209, 160, 88, 0.1)'
+  }
+
+  const getLinkHoverBorder = (link: NavLink) => {
+    if (link.highlight === 'teal') return '#06b6d4'
+    return '#d1a058'
+  }
 
   useEffect(() => {
     if (!navRef.current) return
@@ -23,11 +86,11 @@ export function Navigation() {
       })
 
       // Create scroll trigger to fade in navigation when leaving hero section
-      const heroSection = document.getElementById('hero')
+      const heroSection = document.getElementById('hero') || document.getElementById('beach-hero')
       if (heroSection) {
         ScrollTrigger.create({
           trigger: heroSection,
-          start: 'bottom top', // When bottom of hero reaches top of viewport
+          start: 'bottom top',
           end: 'bottom top',
           onEnter: () => {
             if (navRef.current) {
@@ -130,6 +193,49 @@ export function Navigation() {
     }
   }, [isMenuOpen])
 
+  const renderLink = (link: NavLink) => {
+    const href = getHref(link)
+    const color = getLinkColor(link)
+    const hoverBg = getLinkHoverBg(link)
+    const hoverBorder = getLinkHoverBorder(link)
+
+    const sharedProps = {
+      onClick: () => setIsMenuOpen(false),
+      className: 'block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide',
+      style: {
+        fontFamily: "'TheWalkyrDemo', serif",
+        color,
+        border: '2px solid transparent',
+      } as React.CSSProperties,
+      onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+        e.currentTarget.style.backgroundColor = hoverBg
+        e.currentTarget.style.borderColor = hoverBorder
+        e.currentTarget.style.transform = 'translateX(8px)'
+      },
+      onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+        e.currentTarget.style.backgroundColor = 'transparent'
+        e.currentTarget.style.borderColor = 'transparent'
+        e.currentTarget.style.transform = 'translateX(0)'
+      },
+    }
+
+    // For page-level routes or cross-page hash links, use Link for proper client navigation
+    if (link.isPage || (href.startsWith('/') && !href.startsWith('#'))) {
+      return (
+        <Link key={link.label} href={href} {...sharedProps}>
+          {link.label}
+        </Link>
+      )
+    }
+
+    // For same-page hash anchors
+    return (
+      <a key={link.label} href={href} {...sharedProps}>
+        {link.label}
+      </a>
+    )
+  }
+
   return (
     <>
       <nav
@@ -142,8 +248,8 @@ export function Navigation() {
         }}
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
+          {/* Logo — links to home */}
+          <Link href="/" className="flex items-center">
             <Image
               src="/Zambaara.png"
               alt="ZAMBAARA"
@@ -152,7 +258,7 @@ export function Navigation() {
               className="h-8 md:h-12 w-auto object-contain"
               priority
             />
-          </div>
+          </Link>
 
           {/* Right side - Menu */}
           <div className="flex items-center gap-4">
@@ -204,7 +310,7 @@ export function Navigation() {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
           onClick={() => setIsMenuOpen(false)}
-          style={{ top: '73px' }} // Below navigation bar
+          style={{ top: '73px' }}
         />
       )}
 
@@ -213,7 +319,7 @@ export function Navigation() {
         ref={sideNavRef}
         className="fixed top-0 right-0 h-full w-80 bg-black border-l-2 border-[#d1a058] z-50 overflow-y-auto"
         style={{
-          top: '73px', // Below navigation bar
+          top: '73px',
           boxShadow: '-4px 0 20px rgba(209, 160, 88, 0.2)',
           transform: 'translateX(100%)',
           opacity: 0,
@@ -222,184 +328,19 @@ export function Navigation() {
         }}
       >
         <div className="p-8">
-          {/* Navigation Links */}
-          <nav className="mt-12 space-y-6">
-            <a
-              href="#hero"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Home
-            </a>
-            <a
-              href="#cards"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Game Cards
-            </a>
-            <a
-              href="#battle-pack"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Battle Pack
-            </a>
-            <a
-              href="#cave"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Pre-Book
-            </a>
-            <Link
-              href="/how-to-play"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              How to Play
-            </Link>
-            <Link
-              href="/beach-battle"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#06b6d4',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(6, 182, 212, 0.1)'
-                e.currentTarget.style.borderColor = '#06b6d4'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Beach Battle
-            </Link>
-            <a
-              href="#rankings"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Rankings
-            </a>
-            <a
-              href="#contact"
-              onClick={() => setIsMenuOpen(false)}
-              className="block py-3 px-4 rounded-lg transition-all duration-300 uppercase tracking-wide"
-              style={{
-                fontFamily: "'TheWalkyrDemo', serif",
-                color: '#d1a058',
-                border: '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-                e.currentTarget.style.borderColor = '#d1a058'
-                e.currentTarget.style.transform = 'translateX(8px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              Contact
-            </a>
+          {/* Page indicator */}
+          {isBeachBattle && (
+            <div className="mb-4 px-4">
+              <span className="text-[10px] uppercase tracking-[0.3em]"
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.5)' }}>
+                Beach Battle
+              </span>
+            </div>
+          )}
+
+          {/* Navigation Links — context-aware */}
+          <nav className="mt-8 space-y-6">
+            {links.map(renderLink)}
           </nav>
         </div>
       </div>

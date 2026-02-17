@@ -133,19 +133,16 @@ export function BracketSection() {
   return (
     <section
       ref={sectionRef}
+      id="bracket"
       className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
       aria-label="Tournament Structure"
-      style={{ background: 'linear-gradient(180deg, #000 0%, #030c1a 30%, #091b30 50%, #030c1a 70%, #000 100%)' }}
     >
-      {/* Ocean-war ambient */}
+      {/* Subtle section overlay — transparent, unified bg shows through */}
       <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.45]"
+          style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%)' }} />
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-72 h-72 md:w-[500px] md:h-[500px] rounded-full opacity-[0.05]"
           style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.2), transparent 60%)', filter: 'blur(80px)' }} />
-        {/* Mist layers */}
-        <div className="absolute top-0 left-0 right-0 h-20 opacity-[0.03]"
-          style={{ background: 'linear-gradient(to bottom, rgba(148,216,240,0.15), transparent)' }} />
-        <div className="absolute bottom-0 left-0 right-0 h-20 opacity-[0.03]"
-          style={{ background: 'linear-gradient(to top, rgba(148,216,240,0.1), transparent)' }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">

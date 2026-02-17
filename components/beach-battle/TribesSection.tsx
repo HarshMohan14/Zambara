@@ -266,17 +266,11 @@ export function TribesSection() {
       id="tribes"
       aria-label="The Four Tribes"
       className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #000 0%, #050a14 30%, #0a1222 50%, #050a14 70%, #000 100%)',
-      }}
     >
-      {/* Ocean mist ambient layers */}
+      {/* Subtle section overlay for depth separation — no opaque background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Fog layers */}
-        <div className="absolute top-0 left-0 right-0 h-32 opacity-[0.04]"
-          style={{ background: 'linear-gradient(to bottom, rgba(148, 216, 240, 0.2), transparent)' }} />
-        <div className="absolute bottom-0 left-0 right-0 h-32 opacity-[0.03]"
-          style={{ background: 'linear-gradient(to top, rgba(148, 216, 240, 0.15), transparent)' }} />
+        <div className="absolute inset-0 opacity-[0.45]"
+          style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.6) 100%)' }} />
         {/* Tribe-colored ambient glows */}
         <div className="absolute top-1/4 -left-20 w-52 h-52 sm:w-72 sm:h-72 rounded-full opacity-[0.05]"
           style={{ background: 'radial-gradient(circle, #ef4444, transparent 70%)', filter: 'blur(60px)' }} />
@@ -286,11 +280,6 @@ export function TribesSection() {
           style={{ background: 'radial-gradient(circle, #e0e0e0, transparent 70%)', filter: 'blur(60px)' }} />
         <div className="absolute bottom-1/4 -right-20 w-52 h-52 sm:w-72 sm:h-72 rounded-full opacity-[0.04]"
           style={{ background: 'radial-gradient(circle, #555, transparent 70%)', filter: 'blur(60px)' }} />
-        {/* Wet-sand texture overlay */}
-        <div className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394d8f0' fill-opacity='0.4'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3Ccircle cx='31' cy='31' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
