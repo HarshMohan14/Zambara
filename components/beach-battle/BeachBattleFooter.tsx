@@ -231,7 +231,7 @@ export function BeachBattleFooter() {
                 }}>
                 <span className="text-sm">{tribe.icon}</span>
               </div>
-              <span className="text-[7px] sm:text-[8px] uppercase tracking-wider"
+              <span className="text-[9px] sm:text-xs uppercase tracking-wider"
                 style={{
                   fontFamily: "'BlinkerRegular', sans-serif",
                   color: tribe.name === 'Mountain' ? 'rgba(150,150,150,0.45)' : `${tribe.color}60`,
@@ -327,11 +327,11 @@ export function BeachBattleFooter() {
         {/* Copyright */}
         <div className="text-center pt-6 opacity-0"
           style={{ borderTop: '1px solid rgba(209, 160, 88, 0.06)' }}>
-          <p className="text-[10px] sm:text-xs text-white/35"
+          <p className="text-xs sm:text-sm text-white/35"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             &copy; {new Date().getFullYear()} ZAMBAARA. All rights reserved.
           </p>
-          <p className="text-[9px] sm:text-[10px] text-white/15 mt-1"
+          <p className="text-[10px] sm:text-xs text-white/15 mt-1"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             Where Elements Clash by the Sea
           </p>

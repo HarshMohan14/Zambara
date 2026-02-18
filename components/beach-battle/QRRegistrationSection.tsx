@@ -90,7 +90,7 @@ export function QRRegistrationSection() {
       <div className="container mx-auto px-4 relative z-10">
         <div ref={contentRef} className="max-w-sm sm:max-w-lg mx-auto text-center opacity-0">
           {/* Header */}
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] mb-3"
+          <p className="text-sm sm:text-base uppercase tracking-[0.35em] mb-3"
             style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.6)' }}>
             Enter The Arena
           </p>
@@ -98,7 +98,7 @@ export function QRRegistrationSection() {
             style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0', textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)' }}>
             Discover Your Tribe
           </h2>
-          <p className="text-xs sm:text-sm text-white/40 max-w-xs sm:max-w-sm mx-auto mb-6"
+          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-sm mx-auto mb-6"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             Scan the QR code to register. The Ocean will assign you to one of four elemental tribes.
           </p>
@@ -114,7 +114,7 @@ export function QRRegistrationSection() {
                   border: `1px solid ${isFull ? 'rgba(239,68,68,0.25)' : 'rgba(6,182,212,0.2)'}`,
                 }}>
                 <div className={`w-2 h-2 rounded-full ${isFull ? 'bg-red-500' : slotsLeft <= 4 ? 'bg-amber-500' : 'bg-cyan-500'} animate-pulse`} />
-                <span className="text-[10px] sm:text-xs uppercase tracking-wider"
+                <span className="text-xs sm:text-sm uppercase tracking-wider"
                   style={{
                     fontFamily: "'BlinkerSemiBold', sans-serif",
                     color: isFull ? '#fca5a5' : slotsLeft <= 4 ? '#fcd34d' : 'rgba(6,182,212,0.7)',
@@ -141,11 +141,11 @@ export function QRRegistrationSection() {
                       }}>
                       {t.icon}
                     </div>
-                    <p className="text-[8px] sm:text-[9px] uppercase tracking-wider font-semibold"
+                    <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold"
                       style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: full ? 'rgba(255,255,255,0.2)' : `${displayColor(t)}` }}>
                       {t.name}
                     </p>
-                    <p className="text-[7px] sm:text-[8px]"
+                    <p className="text-[9px] sm:text-[10px]"
                       style={{ fontFamily: "'BlinkerRegular', sans-serif", color: full ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.35)' }}>
                       {count}/4
                     </p>
@@ -185,7 +185,7 @@ export function QRRegistrationSection() {
                 {/* Pulse overlay */}
                 <div className="absolute inset-0 rounded-xl" style={{ animation: 'qrPulse 3s ease-in-out infinite' }} />
               </div>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-wider group-hover:text-cyan-300 transition-colors"
+              <p className="text-xs sm:text-sm uppercase tracking-wider group-hover:text-cyan-300 transition-colors"
                 style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.4)' }}>
                 {isFull ? 'Arena is full' : 'Scan to register'}
               </p>
@@ -195,7 +195,7 @@ export function QRRegistrationSection() {
           {/* Divider */}
           <div className="flex items-center gap-3 max-w-[180px] mx-auto mb-6 sm:mb-8">
             <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2))' }} />
-            <span className="text-[9px] uppercase tracking-wider" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.3)' }}>or</span>
+            <span className="text-xs uppercase tracking-wider" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.3)' }}>or</span>
             <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.2), transparent)' }} />
           </div>
 

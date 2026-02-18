@@ -69,7 +69,7 @@ export function BattleWorksSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] mb-3"
+          <p className="text-sm sm:text-base uppercase tracking-[0.35em] mb-3"
             style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.6)' }}>
             The Path to Glory
           </p>
@@ -78,7 +78,7 @@ export function BattleWorksSection() {
             style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0', textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)' }}>
             How The Battle Works
           </h2>
-          <p className="text-xs sm:text-sm text-white/30 max-w-xs sm:max-w-md mx-auto"
+          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-md mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             From 16 warriors to 1 Zampion — the path demands everything
           </p>
@@ -112,7 +112,7 @@ export function BattleWorksSection() {
                   )}
 
                   {/* Step number */}
-                  <div className="absolute top-2 right-2 text-[8px] sm:text-[9px] font-bold"
+                  <div className="absolute top-2 right-2 text-[10px] sm:text-xs font-bold"
                     style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: isActive ? `${step.color}40` : 'rgba(6, 182, 212, 0.2)' }}>
                     {String(index + 1).padStart(2, '0')}
                   </div>
@@ -134,7 +134,7 @@ export function BattleWorksSection() {
                   </div>
 
                   {/* Label */}
-                  <h4 className="text-[9px] sm:text-[10px] uppercase tracking-wider mb-0.5"
+                  <h4 className="text-xs sm:text-sm uppercase tracking-wider mb-0.5"
                     style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#e2e8f0' }}>
                     {step.label}
                   </h4>
@@ -142,7 +142,7 @@ export function BattleWorksSection() {
                   {/* Detail - visible on active */}
                   <div className="overflow-hidden transition-all duration-300"
                     style={{ maxHeight: isActive ? '40px' : '0px', opacity: isActive ? 1 : 0 }}>
-                    <p className="text-[8px] sm:text-[9px] leading-relaxed pt-1"
+                    <p className="text-xs sm:text-sm leading-relaxed pt-1"
                       style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.35)' }}>
                       {step.detail}
                     </p>

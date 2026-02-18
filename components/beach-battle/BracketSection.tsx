@@ -148,7 +148,7 @@ export function BracketSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] mb-3"
+          <p className="text-sm sm:text-base uppercase tracking-[0.35em] mb-3"
             style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.6)' }}>
             Tournament Structure
           </p>
@@ -157,7 +157,7 @@ export function BracketSection() {
             style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0', textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)' }}>
             The Battle Bracket
           </h2>
-          <p className="text-xs sm:text-sm text-white/30 max-w-xs sm:max-w-md mx-auto"
+          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-md mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             16 warriors enter. Only 1 emerges as Zampion.
           </p>
@@ -175,7 +175,7 @@ export function BracketSection() {
               }}>
               <span className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#0891b2' }}>16</span>
             </div>
-            <div className="text-[9px] sm:text-[10px] uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(8, 145, 178, 0.7)' }}>Warriors</div>
+            <div className="text-xs sm:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(8, 145, 178, 0.7)' }}>Warriors</div>
           </div>
 
           {/* Arrow */}
@@ -189,7 +189,7 @@ export function BracketSection() {
               </defs>
               <path d="M8 20h18m0 0l-6-6m6 6l-6 6" stroke="url(#arrowGrad1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="text-[7px] uppercase tracking-wider mt-0.5" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.3)' }}>Rising Tide</span>
+            <span className="text-[9px] sm:text-xs uppercase tracking-wider mt-0.5" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.3)' }}>Rising Tide</span>
           </div>
 
           {/* 4 Qualifiers */}
@@ -202,7 +202,7 @@ export function BracketSection() {
               }}>
               <span className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#06b6d4' }}>4</span>
             </div>
-            <div className="text-[9px] sm:text-[10px] uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.7)' }}>Qualifiers</div>
+            <div className="text-xs sm:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.7)' }}>Qualifiers</div>
           </div>
 
           {/* Arrow */}
@@ -216,7 +216,7 @@ export function BracketSection() {
               </defs>
               <path d="M8 20h18m0 0l-6-6m6 6l-6 6" stroke="url(#arrowGrad2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="text-[7px] uppercase tracking-wider mt-0.5" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(251, 191, 36, 0.3)' }}>Zampion</span>
+            <span className="text-[9px] sm:text-xs uppercase tracking-wider mt-0.5" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(251, 191, 36, 0.3)' }}>Zampion</span>
           </div>
 
           {/* 1 Champion */}
@@ -230,7 +230,7 @@ export function BracketSection() {
               <span className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#fbbf24' }}>1</span>
               <span className="absolute -top-1 -right-1 text-lg">👑</span>
             </div>
-            <div className="text-[9px] sm:text-[10px] uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.7)' }}>Zampion</div>
+            <div className="text-xs sm:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.7)' }}>Zampion</div>
           </div>
         </div>
 
@@ -271,7 +271,7 @@ export function BracketSection() {
                   {/* Header row */}
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-0.5"
+                      <p className="text-xs sm:text-sm uppercase tracking-[0.2em] mb-0.5"
                         style={{ fontFamily: "'BlinkerRegular', sans-serif", color: `${round.color}80` }}>
                         {round.subtitle}
                       </p>
@@ -304,7 +304,7 @@ export function BracketSection() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-[10px] sm:text-xs leading-relaxed mb-3"
+                  <p className="text-sm sm:text-base leading-relaxed mb-3"
                     style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.45)' }}>
                     {round.description}
                   </p>
@@ -315,7 +315,7 @@ export function BracketSection() {
                     <div className="w-full h-px mb-3" style={{ background: `linear-gradient(90deg, transparent, ${round.color}20, transparent)` }} />
                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {round.details.map((detail, i) => (
-                        <span key={i} className="text-[8px] sm:text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full"
+                        <span key={i} className="text-[10px] sm:text-xs uppercase tracking-wider px-2.5 py-1 rounded-full"
                           style={{
                             fontFamily: "'BlinkerRegular', sans-serif",
                             background: `${round.color}08`,
@@ -329,7 +329,7 @@ export function BracketSection() {
                   </div>
 
                   {/* Tap hint */}
-                  <p className="text-[8px] uppercase tracking-wider mt-2"
+                  <p className="text-xs uppercase tracking-wider mt-2"
                     style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.15)' }}>
                     {isActive ? '▲ Collapse' : '▼ Tap for details'}
                   </p>
@@ -347,7 +347,7 @@ export function BracketSection() {
         <div ref={fameRef} className="opacity-0">
           {/* Hall of Fame Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-2"
+            <p className="text-xs sm:text-sm uppercase tracking-[0.3em] mb-2"
               style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.55)' }}>
               ✦ Hall of Fame ✦
             </p>
@@ -355,7 +355,7 @@ export function BracketSection() {
               style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#fbbf24', textShadow: '0 0 30px rgba(251, 191, 36, 0.15)' }}>
               Legends of the Tides
             </h3>
-            <p className="text-[10px] sm:text-xs text-white/20 mt-2"
+            <p className="text-xs sm:text-sm text-white/20 mt-2"
               style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
               Zampion Robe bearers throughout history
             </p>
@@ -389,7 +389,7 @@ export function BracketSection() {
                       <div className="text-4xl mb-3" style={{ filter: `drop-shadow(0 0 10px ${entry.color}40)` }}>
                         {entry.icon}
                       </div>
-                      <div className="text-xs uppercase tracking-wider mb-1"
+                      <div className="text-sm uppercase tracking-wider mb-1"
                         style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.25)' }}>
                         #{entry.rank}
                       </div>
@@ -399,7 +399,7 @@ export function BracketSection() {
                       </div>
                       <div className="h-12 rounded-lg flex items-center justify-center"
                         style={{ border: `1px dashed ${entry.color}20`, background: 'rgba(0,0,0,0.3)' }}>
-                        <span className="text-[10px] uppercase tracking-wider"
+                        <span className="text-xs uppercase tracking-wider"
                           style={{ fontFamily: "'BlinkerRegular', sans-serif", color: `${entry.color}40` }}>
                           {entry.name}
                         </span>
@@ -424,7 +424,7 @@ export function BracketSection() {
                     aria-label={`View ${entry.title}`} />
                 ))}
               </div>
-              <p className="text-center mt-2 text-[9px] uppercase tracking-wider"
+              <p className="text-center mt-2 text-xs uppercase tracking-wider"
                 style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.25)' }}>
                 ← Swipe →
               </p>
@@ -447,17 +447,17 @@ export function BracketSection() {
                   style={{ filter: `drop-shadow(0 0 8px ${entry.color}35)` }}>
                   {entry.icon}
                 </div>
-                <div className="text-[9px] sm:text-xs uppercase tracking-wider mb-1"
+                <div className="text-xs sm:text-sm uppercase tracking-wider mb-1"
                   style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.25)' }}>
                   #{entry.rank}
                 </div>
-                <div className="text-[10px] sm:text-sm font-bold uppercase"
+                <div className="text-sm sm:text-base font-bold uppercase"
                   style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: entry.color, textShadow: `0 0 10px ${entry.color}25` }}>
                   {entry.title}
                 </div>
                 <div className="mt-3 h-10 rounded-lg flex items-center justify-center"
                   style={{ border: `1px dashed ${entry.color}20`, background: 'rgba(0,0,0,0.3)' }}>
-                  <span className="text-[8px] sm:text-[9px] uppercase tracking-wider"
+                  <span className="text-[10px] sm:text-xs uppercase tracking-wider"
                     style={{ fontFamily: "'BlinkerRegular', sans-serif", color: `${entry.color}35` }}>
                     {entry.name}
                   </span>
@@ -475,11 +475,11 @@ export function BracketSection() {
               border: '1px solid rgba(251, 191, 36, 0.18)',
               boxShadow: '0 0 25px rgba(251, 191, 36, 0.04)',
             }}>
-            <p className="text-[9px] sm:text-xs uppercase tracking-[0.3em] mb-1"
+            <p className="text-xs sm:text-sm uppercase tracking-[0.3em] mb-1"
               style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(251, 191, 36, 0.5)' }}>
               Grand Prize
             </p>
-            <p className="text-sm sm:text-lg"
+            <p className="text-base sm:text-xl"
               style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#fbbf24' }}>
               🏆 Ceremonial Robe + Ocean Bracelet + ₹1,000
             </p>
