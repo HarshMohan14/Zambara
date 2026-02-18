@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { gsap, createTimeline } from '@/lib/gsap'
+import Link from 'next/link'
 
 const TRIBES = [
   { name: 'Lava', color: '#ef4444', glowColor: 'rgba(239, 68, 68, 0.5)', icon: '🔥', borderColor: '#ef4444', bgFrom: '#7f1d1d', bgTo: '#991b1b', element: 'Fire' },
@@ -320,9 +321,9 @@ export function QRRegistrationSection() {
             The Ocean decides your fate. Scan the QR code or tap below to discover which tribe claims you.
           </p>
 
-          {/* QR Code */}
+          {/* QR Code — links to registration form */}
           <div className="mb-6 sm:mb-8">
-            <div className="inline-block p-4 sm:p-6 rounded-2xl"
+            <Link href="/beach-battle/register" className="inline-block p-4 sm:p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] group"
               style={{
                 background: 'linear-gradient(145deg, rgba(6, 30, 50, 0.5) 0%, rgba(0,0,0,0.7) 100%)',
                 border: '1px solid rgba(6, 182, 212, 0.2)',
@@ -357,11 +358,11 @@ export function QRRegistrationSection() {
                 </svg>
                 <div className="absolute inset-0 rounded-xl" style={{ animation: 'qrPulse 3s ease-in-out infinite' }} />
               </div>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-wider"
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-wider group-hover:text-cyan-300 transition-colors"
                 style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.4)' }}>
-                Scan with your phone camera
+                Scan to register
               </p>
-            </div>
+            </Link>
           </div>
 
           {/* Divider */}
@@ -371,10 +372,10 @@ export function QRRegistrationSection() {
             <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.2), transparent)' }} />
           </div>
 
-          {/* Reveal button */}
+          {/* Register button — links to the registration form */}
           {!isRevealing && !isRevealed && (
-            <button onClick={handleReveal}
-              className="px-7 py-4 sm:px-10 sm:py-5 rounded-xl font-semibold uppercase tracking-wider text-sm transition-all duration-500 relative overflow-hidden group active:scale-95"
+            <Link href="/beach-battle/register"
+              className="inline-block px-7 py-4 sm:px-10 sm:py-5 rounded-xl font-semibold uppercase tracking-wider text-sm transition-all duration-500 relative overflow-hidden group active:scale-95"
               style={{
                 fontFamily: "'BlinkerSemiBold', sans-serif",
                 background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(14, 116, 144, 0.3) 100%)',
@@ -384,9 +385,9 @@ export function QRRegistrationSection() {
               }}
               onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 55px rgba(6, 182, 212, 0.25)' }}
               onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 0 35px rgba(6, 182, 212, 0.1)' }}>
-              <span className="relative z-10">✦ Discover Your Element</span>
+              <span className="relative z-10">✦ Register Now</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </button>
+            </Link>
           )}
 
           {/* Reveal Phase: Ocean Choosing */}
