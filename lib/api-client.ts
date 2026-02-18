@@ -452,6 +452,10 @@ class ApiClient {
     return this.request(`/beach-battle/register${queryString ? `?${queryString}` : ''}`)
   }
 
+  async getBeachBattleSlotStatus() {
+    return this.request('/beach-battle/register?status=true')
+  }
+
   async getBeachBattleRegistration(id: string) {
     return this.request(`/beach-battle/register/${id}`)
   }

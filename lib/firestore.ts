@@ -1296,6 +1296,37 @@ export async function deleteHost(id: string) {
 // Beach Battle Registrations
 export const beachBattleRegistrationsCollection = collection(db, 'beachBattleRegistrations')
 
+const BEACH_BATTLE_TRIBES = ['Lava', 'Rain', 'Wind', 'Mountain'] as const
+const MAX_PER_TRIBE = 4
+const MAX_TOTAL_PLAYERS = BEACH_BATTLE_TRIBES.length * MAX_PER_TRIBE // 16
+
+export async function getBeachBattleTribeCounts(): Promise<{ tribe: string; count: number }[]> {
+  const snapshot = await getDocs(query(beachBattleRegistrationsCollection))
+  const counts: Record<string, number> = {}
+  for (const t of BEACH_BATTLE_TRIBES) counts[t] = 0
+  snapshot.docs.forEach((d) => {
+    const tribe = d.data().tribe as string
+    if (tribe && counts[tribe] !== undefined) counts[tribe]++
+  })
+  return Object.entries(counts).map(([tribe, count]) => ({ tribe, count }))
+}
+
+export async function getBeachBattleSlotStatus(): Promise<{
+  total: number
+  maxPlayers: number
+  isFull: boolean
+  tribes: { tribe: string; count: number; maxPerTribe: number }[]
+}> {
+  const tribeCounts = await getBeachBattleTribeCounts()
+  const total = tribeCounts.reduce((sum, t) => sum + t.count, 0)
+  return {
+    total,
+    maxPlayers: MAX_TOTAL_PLAYERS,
+    isFull: total >= MAX_TOTAL_PLAYERS,
+    tribes: tribeCounts.map((t) => ({ ...t, maxPerTribe: MAX_PER_TRIBE })),
+  }
+}
+
 export async function createBeachBattleRegistration(data: {
   name: string
   email: string
@@ -1309,10 +1340,28 @@ export async function createBeachBattleRegistration(data: {
     throw new Error('This email is already registered for Beach Battle')
   }
 
+  // Get current tribe counts and auto-assign
+  const tribeCounts = await getBeachBattleTribeCounts()
+  const total = tribeCounts.reduce((sum, t) => sum + t.count, 0)
+  if (total >= MAX_TOTAL_PLAYERS) {
+    throw new Error('BATTLE_FULL')
+  }
+
+  // Find tribes that still have open slots and pick one randomly
+  const available = tribeCounts.filter((t) => t.count < MAX_PER_TRIBE)
+  if (available.length === 0) {
+    throw new Error('BATTLE_FULL')
+  }
+  const assignedTribe = available[Math.floor(Math.random() * available.length)].tribe
+  const tribeCount = tribeCounts.find((t) => t.tribe === assignedTribe)!.count
+  const playerNumber = tribeCount + 1
+
   const docData = {
     name: data.name.trim(),
     email: data.email.trim().toLowerCase(),
     phone: data.phone.trim(),
+    tribe: assignedTribe,
+    playerNumber,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   }
