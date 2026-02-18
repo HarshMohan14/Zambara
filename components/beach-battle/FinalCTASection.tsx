@@ -149,7 +149,7 @@ export function FinalCTASection() {
             Your tribe awaits. The tides are turning. Will you answer the call?
           </p>
 
-          <a ref={btnRef} href="#qr-register"
+          <a ref={btnRef} href="/beach-battle/register"
             className="inline-block px-7 py-4 sm:px-10 sm:py-5 rounded-xl font-semibold uppercase tracking-wider text-sm sm:text-base relative overflow-hidden group transition-all duration-500 opacity-0 active:scale-95"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",
@@ -185,7 +185,7 @@ export function FinalCTASection() {
           opacity: showSticky ? 1 : 0,
         }}>
         <div className="pointer-events-auto mx-auto max-w-md px-4 pb-4 sm:pb-5">
-          <a href="#qr-register"
+          <a href="/beach-battle/register"
             className="flex items-center justify-center gap-2 w-full py-3.5 sm:py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider font-semibold transition-all duration-300 active:scale-95"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",

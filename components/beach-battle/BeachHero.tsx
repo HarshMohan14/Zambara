@@ -216,7 +216,7 @@ export function BeachHero() {
 
         {/* CTA Buttons - stacked on mobile, touch-friendly sizes */}
         <div ref={ctaRef} className="flex flex-col sm:flex-row gap-3 sm:gap-5 w-full sm:w-auto max-w-[280px] sm:max-w-none">
-          <a href="#qr-register"
+          <a href="/beach-battle/register"
             className="group relative px-6 py-4 sm:px-8 sm:py-4 rounded-xl font-semibold uppercase tracking-wider text-sm overflow-hidden transition-all duration-500 text-center active:scale-95"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",

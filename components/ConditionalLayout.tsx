@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { Layout } from './Layout'
 
-const PAGES_WITHOUT_FOOTER = ['/how-to-play', '/about', '/beach-battle']
+const PAGES_WITHOUT_FOOTER = ['/how-to-play', '/about', '/beach-battle', '/beach-battle/register']
 
 export function ConditionalLayout({
   children,

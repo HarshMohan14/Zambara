@@ -1292,3 +1292,53 @@ export async function deleteHost(id: string) {
   const docRef = doc(db, 'hosts', id)
   await deleteDoc(docRef)
 }
+
+// Beach Battle Registrations
+export const beachBattleRegistrationsCollection = collection(db, 'beachBattleRegistrations')
+
+export async function createBeachBattleRegistration(data: {
+  name: string
+  email: string
+  phone: string
+}) {
+  // Check for duplicate email
+  const existing = await getDocs(
+    query(beachBattleRegistrationsCollection, where('email', '==', data.email.toLowerCase()))
+  )
+  if (!existing.empty) {
+    throw new Error('This email is already registered for Beach Battle')
+  }
+
+  const docData = {
+    name: data.name.trim(),
+    email: data.email.trim().toLowerCase(),
+    phone: data.phone.trim(),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  const ref = await addDoc(beachBattleRegistrationsCollection, docData)
+  const snap = await getDoc(ref)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
+}
+
+export async function getBeachBattleRegistrations(params?: {
+  limit?: number
+  offset?: number
+}) {
+  try {
+    let q = query(beachBattleRegistrationsCollection)
+    try {
+      q = query(q, orderBy('createdAt', 'desc'))
+    } catch (_) {}
+    const snapshot = await getDocs(q)
+    let registrations = snapshot.docs.map((d) => ({ id: d.id, ...convertTimestamps(d.data()) }))
+    const total = registrations.length
+    const offset = params?.offset || 0
+    const limitVal = params?.limit || registrations.length
+    registrations = registrations.slice(offset, offset + limitVal)
+    return { registrations, total }
+  } catch (error: any) {
+    console.error('[getBeachBattleRegistrations]', error)
+    return { registrations: [], total: 0 }
+  }
+}

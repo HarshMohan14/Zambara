@@ -90,3 +90,9 @@ export interface CreateHostRequest {
   image?: string
   status?: 'active' | 'inactive'
 }
+
+export interface BeachBattleRegisterRequest {
+  name: string
+  email: string
+  phone: string
+}
