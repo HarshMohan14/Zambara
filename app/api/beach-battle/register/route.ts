@@ -5,12 +5,23 @@ import {
   serverErrorResponse,
 } from '@/lib/api-response'
 import { validateRequired, validateEmail } from '@/lib/validation'
-import { createBeachBattleRegistration, getBeachBattleRegistrations } from '@/lib/firestore'
+import {
+  createBeachBattleRegistration,
+  getBeachBattleRegistrations,
+  getBeachBattleSlotStatus,
+} from '@/lib/firestore'
 
-// GET /api/beach-battle/register — list all registrations
+// GET /api/beach-battle/register — list registrations or get slot status
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
+
+    // If ?status=true, return slot availability info
+    if (searchParams.get('status') === 'true') {
+      const status = await getBeachBattleSlotStatus()
+      return successResponse(status)
+    }
+
     const limitVal = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
@@ -64,6 +75,12 @@ export async function POST(request: NextRequest) {
     return successResponse(registration, 'Registered successfully!', 201)
   } catch (error: any) {
     console.error('[beach-battle/register] Error:', error)
+    if (error.message === 'BATTLE_FULL') {
+      return errorResponse(
+        'The arena is full! All 16 warrior slots have been claimed. Try the next battle slot.',
+        409
+      )
+    }
     if (error.message) {
       return errorResponse(error.message, 400)
     }
