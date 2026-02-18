@@ -175,7 +175,7 @@ export function BeachHero() {
 
       {/* Cinematic Overlays - heavier on mobile for text readability over 3D video */}
       <div className="absolute inset-0 z-10"
-        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0.95) 100%)' }} />
+        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0.95) 100%)' }} />
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50 z-10" />
 
       {/* Bioluminescent vignette - matches the 3D water glow */}
@@ -203,7 +203,7 @@ export function BeachHero() {
         {/* Subtitle */}
         <p
           ref={subtitleRef}
-          className="text-sm sm:text-lg md:text-xl lg:text-2xl mb-7 sm:mb-9 max-w-[280px] sm:max-w-xl opacity-0"
+          className="text-base sm:text-xl md:text-2xl lg:text-3xl mb-7 sm:mb-9 max-w-[320px] sm:max-w-xl opacity-0"
           style={{
             fontFamily: "'BlinkerRegular', sans-serif",
             color: 'rgba(148, 216, 240, 0.85)',

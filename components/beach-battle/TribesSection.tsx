@@ -285,7 +285,7 @@ export function TribesSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] mb-3"
+          <p className="text-sm sm:text-base uppercase tracking-[0.35em] mb-3"
             style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.7)' }}>
             Choose Your Allegiance
           </p>
@@ -297,7 +297,7 @@ export function TribesSection() {
             }}>
             The Four Tribes
           </h2>
-          <p className="text-xs sm:text-sm text-white/35 max-w-xs sm:max-w-md mx-auto"
+          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-md mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             Each seal hides a tribe. Tap to break the seal and reveal your warriors.
           </p>
@@ -368,7 +368,7 @@ export function TribesSection() {
                     </div>
 
                     {/* Mystery label */}
-                    <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] mb-1"
+                    <p className="text-xs sm:text-sm uppercase tracking-[0.25em] mb-1"
                       style={{
                         fontFamily: "'BlinkerSemiBold', sans-serif",
                         color: `${tribe.name === 'Mountain' ? 'rgba(150,150,150,0.5)' : tribe.color + '60'}`,
@@ -377,7 +377,7 @@ export function TribesSection() {
                     </p>
 
                     {/* Tap hint - pulses */}
-                    <p className="text-[8px] sm:text-[9px] uppercase tracking-wider mt-2"
+                    <p className="text-[10px] sm:text-xs uppercase tracking-wider mt-2"
                       style={{
                         fontFamily: "'BlinkerRegular', sans-serif",
                         color: 'rgba(6, 182, 212, 0.35)',
@@ -433,7 +433,7 @@ export function TribesSection() {
                     </h3>
 
                     {/* Title */}
-                    <p className="text-[8px] sm:text-[10px] uppercase tracking-[0.15em] italic relative z-10"
+                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.15em] italic relative z-10"
                       style={{
                         fontFamily: "'BlinkerRegular', sans-serif",
                         color: getTextColor(tribe, 'title'),
@@ -463,7 +463,7 @@ export function TribesSection() {
                 {/* Tribe name below card when revealed */}
                 <div className="text-center mt-2 transition-all duration-500"
                   style={{ opacity: isRevealed ? 1 : 0, transform: isRevealed ? 'translateY(0)' : 'translateY(8px)' }}>
-                  <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider"
+                  <p className="text-xs sm:text-sm font-bold uppercase tracking-wider"
                     style={{
                       fontFamily: "'BlinkerSemiBold', sans-serif",
                       color: getTextColor(tribe, 'name'),
@@ -524,7 +524,7 @@ export function TribesSection() {
                     {tribe.name}
                   </h4>
                 </div>
-                <p className="text-[10px] sm:text-xs leading-relaxed"
+                <p className="text-xs sm:text-sm leading-relaxed"
                   style={{ fontFamily: "'BlinkerRegular', sans-serif", color: getTextColor(tribe, 'desc') }}>
                   {tribe.description}
                 </p>
