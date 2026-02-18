@@ -439,6 +439,39 @@ class ApiClient {
   async healthCheck() {
     return this.request('/health')
   }
+
+  // Beach Battle Registrations
+  async getBeachBattleRegistrations(params?: {
+    limit?: number
+    offset?: number
+  }) {
+    const query = new URLSearchParams()
+    if (params?.limit) query.append('limit', params.limit.toString())
+    if (params?.offset) query.append('offset', params.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/beach-battle/register${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getBeachBattleRegistration(id: string) {
+    return this.request(`/beach-battle/register/${id}`)
+  }
+
+  async updateBeachBattleRegistration(id: string, data: {
+    name?: string
+    email?: string
+    phone?: string
+  }) {
+    return this.request(`/beach-battle/register/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteBeachBattleRegistration(id: string) {
+    return this.request(`/beach-battle/register/${id}`, {
+      method: 'DELETE',
+    })
+  }
 }
 
 export const apiClient = new ApiClient()

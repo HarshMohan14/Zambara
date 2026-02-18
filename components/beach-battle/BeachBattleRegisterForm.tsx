@@ -329,7 +329,7 @@ export function BeachBattleRegisterForm() {
               <label
                 htmlFor="reg-name"
                 className="block text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-2"
-                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6,182,212,0.5)' }}
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#ffffff' }}
               >
                 Warrior Name
               </label>
@@ -364,7 +364,7 @@ export function BeachBattleRegisterForm() {
               <label
                 htmlFor="reg-email"
                 className="block text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-2"
-                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6,182,212,0.5)' }}
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#ffffff' }}
               >
                 Battle Scroll (Email)
               </label>
@@ -399,7 +399,7 @@ export function BeachBattleRegisterForm() {
               <label
                 htmlFor="reg-phone"
                 className="block text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-2"
-                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6,182,212,0.5)' }}
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#ffffff' }}
               >
                 Signal Line (Phone)
               </label>

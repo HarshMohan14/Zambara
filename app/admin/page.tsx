@@ -13,12 +13,13 @@ export default function AdminDashboard() {
     preBookings: 0,
     contacts: 0,
     newsletter: 0,
+    beachBattle: 0,
   })
   const [loading, setLoading] = useState(true)
 
   const fetchStats = async () => {
     try {
-      const [gamesRes, scoresRes, eventsRes, hostsRes, bookingsRes, preBookingsRes, contactsRes, newsletterRes] = await Promise.all([
+      const [gamesRes, scoresRes, eventsRes, hostsRes, bookingsRes, preBookingsRes, contactsRes, newsletterRes, beachBattleRes] = await Promise.all([
         apiClient.getGames({ limit: 1 }),
         apiClient.getScores({ limit: 1 }),
         apiClient.getEvents({ limit: 1 }),
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
         apiClient.getPreBookings({ limit: 1 }),
         apiClient.getContactMessages({ limit: 1 }),
         apiClient.getNewsletterSubscribers({ limit: 1 }),
+        apiClient.getBeachBattleRegistrations({ limit: 1 }),
       ])
 
       console.log('Dashboard stats responses:', {
@@ -38,6 +40,7 @@ export default function AdminDashboard() {
         preBookings: preBookingsRes,
         contacts: contactsRes,
         newsletter: newsletterRes,
+        beachBattle: beachBattleRes,
       })
 
       const gamesData = gamesRes.data as { total?: number } | undefined
@@ -48,6 +51,7 @@ export default function AdminDashboard() {
       const preBookingsData = preBookingsRes.data as { total?: number } | undefined
       const contactsData = contactsRes.data as { total?: number } | undefined
       const newsletterData = newsletterRes.data as { total?: number } | undefined
+      const beachBattleData = beachBattleRes.data as { total?: number } | undefined
       
       setStats({
         games: gamesData?.total || 0,
@@ -58,6 +62,7 @@ export default function AdminDashboard() {
         preBookings: preBookingsData?.total || 0,
         contacts: contactsData?.total || 0,
         newsletter: newsletterData?.total || 0,
+        beachBattle: beachBattleData?.total || 0,
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -130,6 +135,12 @@ export default function AdminDashboard() {
       value: stats.newsletter,
       color: '#d1a058',
       icon: '📬',
+    },
+    {
+      title: 'Beach Battle',
+      value: stats.beachBattle,
+      color: '#06b6d4',
+      icon: '🏖️',
     },
   ]
 
@@ -325,6 +336,23 @@ export default function AdminDashboard() {
               style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
             >
               Manage newsletter subscribers
+            </div>
+          </a>
+          <a
+            href="/admin/beach-battle"
+            className="block p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition-all"
+          >
+            <div
+              className="font-semibold text-white"
+              style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+            >
+              Beach Battle Registrations
+            </div>
+            <div
+              className="text-sm text-white/60 mt-1"
+              style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
+            >
+              View and manage beach battle sign-ups
             </div>
           </a>
         </div>

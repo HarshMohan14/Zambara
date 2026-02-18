@@ -12,6 +12,7 @@ const menuItems = [
   { href: '/admin/hosts', label: 'Hosts', icon: '👤' },
   { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
   { href: '/admin/pre-bookings', label: 'Pre-Bookings', icon: '📋' },
+  { href: '/admin/beach-battle', label: 'Beach Battle', icon: '🏖️' },
   { href: '/admin/contact', label: 'Contact', icon: '📧' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📬' },
 ]
