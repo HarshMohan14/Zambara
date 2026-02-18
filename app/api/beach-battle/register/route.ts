@@ -5,7 +5,27 @@ import {
   serverErrorResponse,
 } from '@/lib/api-response'
 import { validateRequired, validateEmail } from '@/lib/validation'
-import { createBeachBattleRegistration } from '@/lib/firestore'
+import { createBeachBattleRegistration, getBeachBattleRegistrations } from '@/lib/firestore'
+
+// GET /api/beach-battle/register — list all registrations
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams
+    const limitVal = parseInt(searchParams.get('limit') || '50')
+    const offset = parseInt(searchParams.get('offset') || '0')
+
+    const result = await getBeachBattleRegistrations({ limit: limitVal, offset })
+    return successResponse({
+      registrations: result.registrations,
+      total: result.total,
+      limit: limitVal,
+      offset,
+    })
+  } catch (error) {
+    console.error('[beach-battle/register] GET Error:', error)
+    return serverErrorResponse('Failed to fetch registrations')
+  }
+}
 
 // POST /api/beach-battle/register
 export async function POST(request: NextRequest) {

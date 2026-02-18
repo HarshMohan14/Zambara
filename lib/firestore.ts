@@ -1342,3 +1342,28 @@ export async function getBeachBattleRegistrations(params?: {
     return { registrations: [], total: 0 }
   }
 }
+
+export async function getBeachBattleRegistration(id: string) {
+  const docRef = doc(db, 'beachBattleRegistrations', id)
+  const snap = await getDoc(docRef)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } : null
+}
+
+export async function updateBeachBattleRegistration(id: string, data: {
+  name?: string
+  email?: string
+  phone?: string
+}) {
+  const docRef = doc(db, 'beachBattleRegistrations', id)
+  const updateData: any = { updatedAt: Timestamp.now() }
+  if (data.name !== undefined) updateData.name = data.name.trim()
+  if (data.email !== undefined) updateData.email = data.email.trim().toLowerCase()
+  if (data.phone !== undefined) updateData.phone = data.phone.trim()
+  await updateDoc(docRef, updateData)
+  return getBeachBattleRegistration(id)
+}
+
+export async function deleteBeachBattleRegistration(id: string) {
+  const docRef = doc(db, 'beachBattleRegistrations', id)
+  await deleteDoc(docRef)
+}
