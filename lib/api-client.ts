@@ -502,7 +502,8 @@ class ApiClient {
   async createBeachBattleGame(data: {
     slotNumber: number
     tribe: string
-    matchups: { table: number; player1: string; player2: string; player1Id?: string; player2Id?: string; status: string }[]
+    players: { name: string; id?: string; playerNumber?: number }[]
+    matchups?: { table: number; player1: string; player2: string; player1Id?: string; player2Id?: string; status: string }[]
   }) {
     return this.request('/beach-battle/games', {
       method: 'POST',

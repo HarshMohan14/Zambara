@@ -1419,8 +1419,19 @@ export async function deleteBeachBattleRegistration(id: string) {
 
 // ═══════════════════════════════════════════════════════════
 // Beach Battle GAMES – Live arena, matchups, winners, slots
+// Game flow:
+//   - 4 players per tribe compete at one table
+//   - Winner of each tribe game = "Warrior"
+//   - 4 warriors (one per tribe) compete in the Zampion Round
+//   - Ultimate winner = "Zampion of the Tides"
 // ═══════════════════════════════════════════════════════════
 export const beachBattleGamesCollection = collection(db, 'beachBattleGames')
+
+export interface BeachBattlePlayer {
+  name: string
+  id?: string // registration id
+  playerNumber?: number
+}
 
 export interface BeachBattleMatchup {
   table: number
@@ -1438,6 +1449,9 @@ export interface BeachBattleGame {
   slotNumber: number
   tribe: string
   status: 'pending' | 'live' | 'completed'
+  // All 4 players competing at this tribe's table
+  players: BeachBattlePlayer[]
+  // Legacy matchups (kept for backward compat)
   matchups: BeachBattleMatchup[]
   // Round 1 warrior (the one who qualifies from this tribe game)
   warrior?: string
@@ -1495,17 +1509,19 @@ export async function getBeachBattleGame(id: string): Promise<BeachBattleGame | 
   return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } as BeachBattleGame : null
 }
 
-/** Admin creates / starts a game for a tribe (when 4 players are filled) */
+/** Admin creates a game for a tribe (when 4 players are filled) */
 export async function createBeachBattleGame(data: {
   slotNumber: number
   tribe: string
-  matchups: BeachBattleMatchup[]
+  players: BeachBattlePlayer[]
+  matchups?: BeachBattleMatchup[]
 }): Promise<BeachBattleGame | null> {
   const docData = {
     slotNumber: data.slotNumber,
     tribe: data.tribe,
     status: 'pending' as const,
-    matchups: data.matchups,
+    players: data.players || [],
+    matchups: data.matchups || [],
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   }
@@ -1585,6 +1601,7 @@ export async function setBeachBattleZampion(slotNumber: number, data: {
 /** Update a game (general) */
 export async function updateBeachBattleGame(id: string, data: Partial<{
   status: string
+  players: BeachBattlePlayer[]
   matchups: BeachBattleMatchup[]
   warrior: string
   warriorId: string
@@ -1595,6 +1612,7 @@ export async function updateBeachBattleGame(id: string, data: Partial<{
   const docRef = doc(db, 'beachBattleGames', id)
   const updateData: any = { updatedAt: Timestamp.now() }
   if (data.status !== undefined) updateData.status = data.status
+  if (data.players !== undefined) updateData.players = data.players
   if (data.matchups !== undefined) updateData.matchups = data.matchups
   if (data.warrior !== undefined) updateData.warrior = data.warrior
   if (data.warriorId !== undefined) updateData.warriorId = data.warriorId
