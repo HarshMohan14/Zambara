@@ -39,10 +39,45 @@ interface LiveData {
 // ═══════════════════════════════════════════════════════════
 
 export function LiveBattleArena() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const [data, setData] = useState<LiveData | null>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const [data, setData] = useState<LiveData | null>(null)
+  const hasAnimated = useRef(false)
+
+  // GSAP scroll-triggered entrance animations — runs once after first data load
+  useEffect(() => {
+    if (!data || hasAnimated.current) return
+    hasAnimated.current = true
+
+    if (titleRef.current) {
+      gsap.from(titleRef.current, {
+        opacity: 0,
+        y: 50,
+        filter: 'blur(8px)',
+        duration: 1.4,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: titleRef.current,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+
+    if (contentRef.current) {
+      gsap.from(contentRef.current, {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: contentRef.current,
+          start: 'top 82%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+  }, [data])
 
   // Fetch live data every 8 seconds
   useEffect(() => {
@@ -64,31 +99,6 @@ export function LiveBattleArena() {
     return () => clearInterval(interval)
   }, [])
 
-  // GSAP animations
-  useEffect(() => {
-    if (!sectionRef.current) return
-    const ctx = gsap.context(() => {
-      if (titleRef.current) {
-        gsap.fromTo(titleRef.current,
-          { opacity: 0, y: 50, filter: 'blur(8px)' },
-          {
-            opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'power3.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' }
-          }
-        )
-      }
-      if (contentRef.current) {
-        gsap.fromTo(contentRef.current,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power2.out',
-            scrollTrigger: { trigger: contentRef.current, start: 'top 82%', toggleActions: 'play none none none' }
-          }
-        )
-      }
-    }, sectionRef)
-    return () => { ctx.revert() }
-  }, [])
 
   const pendingGames = data?.pending || []
   const liveGames = data?.live || []
@@ -125,7 +135,6 @@ export function LiveBattleArena() {
 
   return (
     <section
-      ref={sectionRef}
       id="live-arena"
       aria-label="Live Battle Arena"
       className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
@@ -169,7 +178,8 @@ export function LiveBattleArena() {
             )}
           </div>
 
-          <h2 ref={titleRef}
+          <h2
+            ref={titleRef}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
@@ -194,7 +204,7 @@ export function LiveBattleArena() {
 
         {/* ── NO GAMES: UPCOMING STATE ── */}
         {!hasAny && (
-          <div className="max-w-3xl mx-auto relative z-10">
+          <div ref={contentRef} className="max-w-3xl mx-auto relative z-10">
             <div className="rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden"
               style={{
                 background: 'linear-gradient(160deg, rgba(6,30,50,0.85), rgba(0,0,0,0.95))',
@@ -714,12 +724,6 @@ export function LiveBattleArena() {
         )}
       </div>
 
-      <style jsx>{`
-        @keyframes arenaGlow {
-          0%, 100% { opacity: 0.03; }
-          50% { opacity: 0.08; }
-        }
-      `}</style>
     </section>
   )
 }
