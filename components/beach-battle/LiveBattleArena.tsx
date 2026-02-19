@@ -14,7 +14,7 @@ interface Player {
   playerNumber?: number
 }
 
-interface LiveGame {
+interface Game {
   id: string
   slotNumber: number
   tribe: string
@@ -26,12 +26,8 @@ interface LiveGame {
   zampion?: string
   zampionId?: string
   zampionTribe?: string
-}
-
-interface LiveData {
-  pending: LiveGame[]
-  live: LiveGame[]
-  completed: LiveGame[]
+  createdAt?: string
+  updatedAt?: string
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -39,14 +35,30 @@ interface LiveData {
 // ═══════════════════════════════════════════════════════════
 
 export function LiveBattleArena() {
-  const [data, setData] = useState<LiveData | null>(null)
+  const [games, setGames] = useState<Game[]>([])
   const titleRef = useRef<HTMLHeadingElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
 
+  // Fetch from /api/beach-battle/games — same endpoint as admin panel
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const res = await fetch('/api/beach-battle/games?limit=100')
+        const json = await res.json()
+        if (json.success && json.data) {
+          setGames(json.data.games || [])
+        }
+      } catch { /* silent */ }
+    }
+    fetchGames()
+    const interval = setInterval(fetchGames, 8000)
+    return () => clearInterval(interval)
+  }, [])
+
   // GSAP scroll-triggered entrance animations — runs once after first data load
   useEffect(() => {
-    if (!data || hasAnimated.current) return
+    if (games.length === 0 || hasAnimated.current) return
     hasAnimated.current = true
 
     if (titleRef.current) {
@@ -77,46 +89,25 @@ export function LiveBattleArena() {
         },
       })
     }
-  }, [data])
+  }, [games])
 
-  // Fetch live data every 8 seconds
-  useEffect(() => {
-    const fetchLive = async () => {
-      try {
-        const res = await fetch('/api/beach-battle/live')
-        const json = await res.json()
-        if (json.success && json.data) {
-          setData({
-            pending: json.data.pending || [],
-            live: json.data.live || [],
-            completed: json.data.completed || [],
-          })
-        }
-      } catch { /* silent */ }
-    }
-    fetchLive()
-    const interval = setInterval(fetchLive, 8000)
-    return () => clearInterval(interval)
-  }, [])
-
-
-  const pendingGames = data?.pending || []
-  const liveGames = data?.live || []
-  const completedGames = data?.completed || []
-  const allGames = [...pendingGames, ...liveGames, ...completedGames]
-  const hasAny = allGames.length > 0
+  // Derive pending/live/completed from games — same logic as admin panel
+  const pendingGames = games.filter(g => g.status === 'pending')
+  const liveGames = games.filter(g => g.status === 'live')
+  const completedGames = games.filter(g => g.status === 'completed')
+  const hasAny = games.length > 0
   const hasLive = liveGames.length > 0
 
   // Derive the current slot (latest slot that has games)
-  const activeSlot = allGames.length > 0
-    ? Math.max(...allGames.map(g => g.slotNumber))
+  const activeSlot = games.length > 0
+    ? Math.max(...games.map(g => g.slotNumber))
     : 1
 
   // Get games for the active slot
-  const slotGames = allGames.filter(g => g.slotNumber === activeSlot)
-  const slotLive = liveGames.filter(g => g.slotNumber === activeSlot)
-  const slotCompleted = completedGames.filter(g => g.slotNumber === activeSlot)
-  const slotPending = pendingGames.filter(g => g.slotNumber === activeSlot)
+  const slotGames = games.filter(g => g.slotNumber === activeSlot)
+  const slotLive = slotGames.filter(g => g.status === 'live')
+  const slotCompleted = slotGames.filter(g => g.status === 'completed')
+  const slotPending = slotGames.filter(g => g.status === 'pending')
 
   // Warriors from completed games
   const warriors = slotCompleted
@@ -732,7 +723,7 @@ export function LiveBattleArena() {
 // Helper: Get players from game (players array or fallback)
 // ═══════════════════════════════════════════════════════════
 
-function getGamePlayers(game: LiveGame): Player[] {
+function getGamePlayers(game: Game): Player[] {
   if (game.players && game.players.length > 0) return game.players
   if (game.matchups && game.matchups.length > 0) {
     const playerMap = new Map<string, Player>()

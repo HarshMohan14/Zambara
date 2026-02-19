@@ -8,7 +8,7 @@ import { TribeIcon, CrownIcon, TrophyIcon, ShieldIcon, OceanIcon, SwordsIcon, ge
 // Types — synced with admin panel data model
 // ═══════════════════════════════════════════════════════════
 
-interface CompletedGame {
+interface Game {
   id: string
   slotNumber: number
   tribe: string
@@ -18,6 +18,8 @@ interface CompletedGame {
   zampion?: string
   zampionId?: string
   zampionTribe?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 // Creative upcoming line — fixed to avoid hydration mismatch
@@ -29,14 +31,30 @@ const UPCOMING_LINE = 'The tides are gathering. Soon, legends will be written in
 // ═══════════════════════════════════════════════════════════
 
 export function HallOfFameSection() {
-  const [completedGames, setCompletedGames] = useState<CompletedGame[]>([])
+  const [games, setGames] = useState<Game[]>([])
   const titleRef = useRef<HTMLHeadingElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
 
+  // Fetch from /api/beach-battle/games — same endpoint as admin panel
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('/api/beach-battle/games?limit=100')
+        const json = await res.json()
+        if (json.success && json.data) {
+          setGames(json.data.games || [])
+        }
+      } catch { /* silent */ }
+    }
+    fetchData()
+    const interval = setInterval(fetchData, 15000)
+    return () => clearInterval(interval)
+  }, [])
+
   // GSAP scroll-triggered entrance animations — runs once after first data load
   useEffect(() => {
-    if (completedGames.length === 0 || hasAnimated.current) return
+    if (games.length === 0 || hasAnimated.current) return
     hasAnimated.current = true
 
     if (titleRef.current) {
@@ -69,22 +87,10 @@ export function HallOfFameSection() {
         },
       })
     }
-  }, [completedGames])
+  }, [games])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('/api/beach-battle/live')
-        const json = await res.json()
-        if (json.success && json.data) {
-          setCompletedGames(json.data.completed || [])
-        }
-      } catch { /* silent */ }
-    }
-    fetchData()
-    const interval = setInterval(fetchData, 15000)
-    return () => clearInterval(interval)
-  }, [])
+  // Derive completed games from all games — same data as admin panel
+  const completedGames = games.filter(g => g.status === 'completed')
 
 
   // Derive warriors from completed games (one per tribe)
