@@ -186,11 +186,11 @@ export function LiveBattleArena() {
 
         {/* ── NO GAMES: UPCOMING STATE ── */}
         {!hasAny && (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto relative z-10">
             <div className="rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden"
               style={{
-                background: 'linear-gradient(160deg, rgba(6,30,50,0.3), rgba(0,0,0,0.75))',
-                border: '1px solid rgba(6,182,212,0.12)',
+                background: 'linear-gradient(160deg, rgba(6,30,50,0.85), rgba(0,0,0,0.95))',
+                border: '1px solid rgba(6,182,212,0.2)',
               }}>
               {/* Decorative wave pattern */}
               <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
