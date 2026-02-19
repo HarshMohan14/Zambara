@@ -8,7 +8,6 @@ interface BracketRound {
   subtitle: string
   playersIn: number
   playersOut: number
-  icon: string
   color: string
   description: string
   bgAccent: string
@@ -21,7 +20,6 @@ const rounds: BracketRound[] = [
     subtitle: 'Round 1 — The Gauntlet',
     playersIn: 16,
     playersOut: 4,
-    icon: '🌊',
     color: '#0891b2',
     bgAccent: 'rgba(8, 145, 178, 0.1)',
     description: '16 warriors enter the arena across 4 elemental tables. Battles rage simultaneously — only the strongest from each table survives.',
@@ -32,7 +30,6 @@ const rounds: BracketRound[] = [
     subtitle: 'The Final Showdown',
     playersIn: 4,
     playersOut: 1,
-    icon: '👑',
     color: '#fbbf24',
     bgAccent: 'rgba(251, 191, 36, 0.08)',
     description: 'The 4 surviving warriors face off in the ultimate clash. One will rise above all to claim the title: Zampion of the Tides.',
@@ -45,17 +42,16 @@ interface HallOfFameEntry {
   title: string
   name: string
   tribe: string
-  icon: string
   color: string
   borderColor: string
   tribeColor: string
 }
 
 const hallOfFame: HallOfFameEntry[] = [
-  { rank: 1, title: 'Zampion of the Tides', name: 'To Be Crowned', tribe: '—', icon: '👑', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.4)', tribeColor: '#fbbf24' },
-  { rank: 2, title: 'Second Wave', name: 'Awaiting', tribe: '—', icon: '🥈', color: '#94a3b8', borderColor: 'rgba(148, 163, 184, 0.25)', tribeColor: '#94a3b8' },
-  { rank: 3, title: 'Third Current', name: 'Awaiting', tribe: '—', icon: '🥉', color: '#d97706', borderColor: 'rgba(217, 119, 6, 0.25)', tribeColor: '#d97706' },
-  { rank: 4, title: 'Fourth Shore', name: 'Awaiting', tribe: '—', icon: '✦', color: '#64748b', borderColor: 'rgba(100, 116, 139, 0.2)', tribeColor: '#64748b' },
+  { rank: 1, title: 'Zampion of the Tides', name: 'To Be Crowned', tribe: '—', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.4)', tribeColor: '#fbbf24' },
+  { rank: 2, title: 'Second Wave', name: 'Awaiting', tribe: '—', color: '#94a3b8', borderColor: 'rgba(148, 163, 184, 0.25)', tribeColor: '#94a3b8' },
+  { rank: 3, title: 'Third Current', name: 'Awaiting', tribe: '—', color: '#d97706', borderColor: 'rgba(217, 119, 6, 0.25)', tribeColor: '#d97706' },
+  { rank: 4, title: 'Fourth Shore', name: 'Awaiting', tribe: '—', color: '#64748b', borderColor: 'rgba(100, 116, 139, 0.2)', tribeColor: '#64748b' },
 ]
 
 export function BracketSection() {
@@ -228,7 +224,7 @@ export function BracketSection() {
                 boxShadow: '0 0 35px rgba(251, 191, 36, 0.1)',
               }}>
               <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#fbbf24' }}>1</span>
-              <span className="absolute -top-1 -right-1 text-lg">👑</span>
+              <svg className="absolute -top-1 -right-1 w-5 h-5" viewBox="0 0 24 24" fill="#fbbf24" opacity="0.8"><path d="M2 20h20v2H2v-2zm1-7l4 3V8l5 6 5-6v8l4-3-1 7H4l-1-7zm9-11l3 4h-6l3-4z" /></svg>
             </div>
             <div className="text-xs sm:text-sm lg:text-base xl:text-lg uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.7)' }}>Zampion</div>
           </div>
@@ -281,7 +277,7 @@ export function BracketSection() {
                           color: isChampion ? '#fbbf24' : round.color,
                           textShadow: `0 0 15px ${round.color}25`,
                         }}>
-                        {round.icon} {round.name}
+                        {round.name}
                       </h3>
                     </div>
 
@@ -387,7 +383,7 @@ export function BracketSection() {
                           }} />
                       )}
                       <div className="text-4xl mb-3" style={{ filter: `drop-shadow(0 0 10px ${entry.color}40)` }}>
-                        {entry.icon}
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill={entry.color}><path d={entry.rank === 1 ? 'M2 20h20v2H2v-2zm1-7l4 3V8l5 6 5-6v8l4-3-1 7H4l-1-7zm9-11l3 4h-6l3-4z' : entry.rank <= 3 ? 'M18 2H6v6a6 6 0 005 5.91V18H8v2h8v-2h-3v-4.09A6 6 0 0018 8V2zM4 4V8a2 2 0 004 0V4H4zm16 0h-4v4a2 2 0 004 0V4z' : 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'} /></svg>
                       </div>
                       <div className="text-sm uppercase tracking-wider mb-1"
                         style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.25)' }}>
@@ -445,7 +441,7 @@ export function BracketSection() {
                 }}>
                 <div className="text-2xl sm:text-3xl mb-2 transition-transform duration-300 group-hover:scale-110"
                   style={{ filter: `drop-shadow(0 0 8px ${entry.color}35)` }}>
-                  {entry.icon}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill={entry.color}><path d={entry.rank === 1 ? 'M2 20h20v2H2v-2zm1-7l4 3V8l5 6 5-6v8l4-3-1 7H4l-1-7zm9-11l3 4h-6l3-4z' : entry.rank <= 3 ? 'M18 2H6v6a6 6 0 005 5.91V18H8v2h8v-2h-3v-4.09A6 6 0 0018 8V2zM4 4V8a2 2 0 004 0V4H4zm16 0h-4v4a2 2 0 004 0V4z' : 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'} /></svg>
                 </div>
                 <div className="text-xs sm:text-sm uppercase tracking-wider mb-1"
                   style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.25)' }}>
@@ -481,7 +477,7 @@ export function BracketSection() {
             </p>
             <p className="text-base sm:text-xl"
               style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#fbbf24' }}>
-              🏆 Ceremonial Robe + Ocean Bracelet + ₹1,000
+                            <svg className="inline-block w-5 h-5 -mt-0.5 mr-1" viewBox="0 0 24 24" fill="#fbbf24"><path d="M18 2H6v6a6 6 0 005 5.91V18H8v2h8v-2h-3v-4.09A6 6 0 0018 8V2zM4 4V8a2 2 0 004 0V4H4zm16 0h-4v4a2 2 0 004 0V4z" /></svg> Ceremonial Robe + Ocean Bracelet + ₹1,000
             </p>
           </div>
         </div>

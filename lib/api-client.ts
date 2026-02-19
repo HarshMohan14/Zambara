@@ -476,6 +476,60 @@ class ApiClient {
       method: 'DELETE',
     })
   }
+
+  // Beach Battle Games
+  async getBeachBattleGames(params?: {
+    tribe?: string
+    status?: string
+    slotNumber?: number
+    limit?: number
+    offset?: number
+  }) {
+    const query = new URLSearchParams()
+    if (params?.tribe) query.append('tribe', params.tribe)
+    if (params?.status) query.append('status', params.status)
+    if (params?.slotNumber !== undefined) query.append('slotNumber', params.slotNumber.toString())
+    if (params?.limit) query.append('limit', params.limit.toString())
+    if (params?.offset) query.append('offset', params.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/beach-battle/games${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getBeachBattleGame(id: string) {
+    return this.request(`/beach-battle/games/${id}`)
+  }
+
+  async createBeachBattleGame(data: {
+    slotNumber: number
+    tribe: string
+    matchups: { table: number; player1: string; player2: string; player1Id?: string; player2Id?: string; status: string }[]
+  }) {
+    return this.request('/beach-battle/games', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateBeachBattleGame(id: string, data: any) {
+    return this.request(`/beach-battle/games/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteBeachBattleGame(id: string) {
+    return this.request(`/beach-battle/games/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async getBeachBattleLive() {
+    return this.request('/beach-battle/live')
+  }
+
+  async getBeachBattleScorecard() {
+    return this.request('/beach-battle/scorecard')
+  }
 }
 
 export const apiClient = new ApiClient()

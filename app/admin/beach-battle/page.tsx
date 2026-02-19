@@ -12,11 +12,12 @@ const TRIBE_COLORS: Record<string, string> = {
   Mountain: '#a78bfa',
 }
 
-const TRIBE_ICONS: Record<string, string> = {
-  Lava: '\uD83D\uDD25',
-  Rain: '\uD83C\uDF27\uFE0F',
-  Wind: '\uD83C\uDF2C\uFE0F',
-  Mountain: '\uD83C\uDFD4\uFE0F',
+// SVG icon paths for each tribe (no emojis)
+const TRIBE_ICON_PATHS: Record<string, string> = {
+  Lava: 'M12 2l2 6h4l-3 3 2 6-5-3-5 3 2-6-3-3h4l2-6z',
+  Rain: 'M12 2l-2 6H4l3 3-2 6 5-3 5 3-2-6 3-3h-6l-2-6z',
+  Wind: 'M12 4c0 0 6 4 7 10s-7 10-7 10-6-4-7-10 7-10 7-10z',
+  Mountain: 'M12 2L4 8v8c0 4 4 8 8 8s8-4 8-8V8l-8-6z',
 }
 
 interface Registration {
@@ -190,13 +191,13 @@ export default function AdminBeachBattle() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {slotStatus.tribes.map((t) => {
             const color = TRIBE_COLORS[t.tribe] || '#d1a058'
-            const icon = TRIBE_ICONS[t.tribe] || ''
+            const iconPath = TRIBE_ICON_PATHS[t.tribe] || ''
             const full = t.count >= t.maxPerTribe
             return (
               <div key={t.tribe}
                 className={`bg-black/60 border-2 rounded-lg p-4 text-center transition-all ${full ? 'border-white/10 opacity-60' : ''}`}
                 style={{ borderColor: full ? undefined : `${color}40`, boxShadow: full ? 'none' : `0 0 10px ${color}10` }}>
-                <div className="text-2xl mb-1">{icon}</div>
+                <div className="text-2xl mb-1 flex justify-center"><svg width="28" height="28" viewBox="0 0 24 24" fill={color}><path d={iconPath} /></svg></div>
                 <p className="text-sm font-semibold" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color }}>{t.tribe}</p>
                 <p className="text-xs text-white/50 mt-0.5">{t.count} / {t.maxPerTribe} warriors</p>
                 <div className="w-full h-1.5 rounded-full mt-2 overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -255,7 +256,7 @@ export default function AdminBeachBattle() {
                             {reg.tribe && (
                               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
                                 style={{ background: `${TRIBE_COLORS[reg.tribe] || '#555'}20`, color: TRIBE_COLORS[reg.tribe] || '#ccc', border: `1px solid ${TRIBE_COLORS[reg.tribe] || '#555'}30` }}>
-                                {TRIBE_ICONS[reg.tribe]} {reg.tribe} #{reg.playerNumber}
+                                <svg className="inline w-3.5 h-3.5 mr-1 -mt-0.5" viewBox="0 0 24 24" fill={TRIBE_COLORS[reg.tribe] || '#ccc'}><path d={TRIBE_ICON_PATHS[reg.tribe] || ''} /></svg>{reg.tribe} #{reg.playerNumber}
                               </span>
                             )}
                           </td>
@@ -291,7 +292,7 @@ export default function AdminBeachBattle() {
                             {reg.tribe ? (
                               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
                                 style={{ background: `${TRIBE_COLORS[reg.tribe] || '#555'}20`, color: TRIBE_COLORS[reg.tribe] || '#ccc', border: `1px solid ${TRIBE_COLORS[reg.tribe] || '#555'}30` }}>
-                                {TRIBE_ICONS[reg.tribe]} {reg.tribe} #{reg.playerNumber}
+                                <svg className="inline w-3.5 h-3.5 mr-1 -mt-0.5" viewBox="0 0 24 24" fill={TRIBE_COLORS[reg.tribe] || '#ccc'}><path d={TRIBE_ICON_PATHS[reg.tribe] || ''} /></svg>{reg.tribe} #{reg.playerNumber}
                               </span>
                             ) : (
                               <span className="text-white/30 text-xs">No tribe</span>
