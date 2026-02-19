@@ -98,7 +98,7 @@ export default function BeachBattlePage() {
           all content below scrolls over it. Cleaned up on unmount. */}
       <BeachBattleBackground />
 
-      <div className="min-h-screen overflow-x-hidden relative">
+      <div className="min-h-screen overflow-x-hidden relative z-[1]">
         {/* Section 1: Cinematic Hero with video */}
         <BeachHero />
 
