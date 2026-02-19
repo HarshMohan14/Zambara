@@ -115,9 +115,6 @@ export function LiveBattleArena() {
   const hasWarriors = warriors.length > 0
   const hasZampion = !!zampion
 
-  // If nothing to show, render a minimal waiting state
-  if (!hasAny) return null
-
   return (
     <section
       ref={sectionRef}
@@ -180,61 +177,168 @@ export function LiveBattleArena() {
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             {hasLive
               ? 'Warriors are clashing right now. Watch the tide turn in real time.'
-              : 'The arena has seen battle. Explore the history of tribal warfare.'}
+              : hasAny
+                ? 'The arena has seen battle. Explore the history of tribal warfare.'
+                : 'The arena awaits. When the tribes clash, their battles will unfold here in real time.'}
           </p>
         </div>
 
-        {/* ── SLOT SELECTOR ── */}
-        {slots.length > 1 && (
-          <div className="flex justify-center gap-2 mb-8">
-            {slots.map(s => (
-              <button key={s}
-                onClick={() => setSelectedSlot(s)}
-                className="px-4 py-2 rounded-lg text-xs sm:text-sm uppercase tracking-wider font-semibold transition-all duration-300"
+        {/* ── NO GAMES: UPCOMING STATE ── */}
+        {!hasAny && (
+          <div className="max-w-3xl mx-auto">
+            <div className="rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(160deg, rgba(6,30,50,0.3), rgba(0,0,0,0.75))',
+                border: '1px solid rgba(6,182,212,0.12)',
+              }}>
+              {/* Decorative wave pattern */}
+              <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
                 style={{
-                  fontFamily: "'BlinkerSemiBold', sans-serif",
-                  background: activeSlot === s ? 'rgba(6,182,212,0.15)' : 'rgba(0,0,0,0.3)',
-                  border: `1.5px solid ${activeSlot === s ? 'rgba(6,182,212,0.4)' : 'rgba(255,255,255,0.06)'}`,
-                  color: activeSlot === s ? '#22d3ee' : 'rgba(255,255,255,0.3)',
-                  boxShadow: activeSlot === s ? '0 0 20px rgba(6,182,212,0.1)' : 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='40' viewBox='0 0 80 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20C10 10 20 30 30 20C40 10 50 30 60 20C70 10 80 30 80 30' stroke='%2306b6d4' fill='none' stroke-width='1'/%3E%3C/svg%3E")`,
+                }} />
+
+              {/* Icons row */}
+              <div className="flex justify-center items-center gap-4 mb-6">
+                <ShieldIcon size={28} className="opacity-20" />
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(6,182,212,0.1), rgba(0,0,0,0.4))',
+                    border: '1.5px solid rgba(6,182,212,0.15)',
+                    boxShadow: '0 0 30px rgba(6,182,212,0.05)',
+                  }}>
+                  <SwordsIcon size={40} />
+                </div>
+                <ShieldIcon size={28} className="opacity-20" />
+              </div>
+
+              {/* Upcoming text */}
+              <p className="text-sm sm:text-base text-white/35 mb-4 max-w-md mx-auto italic leading-relaxed"
+                style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
+                &ldquo;The drums of war have not yet sounded. When the tribes meet, every clash will appear here — live.&rdquo;
+              </p>
+
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-8"
+                style={{
+                  background: 'rgba(6,182,212,0.06)',
+                  border: '1px solid rgba(6,182,212,0.15)',
                 }}>
-                Slot #{s}
-              </button>
-            ))}
+                <OceanIcon size={16} />
+                <span className="text-xs uppercase tracking-[0.25em] font-semibold"
+                  style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6,182,212,0.5)' }}>
+                  Live Battles Upcoming
+                </span>
+              </div>
+
+              {/* 4 Tribe placeholder cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {TRIBES.map(tribe => {
+                  const color = getDisplayColor(tribe.name)
+                  return (
+                    <div key={tribe.name} className="rounded-xl p-3 sm:p-4 text-center"
+                      style={{
+                        background: `${color}05`,
+                        border: `1px dashed ${color}15`,
+                      }}>
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mx-auto mb-2 flex items-center justify-center opacity-40"
+                        style={{
+                          background: `radial-gradient(circle, ${color}20, ${color}05)`,
+                          border: `1px solid ${color}15`,
+                        }}>
+                        <TribeIcon tribe={tribe.name} size={20} />
+                      </div>
+                      <p className="text-[10px] sm:text-xs uppercase tracking-wider mb-0.5"
+                        style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: `${color}40` }}>
+                        {tribe.name}
+                      </p>
+                      <p className="text-[8px] sm:text-[9px] uppercase tracking-wider text-white/15"
+                        style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
+                        4 Players &middot; Awaiting
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Game flow reminder */}
+              <div className="mt-6 pt-5" style={{ borderTop: '1px solid rgba(6,182,212,0.08)' }}>
+                <div className="flex flex-wrap justify-center items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-wider"
+                  style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+                  <span style={{ color: 'rgba(6,182,212,0.4)' }}>4 per Tribe</span>
+                  <span className="text-white/10">&rarr;</span>
+                  <span style={{ color: 'rgba(34,197,94,0.4)' }}>Tribe Fight</span>
+                  <span className="text-white/10">&rarr;</span>
+                  <span style={{ color: 'rgba(239,68,68,0.4)' }}>1 Warrior</span>
+                  <span className="text-white/10">&rarr;</span>
+                  <span style={{ color: 'rgba(251,191,36,0.4)' }}>Zampion Round</span>
+                  <span className="text-white/10">&rarr;</span>
+                  <span style={{ color: 'rgba(251,191,36,0.5)' }}>1 Zampion</span>
+                </div>
+              </div>
+
+              {/* Bottom line */}
+              <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(6,182,212,0.15), transparent)' }} />
+            </div>
           </div>
         )}
 
-        {/* ── TAB NAVIGATION ── */}
-        <div className="flex justify-center mb-8 sm:mb-10">
-          <div className="inline-flex rounded-xl overflow-hidden"
-            style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(6,182,212,0.12)' }}>
-            {[
-              { id: 'arena' as TabView, label: 'Live Arena', icon: <ShieldIcon size={16} />, show: true },
-              { id: 'tribeFight' as TabView, label: 'Tribe Fights', icon: <SwordsIcon size={16} />, show: true },
-              { id: 'zampion' as TabView, label: 'Zampion Round', icon: <CrownIcon size={16} />, show: hasWarriors || hasZampion },
-            ].filter(t => t.show).map((tab) => (
-              <button key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm uppercase tracking-wider font-semibold transition-all duration-300"
-                style={{
-                  fontFamily: "'BlinkerSemiBold', sans-serif",
-                  background: activeTab === tab.id ? 'rgba(6,182,212,0.12)' : 'transparent',
-                  color: activeTab === tab.id ? '#22d3ee' : 'rgba(255,255,255,0.3)',
-                  borderBottom: activeTab === tab.id ? '2px solid #06b6d4' : '2px solid transparent',
-                }}>
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* ── HAS GAMES: FULL ARENA ── */}
+        {hasAny && (
+          <>
+            {/* ── SLOT SELECTOR ── */}
+            {slots.length > 1 && (
+              <div className="flex justify-center gap-2 mb-8">
+                {slots.map(s => (
+                  <button key={s}
+                    onClick={() => setSelectedSlot(s)}
+                    className="px-4 py-2 rounded-lg text-xs sm:text-sm uppercase tracking-wider font-semibold transition-all duration-300"
+                    style={{
+                      fontFamily: "'BlinkerSemiBold', sans-serif",
+                      background: activeSlot === s ? 'rgba(6,182,212,0.15)' : 'rgba(0,0,0,0.3)',
+                      border: `1.5px solid ${activeSlot === s ? 'rgba(6,182,212,0.4)' : 'rgba(255,255,255,0.06)'}`,
+                      color: activeSlot === s ? '#22d3ee' : 'rgba(255,255,255,0.3)',
+                      boxShadow: activeSlot === s ? '0 0 20px rgba(6,182,212,0.1)' : 'none',
+                    }}>
+                    Slot #{s}
+                  </button>
+                ))}
+              </div>
+            )}
 
-        {/* ── CONTENT ── */}
-        <div ref={contentRef} className="opacity-0">
-          {activeTab === 'arena' && <ArenaView games={slotGames} hasLive={hasLive} />}
-          {activeTab === 'tribeFight' && <TribeFightView games={slotGames} expandedGame={expandedGame} setExpandedGame={setExpandedGame} />}
-          {activeTab === 'zampion' && <ZampionRoundView warriors={warriors} zampion={zampion} slotNumber={activeSlot} />}
-        </div>
+            {/* ── TAB NAVIGATION ── */}
+            <div className="flex justify-center mb-8 sm:mb-10">
+              <div className="inline-flex rounded-xl overflow-hidden"
+                style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(6,182,212,0.12)' }}>
+                {[
+                  { id: 'arena' as TabView, label: 'Live Arena', icon: <ShieldIcon size={16} />, show: true },
+                  { id: 'tribeFight' as TabView, label: 'Tribe Fights', icon: <SwordsIcon size={16} />, show: true },
+                  { id: 'zampion' as TabView, label: 'Zampion Round', icon: <CrownIcon size={16} />, show: hasWarriors || hasZampion },
+                ].filter(t => t.show).map((tab) => (
+                  <button key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm uppercase tracking-wider font-semibold transition-all duration-300"
+                    style={{
+                      fontFamily: "'BlinkerSemiBold', sans-serif",
+                      background: activeTab === tab.id ? 'rgba(6,182,212,0.12)' : 'transparent',
+                      color: activeTab === tab.id ? '#22d3ee' : 'rgba(255,255,255,0.3)',
+                      borderBottom: activeTab === tab.id ? '2px solid #06b6d4' : '2px solid transparent',
+                    }}>
+                    {tab.icon}
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ── CONTENT ── */}
+            <div ref={contentRef} className="opacity-0">
+              {activeTab === 'arena' && <ArenaView games={slotGames} hasLive={hasLive} />}
+              {activeTab === 'tribeFight' && <TribeFightView games={slotGames} expandedGame={expandedGame} setExpandedGame={setExpandedGame} />}
+              {activeTab === 'zampion' && <ZampionRoundView warriors={warriors} zampion={zampion} slotNumber={activeSlot} />}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Inline keyframes */}
