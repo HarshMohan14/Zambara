@@ -77,7 +77,7 @@ export function QRRegistrationSection() {
       ref={sectionRef}
       id="qr-register"
       aria-label="QR Registration"
-      className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
+      className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
     >
       {/* Subtle section overlay */}
       <div className="absolute inset-0 pointer-events-none">
@@ -88,17 +88,22 @@ export function QRRegistrationSection() {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div ref={contentRef} className="max-w-sm sm:max-w-lg mx-auto text-center opacity-0">
+        <div ref={contentRef} className="max-w-sm sm:max-w-lg lg:max-w-5xl xl:max-w-6xl mx-auto opacity-0">
+          {/* Desktop: side-by-side layout */}
+          <div className="lg:flex lg:items-center lg:gap-12 xl:gap-16">
+
+          {/* Left column: Text + tribe slots */}
+          <div className="lg:flex-1 text-center lg:text-left">
           {/* Header */}
           <p className="text-sm sm:text-base uppercase tracking-[0.35em] mb-3"
             style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.6)' }}>
             Enter The Arena
           </p>
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold uppercase mb-3"
+          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3"
             style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0', textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)' }}>
             Discover Your Tribe
           </h2>
-          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-sm mx-auto mb-6"
+          <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-white/50 max-w-xs sm:max-w-sm lg:max-w-md mx-auto lg:mx-0 mb-6"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             Scan the QR code to register. The Ocean will assign you to one of four elemental tribes.
           </p>
@@ -127,7 +132,7 @@ export function QRRegistrationSection() {
 
           {/* Live tribe slots */}
           {slotStatus && (
-            <div className="flex justify-center gap-3 sm:gap-4 mb-8">
+            <div className="flex justify-center lg:justify-start gap-3 sm:gap-4 mb-8">
               {TRIBES.map((t) => {
                 const count = slotStatus.tribes.find((s) => s.tribe === t.name)?.count ?? 0
                 const full = count >= 4
@@ -155,6 +160,18 @@ export function QRRegistrationSection() {
             </div>
           )}
 
+          {/* Desktop-only motivational quote */}
+          <div className="hidden lg:block mb-6">
+            <div className="rounded-xl p-4" style={{ background: 'linear-gradient(145deg, rgba(6,30,50,0.3) 0%, rgba(0,0,0,0.4) 100%)', border: '1px solid rgba(6,182,212,0.1)' }}>
+              <p className="text-sm xl:text-base text-white/30 italic" style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
+                &ldquo;The ocean does not choose the strongest. It chooses those brave enough to answer.&rdquo;
+              </p>
+            </div>
+          </div>
+          </div>{/* end left column */}
+
+          {/* Right column: QR + CTA */}
+          <div className="lg:flex-1 text-center">
           {/* QR Code — real scannable QR */}
           <div className="mb-6 sm:mb-8">
             <Link href="/beach-battle/register"
@@ -225,6 +242,8 @@ export function QRRegistrationSection() {
               {'\u2694\uFE0F'} Arena Full — Try Next Slot
             </div>
           )}
+          </div>{/* end right column */}
+          </div>{/* end flex */}
         </div>
       </div>
 

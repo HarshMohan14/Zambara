@@ -162,7 +162,7 @@ export function BeachBattleFooter() {
   return (
     <footer
       ref={footerRef}
-      className="relative w-full py-12 sm:py-16 md:py-20 overflow-hidden"
+      className="relative w-full py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
     >
       {/* Stormy ocean canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
@@ -189,7 +189,7 @@ export function BeachBattleFooter() {
           style={{ background: 'radial-gradient(circle, #d1a058, transparent 70%)', filter: 'blur(50px)' }} />
       </div>
 
-      <div ref={contentRef} className="container mx-auto px-4 relative z-10">
+      <div ref={contentRef} className="container mx-auto px-4 lg:px-8 relative z-10">
         {/* Logo */}
         <div className="flex justify-center mb-6 sm:mb-8 opacity-0">
           <Image
@@ -205,7 +205,7 @@ export function BeachBattleFooter() {
 
         {/* Closing cinematic line */}
         <div className="text-center mb-6 sm:mb-8 space-y-2 opacity-0">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold uppercase"
+          <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold uppercase"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
               color: '#cbd5e1',
@@ -213,23 +213,23 @@ export function BeachBattleFooter() {
             }}>
             The Ocean Remembers.
           </h3>
-          <p className="text-xs sm:text-sm uppercase tracking-[0.15em]"
+          <p className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.15em]"
             style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(148, 216, 240, 0.35)' }}>
             Fire. Water. Wind. Earth. — Only one prevails.
           </p>
         </div>
 
         {/* Tribe orbs row */}
-        <div className="flex justify-center gap-3 sm:gap-4 mb-6 sm:mb-8 opacity-0">
+        <div className="flex justify-center gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 opacity-0">
           {tribeColors.map((tribe) => (
             <div key={tribe.name} className="flex flex-col items-center gap-1.5 group cursor-default">
-              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+              <div className="w-9 h-9 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                 style={{
                   background: `radial-gradient(circle at 40% 35%, ${tribe.color}99, ${tribe.color}44, ${tribe.color}15)`,
                   border: `1.5px solid ${tribe.color}30`,
                   boxShadow: `0 0 12px ${tribe.color}15`,
                 }}>
-                <span className="text-sm">{tribe.icon}</span>
+                <span className="text-sm lg:text-lg">{tribe.icon}</span>
               </div>
               <span className="text-[9px] sm:text-xs uppercase tracking-wider"
                 style={{
@@ -250,10 +250,10 @@ export function BeachBattleFooter() {
         </div>
 
         {/* Rune-style navigation links */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-8 sm:mb-10 opacity-0">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 opacity-0">
           {runeLinks.map((link) => (
             <Link key={link.label} href={link.href}
-              className="text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 hover:translate-y-[-1px]"
+              className="text-xs sm:text-sm lg:text-base uppercase tracking-wider transition-all duration-300 hover:translate-y-[-1px]"
               style={{
                 fontFamily: "'BlinkerRegular', sans-serif",
                 color: link.accent ? 'rgba(6, 182, 212, 0.7)' : 'rgba(209, 160, 88, 0.5)',

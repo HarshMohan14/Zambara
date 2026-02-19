@@ -53,7 +53,7 @@ export function BattleWorksSection() {
     <section
       ref={sectionRef}
       id="battle-works"
-      className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
+      className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
       aria-label="How The Battle Works"
     >
       {/* Subtle section overlay — transparent, unified bg shows through */}
@@ -74,13 +74,13 @@ export function BattleWorksSection() {
             The Path to Glory
           </p>
           <h2 ref={titleRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase mb-3 opacity-0"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3 opacity-0"
             style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0', textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)' }}>
             How The Battle Works
           </h2>
-          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-md mx-auto"
+          <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-white/50 max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-            From 16 warriors to 1 Zampion — the path demands everything
+            From the opening horn to the final crown — every step is a battle.
           </p>
           <div className="flex justify-center mt-4">
             <div className="w-16 sm:w-20 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent)' }} />
@@ -88,7 +88,7 @@ export function BattleWorksSection() {
         </div>
 
         {/* Cards Grid - 2x4 mobile, 4x2 desktop */}
-        <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 max-w-4xl mx-auto">
+        <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 lg:gap-4 xl:gap-5 max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
           {steps.map((step, index) => {
             const isActive = activeStep === index
             return (
@@ -118,13 +118,13 @@ export function BattleWorksSection() {
                   </div>
 
                   {/* Icon */}
-                  <div className="text-xl sm:text-2xl mb-2 transition-transform duration-300"
+                  <div className="text-xl sm:text-2xl lg:text-3xl mb-2 transition-transform duration-300"
                     style={{ transform: isActive ? 'scale(1.15)' : 'scale(1)' }}>
                     {step.icon}
                   </div>
 
                   {/* Value */}
-                  <div className="text-lg sm:text-xl font-bold mb-0.5"
+                  <div className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mb-0.5"
                     style={{
                       fontFamily: "'TheWalkyrDemo', serif",
                       color: isActive ? step.color : '#06b6d4',
@@ -134,7 +134,7 @@ export function BattleWorksSection() {
                   </div>
 
                   {/* Label */}
-                  <h4 className="text-xs sm:text-sm uppercase tracking-wider mb-0.5"
+                  <h4 className="text-xs sm:text-sm lg:text-base xl:text-lg uppercase tracking-wider mb-0.5"
                     style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#e2e8f0' }}>
                     {step.label}
                   </h4>

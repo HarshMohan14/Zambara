@@ -265,7 +265,7 @@ export function TribesSection() {
       ref={sectionRef}
       id="tribes"
       aria-label="The Four Tribes"
-      className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
+      className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
     >
       {/* Subtle section overlay for depth separation — no opaque background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -290,14 +290,14 @@ export function TribesSection() {
             Choose Your Allegiance
           </p>
           <h2 ref={titleRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase mb-3 opacity-0"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3 opacity-0"
             style={{
               fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0',
               textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)',
             }}>
             The Four Tribes
           </h2>
-          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-md mx-auto"
+          <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-white/50 max-w-xs sm:max-w-md lg:max-w-xl xl:max-w-2xl mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
             Each seal hides a tribe. Tap to break the seal and reveal your warriors.
           </p>
@@ -306,8 +306,8 @@ export function TribesSection() {
           </div>
         </div>
 
-        {/* 2x2 Grid of Sealed Cards */}
-        <div ref={gridRef} className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 max-w-sm sm:max-w-lg md:max-w-2xl mx-auto mb-8 sm:mb-10">
+        {/* 2x2 Grid of Sealed Cards — 4-col on large desktop */}
+        <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto mb-8 sm:mb-10">
           {tribes.map((tribe, index) => {
             const isRevealed = revealedCards[index]
             return (
@@ -408,7 +408,7 @@ export function TribesSection() {
                       style={{ background: `radial-gradient(ellipse at 50% 30%, ${tribe.glowColor}, transparent 70%)` }} />
 
                     {/* Tribe card image */}
-                    <div className="relative w-16 h-24 sm:w-24 sm:h-32 md:w-28 md:h-36 mb-2 sm:mb-3"
+                    <div className="relative w-16 h-24 sm:w-24 sm:h-32 md:w-28 md:h-36 lg:w-36 lg:h-48 xl:w-40 xl:h-52 mb-2 sm:mb-3"
                       style={{
                         filter: `drop-shadow(0 0 12px ${tribe.glowColor})`,
                       }}>
@@ -423,7 +423,7 @@ export function TribesSection() {
                     </div>
 
                     {/* Tribe name */}
-                    <h3 className="text-lg sm:text-2xl md:text-3xl uppercase font-bold mb-0.5 relative z-10"
+                    <h3 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl uppercase font-bold mb-0.5 relative z-10"
                       style={{
                         fontFamily: "'TheWalkyrDemo', serif",
                         color: getTextColor(tribe, 'name'),
@@ -509,7 +509,7 @@ export function TribesSection() {
 
         {/* Description cards after reveal */}
         {allRevealed && (
-          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-sm sm:max-w-lg md:max-w-2xl mx-auto">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto">
             {tribes.map((tribe) => (
               <div key={tribe.name + '-desc'}
                 className="rounded-xl p-3 sm:p-4 transition-all duration-300"

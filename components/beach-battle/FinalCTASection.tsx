@@ -131,9 +131,9 @@ export function FinalCTASection() {
             style={{ background: 'radial-gradient(ellipse at bottom, rgba(6, 182, 212, 0.35), transparent 70%)', filter: 'blur(60px)' }} />
         </div>
 
-        <div className="relative z-10 text-center px-5 max-w-sm sm:max-w-xl mx-auto">
+        <div className="relative z-10 text-center px-5 max-w-sm sm:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto">
           <h2 ref={titleRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold uppercase mb-4 sm:mb-6 opacity-0"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold uppercase mb-4 sm:mb-6 opacity-0"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
               color: '#cbd5e1',
@@ -144,13 +144,13 @@ export function FinalCTASection() {
           </h2>
 
           <p ref={subtitleRef}
-            className="text-xs sm:text-sm md:text-base mb-7 sm:mb-10 max-w-xs sm:max-w-sm mx-auto opacity-0"
+            className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl mb-7 sm:mb-10 max-w-xs sm:max-w-sm lg:max-w-lg mx-auto opacity-0"
             style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(148, 216, 240, 0.4)', letterSpacing: '0.08em' }}>
             Your tribe awaits. The tides are turning. Will you answer the call?
           </p>
 
           <a ref={btnRef} href="/beach-battle/register"
-            className="inline-block px-7 py-4 sm:px-10 sm:py-5 rounded-xl font-semibold uppercase tracking-wider text-sm sm:text-base relative overflow-hidden group transition-all duration-500 opacity-0 active:scale-95"
+            className="inline-block px-7 py-4 sm:px-10 sm:py-5 lg:px-12 lg:py-6 rounded-xl font-semibold uppercase tracking-wider text-sm sm:text-base lg:text-lg relative overflow-hidden group transition-all duration-500 opacity-0 active:scale-95"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",
               background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(14, 116, 144, 0.3) 100%)',
