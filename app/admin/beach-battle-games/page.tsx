@@ -239,6 +239,8 @@ export default function AdminBeachBattleGames() {
   const [zampionModal, setZampionModal] = useState<{ open: boolean; game: Game | null }>({ open: false, game: null })
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; gameId: string | null }>({ open: false, gameId: null })
   const [startModal, setStartModal] = useState<{ open: boolean; gameId: string | null }>({ open: false, gameId: null })
+  const [deleteAllModal, setDeleteAllModal] = useState(false)
+  const [deletingAll, setDeletingAll] = useState(false)
 
   const fetchGames = async () => {
     setLoading(true)
@@ -360,6 +362,26 @@ export default function AdminBeachBattleGames() {
     setDeleteModal({ open: false, gameId: null })
   }
 
+  // Delete ALL beach battle data
+  const handleDeleteAllData = async () => {
+    setDeletingAll(true)
+    try {
+      const res = await apiClient.deleteAllBeachBattleData()
+      if (res.success) {
+        const data = res.data as any
+        toast.success(`Deleted ${data.gamesDeleted} games and ${data.registrationsDeleted} registrations`)
+        fetchGames()
+        fetchRegistrations()
+      } else {
+        toast.error(res.error || 'Failed to delete data')
+      }
+    } catch {
+      toast.error('Failed to delete all data')
+    }
+    setDeletingAll(false)
+    setDeleteAllModal(false)
+  }
+
   // Get warriors for Zampion selection
   const getSlotWarriors = (game: Game) => {
     return games
@@ -396,11 +418,18 @@ export default function AdminBeachBattleGames() {
             4 players per tribe compete — 1 warrior qualifies — 4 warriors clash in Zampion round
           </p>
         </div>
-        <button onClick={() => setShowCreate(!showCreate)}
-          className="px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wider transition-all hover:scale-[1.02]"
-          style={{ fontFamily: "'BlinkerSemiBold', sans-serif", background: 'rgba(6,182,212,0.2)', border: '1.5px solid rgba(6,182,212,0.4)', color: '#e0f2fe' }}>
-          + Create Tribe Game
-        </button>
+        <div className="flex gap-3">
+          <button onClick={() => setShowCreate(!showCreate)}
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wider transition-all hover:scale-[1.02]"
+            style={{ fontFamily: "'BlinkerSemiBold', sans-serif", background: 'rgba(6,182,212,0.2)', border: '1.5px solid rgba(6,182,212,0.4)', color: '#e0f2fe' }}>
+            + Create Tribe Game
+          </button>
+          <button onClick={() => setDeleteAllModal(true)}
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wider transition-all hover:scale-[1.02]"
+            style={{ fontFamily: "'BlinkerSemiBold', sans-serif", background: 'rgba(239,68,68,0.12)', border: '1.5px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>
+            Delete All Data
+          </button>
+        </div>
       </div>
 
       {/* ── GAME FLOW INFO ── */}
@@ -680,6 +709,18 @@ export default function AdminBeachBattleGames() {
         message="Are you sure you want to delete this game? This action cannot be undone."
         confirmLabel="Delete Game"
         onConfirm={handleDeleteGame}
+        accentColor="#ef4444"
+        variant="danger"
+      />
+
+      {/* Delete All Data Modal */}
+      <ConfirmModal
+        open={deleteAllModal}
+        onClose={() => setDeleteAllModal(false)}
+        title="Delete All Beach Battle Data"
+        message="This will permanently delete ALL games AND all player registrations. This cannot be undone. The arena will be completely reset."
+        confirmLabel={deletingAll ? 'Deleting...' : 'Delete Everything'}
+        onConfirm={handleDeleteAllData}
         accentColor="#ef4444"
         variant="danger"
       />

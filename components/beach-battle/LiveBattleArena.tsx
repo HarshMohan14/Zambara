@@ -19,7 +19,8 @@ interface LiveGame {
   slotNumber: number
   tribe: string
   status: string
-  players: Player[]
+  players?: Player[]
+  matchups?: { table: number; player1: string; player2: string; player1Id?: string; player2Id?: string; status: string }[]
   warrior?: string
   warriorId?: string
   zampion?: string
@@ -362,7 +363,19 @@ export function LiveBattleArena() {
 
 function getGamePlayers(game: LiveGame): Player[] {
   if (game.players && game.players.length > 0) return game.players
-  // Legacy fallback: no players array
+  // Legacy fallback: derive players from matchups
+  if (game.matchups && game.matchups.length > 0) {
+    const playerMap = new Map<string, Player>()
+    for (const m of game.matchups) {
+      if (m.player1 && !playerMap.has(m.player1)) {
+        playerMap.set(m.player1, { name: m.player1, id: m.player1Id })
+      }
+      if (m.player2 && !playerMap.has(m.player2)) {
+        playerMap.set(m.player2, { name: m.player2, id: m.player2Id })
+      }
+    }
+    return Array.from(playerMap.values())
+  }
   return []
 }
 

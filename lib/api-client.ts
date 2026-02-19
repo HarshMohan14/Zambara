@@ -531,6 +531,12 @@ class ApiClient {
   async getBeachBattleScorecard() {
     return this.request('/beach-battle/scorecard')
   }
+
+  async deleteAllBeachBattleData() {
+    return this.request('/beach-battle/delete-all', {
+      method: 'DELETE',
+    })
+  }
 }
 
 export const apiClient = new ApiClient()

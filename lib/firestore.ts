@@ -1464,6 +1464,34 @@ export interface BeachBattleGame {
   updatedAt: string
 }
 
+/**
+ * Normalize a game: if `players` array is missing or empty,
+ * derive it from the legacy `matchups` array.
+ * This handles data created with the old schema.
+ */
+function normalizeGame(raw: any): BeachBattleGame {
+  const game = raw as BeachBattleGame
+  if (!game.players || !Array.isArray(game.players) || game.players.length === 0) {
+    // Derive players from matchups (deduped by name)
+    const matchups: BeachBattleMatchup[] = game.matchups || []
+    const playerMap = new Map<string, BeachBattlePlayer>()
+    for (const m of matchups) {
+      if (m.player1 && !playerMap.has(m.player1)) {
+        playerMap.set(m.player1, { name: m.player1, id: m.player1Id })
+      }
+      if (m.player2 && !playerMap.has(m.player2)) {
+        playerMap.set(m.player2, { name: m.player2, id: m.player2Id })
+      }
+    }
+    game.players = Array.from(playerMap.values())
+  }
+  // Ensure matchups is always an array
+  if (!game.matchups || !Array.isArray(game.matchups)) {
+    game.matchups = []
+  }
+  return game
+}
+
 /** Get all games, optionally filtered */
 export async function getBeachBattleGames(params?: {
   tribe?: string
@@ -1485,7 +1513,7 @@ export async function getBeachBattleGames(params?: {
     try { q = query(q, orderBy('createdAt', 'desc')) } catch (_) {}
     
     const snapshot = await getDocs(q)
-    let games = snapshot.docs.map(d => ({ id: d.id, ...convertTimestamps(d.data()) })) as BeachBattleGame[]
+    let games = snapshot.docs.map(d => normalizeGame({ id: d.id, ...convertTimestamps(d.data()) }))
     
     // Client-side sort fallback
     games.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -1506,7 +1534,7 @@ export async function getBeachBattleGames(params?: {
 export async function getBeachBattleGame(id: string): Promise<BeachBattleGame | null> {
   const docRef = doc(db, 'beachBattleGames', id)
   const snap = await getDoc(docRef)
-  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } as BeachBattleGame : null
+  return snap.exists() ? normalizeGame({ id: snap.id, ...convertTimestamps(snap.data()) }) : null
 }
 
 /** Admin creates a game for a tribe (when 4 players are filled) */
@@ -1633,14 +1661,14 @@ export async function deleteBeachBattleGame(id: string): Promise<void> {
 export async function getLiveBeachBattleGames(): Promise<BeachBattleGame[]> {
   const q = query(beachBattleGamesCollection, where('status', '==', 'live'))
   const snapshot = await getDocs(q)
-  return snapshot.docs.map(d => ({ id: d.id, ...convertTimestamps(d.data()) })) as BeachBattleGame[]
+  return snapshot.docs.map(d => normalizeGame({ id: d.id, ...convertTimestamps(d.data()) }))
 }
 
 /** Get completed games with warriors/zampions (for hall of fame) */
 export async function getCompletedBeachBattleGames(): Promise<BeachBattleGame[]> {
   const q = query(beachBattleGamesCollection, where('status', '==', 'completed'))
   const snapshot = await getDocs(q)
-  return snapshot.docs.map(d => ({ id: d.id, ...convertTimestamps(d.data()) })) as BeachBattleGame[]
+  return snapshot.docs.map(d => normalizeGame({ id: d.id, ...convertTimestamps(d.data()) }))
 }
 
 /** Get tribe scorecard: count of zampions per tribe across all completed games */
@@ -1672,4 +1700,72 @@ export async function getBeachBattleTribeScorecard(): Promise<{ tribe: string; z
     zampionCount: zampionSlots[t]?.size || 0,
     warriorCount: scorecard[t]?.warriorCount || 0,
   }))
+}
+
+/** Delete ALL beach battle games */
+export async function deleteAllBeachBattleGames(): Promise<{ deleted: number }> {
+  const snapshot = await getDocs(query(beachBattleGamesCollection))
+  let deleted = 0
+  for (const docSnap of snapshot.docs) {
+    await deleteDoc(doc(db, 'beachBattleGames', docSnap.id))
+    deleted++
+  }
+  return { deleted }
+}
+
+/** Delete ALL beach battle registrations */
+export async function deleteAllBeachBattleRegistrations(): Promise<{ deleted: number }> {
+  const snapshot = await getDocs(query(beachBattleRegistrationsCollection))
+  let deleted = 0
+  for (const docSnap of snapshot.docs) {
+    await deleteDoc(doc(db, 'beachBattleRegistrations', docSnap.id))
+    deleted++
+  }
+  return { deleted }
+}
+
+/**
+ * Migrate legacy games: for any game that has matchups but no players array,
+ * derive the players from matchups and write them back to Firestore.
+ * Returns the number of games migrated.
+ */
+export async function migrateBeachBattleGames(): Promise<{ migrated: number; total: number; details: string[] }> {
+  const snapshot = await getDocs(query(beachBattleGamesCollection))
+  const details: string[] = []
+  let migrated = 0
+
+  for (const docSnap of snapshot.docs) {
+    const data = docSnap.data()
+    const hasPlayers = data.players && Array.isArray(data.players) && data.players.length > 0
+    const hasMatchups = data.matchups && Array.isArray(data.matchups) && data.matchups.length > 0
+
+    if (!hasPlayers && hasMatchups) {
+      // Derive players from matchups
+      const matchups: BeachBattleMatchup[] = data.matchups
+      const playerMap = new Map<string, BeachBattlePlayer>()
+      for (const m of matchups) {
+        if (m.player1 && !playerMap.has(m.player1)) {
+          playerMap.set(m.player1, { name: m.player1, id: m.player1Id })
+        }
+        if (m.player2 && !playerMap.has(m.player2)) {
+          playerMap.set(m.player2, { name: m.player2, id: m.player2Id })
+        }
+      }
+      const players = Array.from(playerMap.values())
+
+      // Write players back to Firestore
+      const docRef = doc(db, 'beachBattleGames', docSnap.id)
+      await updateDoc(docRef, {
+        players,
+        updatedAt: Timestamp.now(),
+      })
+
+      details.push(`Migrated ${docSnap.id} (${data.tribe}): ${players.map(p => p.name).join(', ')}`)
+      migrated++
+    } else if (!hasPlayers && !hasMatchups) {
+      details.push(`Skipped ${docSnap.id} (${data.tribe}): no matchups or players`)
+    }
+  }
+
+  return { migrated, total: snapshot.docs.length, details }
 }
