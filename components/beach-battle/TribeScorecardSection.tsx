@@ -11,10 +11,47 @@ interface TribeScore {
 }
 
 export function TribeScorecardSection() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const [scores, setScores] = useState<TribeScore[]>([])
   const titleRef = useRef<HTMLHeadingElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
-  const [scores, setScores] = useState<TribeScore[]>([])
+  const hasAnimated = useRef(false)
+
+  // GSAP scroll-triggered entrance animations — runs once after scores load
+  useEffect(() => {
+    if (scores.length === 0 || hasAnimated.current) return
+    hasAnimated.current = true
+
+    if (titleRef.current) {
+      gsap.from(titleRef.current, {
+        opacity: 0,
+        y: 50,
+        filter: 'blur(8px)',
+        duration: 1.4,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: titleRef.current,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+
+    if (gridRef.current) {
+      gsap.from(gridRef.current.children, {
+        opacity: 0,
+        y: 40,
+        scale: 0.95,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: 'back.out(1.2)',
+        scrollTrigger: {
+          trigger: gridRef.current,
+          start: 'top 82%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+  }, [scores])
 
   useEffect(() => {
     const fetchScorecard = async () => {
@@ -29,30 +66,6 @@ export function TribeScorecardSection() {
     return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    if (!sectionRef.current) return
-    const ctx = gsap.context(() => {
-      if (titleRef.current) {
-        gsap.fromTo(titleRef.current,
-          { opacity: 0, y: 50, filter: 'blur(8px)' },
-          {
-            opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'power3.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' }
-          }
-        )
-      }
-      if (gridRef.current) {
-        gsap.fromTo(Array.from(gridRef.current.children),
-          { opacity: 0, y: 40, scale: 0.85 },
-          {
-            opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.12, ease: 'back.out(1.4)',
-            scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none none' }
-          }
-        )
-      }
-    }, sectionRef)
-    return () => { ctx.revert() }
-  }, [])
 
   if (scores.length === 0) return null
 
@@ -65,7 +78,6 @@ export function TribeScorecardSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="tribe-scorecard"
       aria-label="Tribe Scorecard"
       className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
@@ -94,7 +106,8 @@ export function TribeScorecardSection() {
             </span>
           </div>
 
-          <h2 ref={titleRef}
+          <h2
+            ref={titleRef}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",

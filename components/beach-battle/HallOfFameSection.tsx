@@ -29,10 +29,47 @@ const UPCOMING_LINE = 'The tides are gathering. Soon, legends will be written in
 // ═══════════════════════════════════════════════════════════
 
 export function HallOfFameSection() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const [completedGames, setCompletedGames] = useState<CompletedGame[]>([])
   const titleRef = useRef<HTMLHeadingElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
-  const [completedGames, setCompletedGames] = useState<CompletedGame[]>([])
+  const hasAnimated = useRef(false)
+
+  // GSAP scroll-triggered entrance animations — runs once after first data load
+  useEffect(() => {
+    if (completedGames.length === 0 || hasAnimated.current) return
+    hasAnimated.current = true
+
+    if (titleRef.current) {
+      gsap.from(titleRef.current, {
+        opacity: 0,
+        y: 50,
+        filter: 'blur(8px)',
+        duration: 1.4,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: titleRef.current,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+
+    if (gridRef.current) {
+      gsap.from(gridRef.current.children, {
+        opacity: 0,
+        y: 40,
+        scale: 0.95,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: 'back.out(1.2)',
+        scrollTrigger: {
+          trigger: gridRef.current,
+          start: 'top 82%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+  }, [completedGames])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,30 +86,6 @@ export function HallOfFameSection() {
     return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    if (!sectionRef.current) return
-    const ctx = gsap.context(() => {
-      if (titleRef.current) {
-        gsap.fromTo(titleRef.current,
-          { opacity: 0, y: 50, filter: 'blur(8px)' },
-          {
-            opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'power3.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' }
-          }
-        )
-      }
-      if (gridRef.current) {
-        gsap.fromTo(Array.from(gridRef.current.children),
-          { opacity: 0, y: 40, scale: 0.95 },
-          {
-            opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.15, ease: 'back.out(1.2)',
-            scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none none' }
-          }
-        )
-      }
-    }, sectionRef)
-    return () => { ctx.revert() }
-  }, [])
 
   // Derive warriors from completed games (one per tribe)
   const warriors: { name: string; tribe: string }[] = []
@@ -95,7 +108,6 @@ export function HallOfFameSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="hall-of-fame"
       aria-label="Hall of Fame"
       className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
@@ -124,7 +136,8 @@ export function HallOfFameSection() {
             </span>
           </div>
 
-          <h2 ref={titleRef}
+          <h2
+            ref={titleRef}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
