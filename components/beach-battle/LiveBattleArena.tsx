@@ -5,18 +5,13 @@ import { gsap } from '@/lib/gsap'
 import { TribeIcon, OceanIcon, SwordsIcon, CrownIcon, TrophyIcon, ShieldIcon, LivePulseIcon, getDisplayColor, TRIBES } from './TribeIcons'
 
 // ═══════════════════════════════════════════════════════════
-// Types
+// Types — Updated for 4-players-per-tribe model
 // ═══════════════════════════════════════════════════════════
 
-interface Matchup {
-  table: number
-  player1: string
-  player2: string
-  player1Id?: string
-  player2Id?: string
-  status: string
-  winner?: string
-  winnerId?: string
+interface Player {
+  name: string
+  id?: string
+  playerNumber?: number
 }
 
 interface LiveGame {
@@ -24,7 +19,7 @@ interface LiveGame {
   slotNumber: number
   tribe: string
   status: string
-  matchups: Matchup[]
+  players: Player[]
   warrior?: string
   warriorId?: string
   zampion?: string
@@ -258,7 +253,18 @@ export function LiveBattleArena() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// Sub-components: Arena View — Overview of all live/recent games
+// Helper: Get players from game (players array or fallback)
+// ═══════════════════════════════════════════════════════════
+
+function getGamePlayers(game: LiveGame): Player[] {
+  if (game.players && game.players.length > 0) return game.players
+  // Legacy fallback: no players array
+  return []
+}
+
+// ═══════════════════════════════════════════════════════════
+// Sub-components: Arena View — Overview of all 4 tribes
+// Shows 4 tribe cards, each with 4 players competing
 // ═══════════════════════════════════════════════════════════
 
 function ArenaView({ games, hasLive }: { games: LiveGame[]; hasLive: boolean }) {
@@ -275,7 +281,7 @@ function ArenaView({ games, hasLive }: { games: LiveGame[]; hasLive: boolean }) 
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Status summary */}
+      {/* 4 Tribe Status Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {TRIBES.map(tribe => {
           const tribeGames = games.filter(g => g.tribe === tribe.name)
@@ -283,6 +289,7 @@ function ArenaView({ games, hasLive }: { games: LiveGame[]; hasLive: boolean }) 
           const isLive = tribeGames.some(g => g.status === 'live')
           const isCompleted = tribeGames.some(g => g.status === 'completed')
           const warrior = tribeGames.find(g => g.warrior)?.warrior
+          const players = tribeGames.length > 0 ? getGamePlayers(tribeGames[0]) : []
 
           return (
             <div key={tribe.name} className="rounded-xl p-3 sm:p-4 relative overflow-hidden"
@@ -319,36 +326,39 @@ function ArenaView({ games, hasLive }: { games: LiveGame[]; hasLive: boolean }) 
                 </div>
               </div>
 
-              {/* Matchup info */}
-              {tribeGames.length > 0 && (
-                <div className="space-y-1.5">
-                  {tribeGames[0].matchups.slice(0, 2).map((m, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs rounded-lg px-2 py-1.5"
-                      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                      <span className="text-[9px] text-white/20 mr-1.5">T{m.table}</span>
-                      <span className={`truncate flex-1 text-center ${m.winner === m.player1 ? 'text-green-400' : 'text-white/60'}`}>
-                        {m.player1}
-                      </span>
-                      <span className="text-white/15 mx-1">vs</span>
-                      <span className={`truncate flex-1 text-center ${m.winner === m.player2 ? 'text-green-400' : 'text-white/60'}`}>
-                        {m.player2}
-                      </span>
-                      {m.status === 'live' && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse ml-1" />
-                      )}
-                    </div>
-                  ))}
+              {/* 4 Players at this tribe's table */}
+              {players.length > 0 && (
+                <div className="space-y-1">
+                  {players.map((p, i) => {
+                    const isWarrior = warrior === p.name
+                    return (
+                      <div key={i} className="flex items-center gap-1.5 rounded-md px-2 py-1"
+                        style={{
+                          background: isWarrior ? `${tribeColor}15` : 'rgba(0,0,0,0.25)',
+                          border: `1px solid ${isWarrior ? `${tribeColor}30` : 'rgba(255,255,255,0.03)'}`,
+                        }}>
+                        {isWarrior && <ShieldIcon size={10} />}
+                        <span className={`text-[10px] sm:text-xs truncate ${isWarrior ? 'font-bold' : ''}`}
+                          style={{ color: isWarrior ? tribeColor : 'rgba(255,255,255,0.55)' }}>
+                          {p.name}
+                        </span>
+                        {isWarrior && (
+                          <span className="text-[7px] uppercase tracking-wider ml-auto flex-shrink-0" style={{ color: `${tribeColor}80` }}>
+                            Warrior
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 
-              {/* Warrior result */}
-              {warrior && (
-                <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${tribeColor}15` }}>
-                  <div className="flex items-center gap-1.5">
-                    <ShieldIcon size={12} />
-                    <span className="text-[10px] uppercase tracking-wider text-white/30">Warrior:</span>
-                    <span className="text-xs font-bold" style={{ color: tribeColor }}>{warrior}</span>
-                  </div>
+              {/* No game for this tribe yet */}
+              {players.length === 0 && tribeGames.length === 0 && (
+                <div className="text-center py-2">
+                  <p className="text-[9px] uppercase tracking-wider" style={{ color: `${tribeColor}30` }}>
+                    No game yet
+                  </p>
                 </div>
               )}
 
@@ -360,71 +370,68 @@ function ArenaView({ games, hasLive }: { games: LiveGame[]; hasLive: boolean }) 
         })}
       </div>
 
-      {/* Per-table view for live games */}
+      {/* Live Games — Show all 4 players fighting at the table */}
       {hasLive && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
             <SwordsIcon size={20} />
             <h3 className="text-lg sm:text-xl font-bold uppercase"
               style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#22c55e', textShadow: '0 0 15px rgba(34,197,94,0.2)' }}>
-              Live Matchups
+              Live Tribe Fights
             </h3>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {games.filter(g => g.status === 'live').flatMap(game =>
-              game.matchups.filter(m => m.status === 'live' || m.status === 'pending').map((m, i) => ({
-                ...m,
-                tribe: game.tribe,
-                gameId: game.id,
-                key: `${game.id}-${i}`,
-              }))
-            ).map(matchup => {
-              const tribeColor = getDisplayColor(matchup.tribe)
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {games.filter(g => g.status === 'live').map(game => {
+              const tribeColor = getDisplayColor(game.tribe)
+              const players = getGamePlayers(game)
               return (
-                <div key={matchup.key} className="rounded-xl p-4 relative overflow-hidden"
+                <div key={game.id} className="rounded-xl p-4 relative overflow-hidden"
                   style={{
                     background: `linear-gradient(160deg, ${tribeColor}08, rgba(0,0,0,0.7))`,
-                    border: `1px solid ${matchup.status === 'live' ? 'rgba(34,197,94,0.25)' : `${tribeColor}15`}`,
-                    boxShadow: matchup.status === 'live' ? '0 0 20px rgba(34,197,94,0.05)' : 'none',
+                    border: `1.5px solid rgba(34,197,94,0.25)`,
+                    boxShadow: '0 0 20px rgba(34,197,94,0.05)',
                   }}>
-                  {/* Tribe + Table badge */}
+                  {/* Tribe + Live badge */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <TribeIcon tribe={matchup.tribe} size={16} />
-                      <span className="text-xs font-bold uppercase tracking-wider" style={{ color: tribeColor }}>
-                        {matchup.tribe}
+                      <TribeIcon tribe={game.tribe} size={20} />
+                      <span className="text-sm font-bold uppercase tracking-wider" style={{ color: tribeColor }}>
+                        {game.tribe} Tribe Table
                       </span>
-                      <span className="text-[10px] text-white/20 uppercase">Table {matchup.table}</span>
                     </div>
-                    {matchup.status === 'live' && (
-                      <span className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-green-400/70">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        In Progress
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-green-400/70">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      In Progress
+                    </span>
                   </div>
 
-                  {/* VS display */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 text-center">
-                      <p className="text-sm sm:text-base font-bold truncate"
-                        style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: matchup.winner === matchup.player1 ? '#22c55e' : '#e2e8f0' }}>
-                        {matchup.player1}
-                      </p>
-                    </div>
-                    <div className="px-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(6,182,212,0.15)' }}>
-                        <SwordsIcon size={18} />
+                  {/* 4 Players competing */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {players.map((p, i) => (
+                      <div key={i} className="rounded-lg p-2.5 text-center relative"
+                        style={{
+                          background: 'rgba(0,0,0,0.3)',
+                          border: `1px solid ${tribeColor}15`,
+                        }}>
+                        <p className="text-xs sm:text-sm font-bold truncate"
+                          style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: '#e2e8f0' }}>
+                          {p.name}
+                        </p>
+                        <p className="text-[8px] uppercase tracking-wider mt-0.5"
+                          style={{ color: `${tribeColor}50` }}>
+                          Player {p.playerNumber || i + 1}
+                        </p>
                       </div>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <p className="text-sm sm:text-base font-bold truncate"
-                        style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: matchup.winner === matchup.player2 ? '#22c55e' : '#e2e8f0' }}>
-                        {matchup.player2}
-                      </p>
-                    </div>
+                    ))}
+                  </div>
+
+                  {/* 4-way battle indicator */}
+                  <div className="mt-3 text-center">
+                    <p className="text-[9px] uppercase tracking-[0.2em]"
+                      style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(34,197,94,0.5)' }}>
+                      4 Players &mdash; 1 Warrior will rise
+                    </p>
                   </div>
                 </div>
               )
@@ -438,6 +445,7 @@ function ArenaView({ games, hasLive }: { games: LiveGame[]; hasLive: boolean }) 
 
 // ═══════════════════════════════════════════════════════════
 // Sub-component: Tribe Fight View — Detailed per-tribe breakdowns
+// Shows 4 players per tribe table, warrior result
 // ═══════════════════════════════════════════════════════════
 
 function TribeFightView({ games, expandedGame, setExpandedGame }: {
@@ -456,7 +464,7 @@ function TribeFightView({ games, expandedGame, setExpandedGame }: {
     )
   }
 
-  // Sort: live first, then completed, then pending
+  // Sort: live first, then pending, then completed
   const sortedGames = [...games].sort((a, b) => {
     const order: Record<string, number> = { live: 0, pending: 1, completed: 2 }
     return (order[a.status] ?? 3) - (order[b.status] ?? 3)
@@ -473,7 +481,7 @@ function TribeFightView({ games, expandedGame, setExpandedGame }: {
             Tribe Battles
           </h3>
           <p className="text-xs text-white/30 uppercase tracking-wider" style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-            Each tribe fights at their own table. One warrior qualifies per tribe.
+            4 players compete at each tribe&apos;s table. The winner becomes the tribe&apos;s Warrior.
           </p>
         </div>
       </div>
@@ -483,9 +491,7 @@ function TribeFightView({ games, expandedGame, setExpandedGame }: {
         const isExpanded = expandedGame === game.id
         const isLive = game.status === 'live'
         const isCompleted = game.status === 'completed'
-        const totalMatchups = game.matchups.length
-        const completedMatchups = game.matchups.filter(m => m.status === 'completed').length
-        const liveMatchups = game.matchups.filter(m => m.status === 'live').length
+        const players = getGamePlayers(game)
 
         return (
           <div key={game.id} className="rounded-xl overflow-hidden transition-all duration-500"
@@ -518,9 +524,9 @@ function TribeFightView({ games, expandedGame, setExpandedGame }: {
                       <StatusBadge status={game.status} />
                     </div>
                     <p className="text-xs text-white/30" style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-                      {totalMatchups} matchup{totalMatchups !== 1 ? 's' : ''}
-                      {liveMatchups > 0 && ` \u00b7 ${liveMatchups} live`}
-                      {completedMatchups > 0 && ` \u00b7 ${completedMatchups} done`}
+                      {players.length} player{players.length !== 1 ? 's' : ''} at the table
+                      {isLive && ' · Fighting now'}
+                      {isCompleted && game.warrior && ` · Warrior: ${game.warrior}`}
                     </p>
                   </div>
                 </div>
@@ -541,72 +547,87 @@ function TribeFightView({ games, expandedGame, setExpandedGame }: {
                 </div>
               </div>
 
-              {/* Progress bar */}
-              {totalMatchups > 0 && (
-                <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                  <div className="h-full rounded-full transition-all duration-1000"
-                    style={{
-                      width: `${isCompleted ? 100 : ((completedMatchups / totalMatchups) * 100)}%`,
-                      background: isLive
-                        ? `linear-gradient(90deg, ${tribeColor}, #22c55e)`
-                        : `linear-gradient(90deg, ${tribeColor}80, ${tribeColor})`,
-                    }} />
-                </div>
-              )}
+              {/* Status bar */}
+              <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <div className="h-full rounded-full transition-all duration-1000"
+                  style={{
+                    width: isCompleted ? '100%' : isLive ? '50%' : '0%',
+                    background: isLive
+                      ? `linear-gradient(90deg, ${tribeColor}, #22c55e)`
+                      : `linear-gradient(90deg, ${tribeColor}80, ${tribeColor})`,
+                  }} />
+              </div>
             </div>
 
-            {/* Expanded matchups */}
+            {/* Expanded: 4 players grid */}
             <div className="overflow-hidden transition-all duration-500"
               style={{ maxHeight: isExpanded ? '600px' : '0px', opacity: isExpanded ? 1 : 0 }}>
               <div className="px-4 sm:px-5 pb-5 space-y-3" style={{ borderTop: `1px solid ${tribeColor}10` }}>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/25 pt-3 mb-2"
                   style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
-                  Table Matchups
+                  Players at the Table
                 </p>
 
-                {game.matchups.map((m, i) => (
-                  <div key={i} className="rounded-xl p-3 sm:p-4 relative overflow-hidden"
-                    style={{
-                      background: m.status === 'live'
-                        ? 'linear-gradient(160deg, rgba(34,197,94,0.05), rgba(0,0,0,0.5))'
-                        : 'rgba(0,0,0,0.3)',
-                      border: `1px solid ${m.status === 'live' ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.04)'}`,
-                    }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] uppercase tracking-wider text-white/20"
-                        style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
-                        Table {m.table}
-                      </span>
-                      <MatchupStatusBadge status={m.status} />
-                    </div>
+                {/* 4 Player Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                  {players.map((p, i) => {
+                    const isWarrior = game.warrior === p.name
+                    return (
+                      <div key={i} className="rounded-xl p-3 sm:p-4 text-center relative overflow-hidden transition-all duration-300"
+                        style={{
+                          background: isWarrior
+                            ? `linear-gradient(160deg, ${tribeColor}15, rgba(0,0,0,0.5))`
+                            : 'rgba(0,0,0,0.3)',
+                          border: `1.5px solid ${isWarrior ? `${tribeColor}40` : 'rgba(255,255,255,0.05)'}`,
+                          boxShadow: isWarrior ? `0 0 20px ${tribeColor}10` : 'none',
+                        }}>
+                        {/* Warrior crown */}
+                        {isWarrior && (
+                          <div className="absolute -top-1 left-1/2 -translate-x-1/2">
+                            <ShieldIcon size={16} />
+                          </div>
+                        )}
 
-                    {/* VS Display */}
-                    <div className="flex items-center">
-                      <PlayerCard name={m.player1} isWinner={m.winner === m.player1} tribeColor={tribeColor} />
-                      <div className="flex-shrink-0 px-2 sm:px-4">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center"
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
                           style={{
-                            background: m.status === 'live' ? 'rgba(34,197,94,0.1)' : 'rgba(0,0,0,0.4)',
-                            border: `1px solid ${m.status === 'live' ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                            background: `radial-gradient(circle, ${tribeColor}${isWarrior ? '35' : '15'}, ${tribeColor}05)`,
+                            border: `1px solid ${tribeColor}${isWarrior ? '35' : '15'}`,
                           }}>
-                          <span className="text-[10px] font-bold uppercase" style={{ color: m.status === 'live' ? '#22c55e' : 'rgba(255,255,255,0.2)' }}>VS</span>
+                          <span className="text-sm font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: isWarrior ? tribeColor : 'rgba(255,255,255,0.4)' }}>
+                            {p.playerNumber || i + 1}
+                          </span>
                         </div>
-                      </div>
-                      <PlayerCard name={m.player2} isWinner={m.winner === m.player2} tribeColor={tribeColor} />
-                    </div>
 
-                    {/* Winner */}
-                    {m.winner && (
-                      <div className="mt-2 pt-2 flex items-center justify-center gap-1.5"
-                        style={{ borderTop: '1px solid rgba(34,197,94,0.1)' }}>
-                        <TrophyIcon size={14} />
-                        <span className="text-xs font-bold text-green-400 uppercase tracking-wider">{m.winner} wins</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                        <p className="text-xs sm:text-sm font-bold truncate mb-0.5"
+                          style={{
+                            fontFamily: "'BlinkerSemiBold', sans-serif",
+                            color: isWarrior ? tribeColor : '#e2e8f0',
+                          }}>
+                          {p.name}
+                        </p>
 
-                {/* Warrior result */}
+                        {isWarrior ? (
+                          <span className="text-[8px] uppercase tracking-[0.15em] font-bold"
+                            style={{ color: tribeColor }}>
+                            Warrior
+                          </span>
+                        ) : (
+                          <span className="text-[8px] uppercase tracking-wider text-white/20">
+                            {isLive ? 'Competing' : isCompleted ? 'Eliminated' : 'Ready'}
+                          </span>
+                        )}
+
+                        {/* Warrior glow bar */}
+                        {isWarrior && (
+                          <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+                            style={{ background: `linear-gradient(90deg, transparent, ${tribeColor}, transparent)` }} />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Warrior result box */}
                 {game.warrior && (
                   <div className="rounded-xl p-4 text-center"
                     style={{
@@ -616,7 +637,7 @@ function TribeFightView({ games, expandedGame, setExpandedGame }: {
                     }}>
                     <ShieldIcon size={24} className="mx-auto mb-2" />
                     <p className="text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: `${tribeColor}80` }}>
-                      Round 1 Warrior (Qualifier)
+                      Tribe Warrior (Qualified for Zampion Round)
                     </p>
                     <p className="text-lg sm:text-xl font-bold uppercase"
                       style={{ fontFamily: "'TheWalkyrDemo', serif", color: tribeColor, textShadow: `0 0 15px ${tribeColor}25` }}>
@@ -820,42 +841,5 @@ function StatusBadge({ status }: { status: string }) {
       {status === 'live' && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: s.text }} />}
       {s.label}
     </span>
-  )
-}
-
-function MatchupStatusBadge({ status }: { status: string }) {
-  const styles: Record<string, { bg: string; text: string; label: string }> = {
-    pending: { bg: 'rgba(251,191,36,0.08)', text: '#fbbf24', label: 'Waiting' },
-    live: { bg: 'rgba(34,197,94,0.08)', text: '#22c55e', label: 'In Progress' },
-    completed: { bg: 'rgba(148,163,184,0.06)', text: '#94a3b8', label: 'Complete' },
-  }
-  const s = styles[status] || styles.pending
-  return (
-    <span className="flex items-center gap-1 text-[9px] uppercase tracking-wider"
-      style={{ color: s.text }}>
-      {status === 'live' && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: s.text }} />}
-      {s.label}
-    </span>
-  )
-}
-
-function PlayerCard({ name, isWinner, tribeColor }: { name: string; isWinner: boolean; tribeColor: string }) {
-  return (
-    <div className="flex-1 text-center rounded-lg p-2 sm:p-3"
-      style={{
-        background: isWinner ? 'rgba(34,197,94,0.08)' : 'rgba(0,0,0,0.2)',
-        border: `1px solid ${isWinner ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.03)'}`,
-      }}>
-      <p className="text-xs sm:text-sm font-bold truncate"
-        style={{
-          fontFamily: "'BlinkerSemiBold', sans-serif",
-          color: isWinner ? '#22c55e' : '#e2e8f0',
-        }}>
-        {name}
-      </p>
-      {isWinner && (
-        <span className="text-[8px] uppercase tracking-wider text-green-400/60">Winner</span>
-      )}
-    </div>
   )
 }

@@ -52,14 +52,15 @@ export async function POST(request: NextRequest) {
     if (body.slotNumber === undefined || typeof body.slotNumber !== 'number') {
       return errorResponse('Slot number is required')
     }
-    if (!body.matchups || !Array.isArray(body.matchups)) {
-      return errorResponse('Matchups array is required')
+    if (!body.players || !Array.isArray(body.players) || body.players.length === 0) {
+      return errorResponse('Players array is required')
     }
 
     const game = await createBeachBattleGame({
       slotNumber: body.slotNumber,
       tribe: body.tribe,
-      matchups: body.matchups,
+      players: body.players,
+      matchups: body.matchups || [],
     })
 
     if (!game) {
