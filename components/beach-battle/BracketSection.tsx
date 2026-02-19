@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { gsap, createTimeline } from '@/lib/gsap'
+import { useEffect, useRef, useState } from 'react'
+import { gsap } from '@/lib/gsap'
 
 interface BracketRound {
   name: string
@@ -37,33 +37,13 @@ const rounds: BracketRound[] = [
   },
 ]
 
-interface HallOfFameEntry {
-  rank: number
-  title: string
-  name: string
-  tribe: string
-  color: string
-  borderColor: string
-  tribeColor: string
-}
-
-const hallOfFame: HallOfFameEntry[] = [
-  { rank: 1, title: 'Zampion of the Tides', name: 'To Be Crowned', tribe: '—', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.4)', tribeColor: '#fbbf24' },
-  { rank: 2, title: 'Second Wave', name: 'Awaiting', tribe: '—', color: '#94a3b8', borderColor: 'rgba(148, 163, 184, 0.25)', tribeColor: '#94a3b8' },
-  { rank: 3, title: 'Third Current', name: 'Awaiting', tribe: '—', color: '#d97706', borderColor: 'rgba(217, 119, 6, 0.25)', tribeColor: '#d97706' },
-  { rank: 4, title: 'Fourth Shore', name: 'Awaiting', tribe: '—', color: '#64748b', borderColor: 'rgba(100, 116, 139, 0.2)', tribeColor: '#64748b' },
-]
 
 export function BracketSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
   const flowRef = useRef<HTMLDivElement>(null)
-  const fameRef = useRef<HTMLDivElement>(null)
   const [activeRound, setActiveRound] = useState<number | null>(null)
-  const [fameIndex, setFameIndex] = useState(0)
-  const [fameTouchStart, setFameTouchStart] = useState<number | null>(null)
-  const [fameTouchEnd, setFameTouchEnd] = useState<number | null>(null)
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -97,34 +77,11 @@ export function BracketSection() {
         )
       }
 
-      // Hall of Fame
-      if (fameRef.current) {
-        gsap.fromTo(fameRef.current,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
-            scrollTrigger: { trigger: fameRef.current, start: 'top 85%', toggleActions: 'play none none reverse' } }
-        )
-      }
+
     }, sectionRef)
     return () => { ctx.revert() }
   }, [])
 
-  // Hall of Fame touch handlers
-  const handleFameTouchStart = (e: React.TouchEvent) => {
-    setFameTouchEnd(null)
-    setFameTouchStart(e.targetTouches[0].clientX)
-  }
-  const handleFameTouchMove = (e: React.TouchEvent) => {
-    setFameTouchEnd(e.targetTouches[0].clientX)
-  }
-  const handleFameTouchEnd = () => {
-    if (!fameTouchStart || !fameTouchEnd) return
-    const dist = fameTouchStart - fameTouchEnd
-    if (Math.abs(dist) > 50) {
-      if (dist > 0) setFameIndex(p => Math.min(p + 1, hallOfFame.length - 1))
-      else setFameIndex(p => Math.max(p - 1, 0))
-    }
-  }
 
   return (
     <section
@@ -337,130 +294,6 @@ export function BracketSection() {
               </div>
             )
           })}
-        </div>
-
-        {/* ─── HALL OF FAME ─── */}
-        <div ref={fameRef} className="opacity-0">
-          {/* Hall of Fame Header */}
-          <div className="text-center mb-6 sm:mb-8">
-            <p className="text-xs sm:text-sm uppercase tracking-[0.3em] mb-2"
-              style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.55)' }}>
-              ✦ Hall of Fame ✦
-            </p>
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold uppercase"
-              style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#fbbf24', textShadow: '0 0 30px rgba(251, 191, 36, 0.15)' }}>
-              Legends of the Tides
-            </h3>
-            <p className="text-xs sm:text-sm text-white/20 mt-2"
-              style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-              Zampion Robe bearers throughout history
-            </p>
-          </div>
-
-          {/* Mobile carousel for Hall of Fame */}
-          <div className="sm:hidden">
-            <div className="relative overflow-hidden"
-              onTouchStart={handleFameTouchStart}
-              onTouchMove={handleFameTouchMove}
-              onTouchEnd={handleFameTouchEnd}>
-              <div className="flex transition-transform duration-500 ease-out"
-                style={{ transform: `translateX(-${fameIndex * 100}%)` }}>
-                {hallOfFame.map((entry) => (
-                  <div key={entry.rank} className="w-full flex-shrink-0 px-4">
-                    <div className="text-center p-6 rounded-xl relative overflow-hidden"
-                      style={{
-                        background: entry.rank === 1
-                          ? 'linear-gradient(145deg, rgba(251, 191, 36, 0.1) 0%, rgba(0,0,0,0.8) 100%)'
-                          : 'linear-gradient(145deg, rgba(30, 41, 59, 0.2) 0%, rgba(0,0,0,0.8) 100%)',
-                        border: `1px solid ${entry.borderColor}`,
-                        boxShadow: entry.rank === 1 ? '0 0 30px rgba(251, 191, 36, 0.08)' : 'none',
-                      }}>
-                      {/* Zampion Robe motif for champion */}
-                      {entry.rank === 1 && (
-                        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-                          style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fbbf24' fill-opacity='0.4'%3E%3Cpath d='M40 10l8 16 18 2-13 13 3 18-16-8-16 8 3-18L14 28l18-2z'/%3E%3C/g%3E%3C/svg%3E")`,
-                          }} />
-                      )}
-                      <div className="text-4xl mb-3" style={{ filter: `drop-shadow(0 0 10px ${entry.color}40)` }}>
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill={entry.color}><path d={entry.rank === 1 ? 'M2 20h20v2H2v-2zm1-7l4 3V8l5 6 5-6v8l4-3-1 7H4l-1-7zm9-11l3 4h-6l3-4z' : entry.rank <= 3 ? 'M18 2H6v6a6 6 0 005 5.91V18H8v2h8v-2h-3v-4.09A6 6 0 0018 8V2zM4 4V8a2 2 0 004 0V4H4zm16 0h-4v4a2 2 0 004 0V4z' : 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'} /></svg>
-                      </div>
-                      <div className="text-sm uppercase tracking-wider mb-1"
-                        style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.25)' }}>
-                        #{entry.rank}
-                      </div>
-                      <div className="text-lg font-bold uppercase mb-2"
-                        style={{ fontFamily: "'TheWalkyrDemo', serif", color: entry.color, textShadow: `0 0 15px ${entry.color}25` }}>
-                        {entry.title}
-                      </div>
-                      <div className="h-12 rounded-lg flex items-center justify-center"
-                        style={{ border: `1px dashed ${entry.color}20`, background: 'rgba(0,0,0,0.3)' }}>
-                        <span className="text-xs uppercase tracking-wider"
-                          style={{ fontFamily: "'BlinkerRegular', sans-serif", color: `${entry.color}40` }}>
-                          {entry.name}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Carousel dots */}
-              <div className="flex justify-center gap-2 mt-4">
-                {hallOfFame.map((entry, i) => (
-                  <button key={i}
-                    onClick={() => setFameIndex(i)}
-                    className="transition-all duration-300 rounded-full"
-                    style={{
-                      width: fameIndex === i ? '24px' : '8px',
-                      height: '8px',
-                      background: fameIndex === i ? entry.color : 'rgba(255,255,255,0.15)',
-                      boxShadow: fameIndex === i ? `0 0 10px ${entry.color}40` : 'none',
-                    }}
-                    aria-label={`View ${entry.title}`} />
-                ))}
-              </div>
-              <p className="text-center mt-2 text-xs uppercase tracking-wider"
-                style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(6, 182, 212, 0.25)' }}>
-                ← Swipe →
-              </p>
-            </div>
-          </div>
-
-          {/* Desktop grid for Hall of Fame */}
-          <div className="hidden sm:grid grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
-            {hallOfFame.map((entry) => (
-              <div key={entry.rank}
-                className="text-center p-4 sm:p-5 rounded-xl transition-all duration-300 group cursor-default relative overflow-hidden"
-                style={{
-                  background: entry.rank === 1
-                    ? 'linear-gradient(145deg, rgba(251, 191, 36, 0.08) 0%, rgba(0,0,0,0.8) 100%)'
-                    : 'linear-gradient(145deg, rgba(30, 41, 59, 0.2) 0%, rgba(0,0,0,0.8) 100%)',
-                  border: `1px solid ${entry.borderColor}`,
-                  boxShadow: entry.rank === 1 ? '0 0 25px rgba(251, 191, 36, 0.06)' : 'none',
-                }}>
-                <div className="text-2xl sm:text-3xl mb-2 transition-transform duration-300 group-hover:scale-110"
-                  style={{ filter: `drop-shadow(0 0 8px ${entry.color}35)` }}>
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill={entry.color}><path d={entry.rank === 1 ? 'M2 20h20v2H2v-2zm1-7l4 3V8l5 6 5-6v8l4-3-1 7H4l-1-7zm9-11l3 4h-6l3-4z' : entry.rank <= 3 ? 'M18 2H6v6a6 6 0 005 5.91V18H8v2h8v-2h-3v-4.09A6 6 0 0018 8V2zM4 4V8a2 2 0 004 0V4H4zm16 0h-4v4a2 2 0 004 0V4z' : 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'} /></svg>
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider mb-1"
-                  style={{ fontFamily: "'BlinkerRegular', sans-serif", color: 'rgba(255,255,255,0.25)' }}>
-                  #{entry.rank}
-                </div>
-                <div className="text-sm sm:text-base font-bold uppercase"
-                  style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: entry.color, textShadow: `0 0 10px ${entry.color}25` }}>
-                  {entry.title}
-                </div>
-                <div className="mt-3 h-10 rounded-lg flex items-center justify-center"
-                  style={{ border: `1px dashed ${entry.color}20`, background: 'rgba(0,0,0,0.3)' }}>
-                  <span className="text-[10px] sm:text-xs uppercase tracking-wider"
-                    style={{ fontFamily: "'BlinkerRegular', sans-serif", color: `${entry.color}35` }}>
-                    {entry.name}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Prize callout */}
