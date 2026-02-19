@@ -26,18 +26,8 @@ interface SlotData {
   zampion?: { name: string; tribe: string }
 }
 
-// Creative upcoming lines
-const UPCOMING_LINES = [
-  'The ocean stirs with anticipation. Warriors have yet to be forged in battle.',
-  'The tides are gathering. Soon, legends will be written in salt and fury.',
-  'Silence before the storm — the arena awaits its first champions.',
-  'The elements are restless. The clash is coming.',
-  'No warriors have risen yet. But the sand remembers — every battle is eternal.',
-]
-
-function getUpcomingLine() {
-  return UPCOMING_LINES[Math.floor(Math.random() * UPCOMING_LINES.length)]
-}
+// Creative upcoming lines — use a fixed line to avoid hydration mismatch
+const UPCOMING_LINE = 'The tides are gathering. Soon, legends will be written in salt and fury.'
 
 // ═══════════════════════════════════════════════════════════
 // Component — ALWAYS renders, shows "upcoming" if no data
@@ -48,7 +38,6 @@ export function HallOfFameSection() {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const [slots, setSlots] = useState<SlotData[]>([])
-  const [upcomingLine] = useState(getUpcomingLine)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -192,7 +181,7 @@ export function HallOfFameSection() {
               {/* Creative upcoming text */}
               <p className="text-sm sm:text-base text-white/35 mb-4 max-w-md mx-auto italic leading-relaxed"
                 style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-                &ldquo;{upcomingLine}&rdquo;
+                &ldquo;{UPCOMING_LINE}&rdquo;
               </p>
 
               {/* Upcoming badge */}
