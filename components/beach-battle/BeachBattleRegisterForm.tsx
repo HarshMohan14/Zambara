@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { TribeIcon, TRIBES as TRIBE_DATA } from './TribeIcons'
 
-const TRIBES = [
-  { name: 'Lava', color: '#ef4444', element: 'Fire', icon: '\uD83D\uDD25', glowColor: 'rgba(239,68,68,0.5)' },
-  { name: 'Rain', color: '#3b82f6', element: 'Water', icon: '\uD83C\uDF27\uFE0F', glowColor: 'rgba(59,130,246,0.5)' },
-  { name: 'Wind', color: '#e0e0e0', element: 'Air', icon: '\uD83C\uDF2C\uFE0F', glowColor: 'rgba(224,224,224,0.4)' },
-  { name: 'Mountain', color: '#a78bfa', element: 'Earth', icon: '\uD83C\uDFD4\uFE0F', glowColor: 'rgba(167,139,250,0.5)' },
-]
+const TRIBES = TRIBE_DATA.map(t => ({
+  name: t.name,
+  color: t.color,
+  element: t.element,
+  glowColor: t.glowColor,
+}))
 
 type FormState = 'loading' | 'idle' | 'submitting' | 'revealing' | 'success' | 'error' | 'closed'
 type RevealPhase = 'init' | 'choosing' | 'tribe' | 'card'
@@ -139,7 +140,7 @@ export function BeachBattleRegisterForm() {
     ctx.fillStyle = 'rgba(6,182,212,0.6)'; ctx.font = '600 22px sans-serif'
     ctx.fillText('B E A C H   B A T T L E', W / 2, 160)
 
-    ctx.font = '180px serif'; ctx.fillText(tc.icon, W / 2, 520)
+    ctx.font = '180px serif'; ctx.fillText(tc.name[0], W / 2, 520)
     ctx.strokeStyle = tc.color + '35'; ctx.lineWidth = 3
     ctx.beginPath(); ctx.arc(W / 2, 440, 160, 0, Math.PI * 2); ctx.stroke()
     ctx.strokeStyle = tc.color + '15'; ctx.lineWidth = 1.5
@@ -169,7 +170,7 @@ export function BeachBattleRegisterForm() {
 
     const items = [
       { label: 'Warrior', value: result.name },
-      { label: 'Tribe', value: `${tc.icon} ${tc.name}` },
+      { label: 'Tribe', value: `${tc.name}` },
       { label: 'Player #', value: `${tc.name.substring(0, 1)}${String(result.playerNumber).padStart(2, '0')}` },
     ]
     items.forEach((item, i) => {
@@ -258,7 +259,7 @@ export function BeachBattleRegisterForm() {
               return (
                 <div key={t.name} className="rounded-xl p-3 md:p-4 text-center"
                   style={{ background: 'linear-gradient(145deg, rgba(6,30,50,0.5) 0%, rgba(0,0,0,0.7) 100%)', border: `1px solid ${displayColor(t)}25` }}>
-                  <div className="text-2xl md:text-3xl mb-1">{t.icon}</div>
+                  <div className="text-2xl md:text-3xl mb-1"><TribeIcon tribe={t.name} size={32} /></div>
                   <p className="text-xs md:text-sm uppercase tracking-wider font-semibold" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: displayColor(t) }}>{t.name}</p>
                   <p className="text-xs text-white/40 mt-0.5" style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>{count}/4 warriors</p>
                 </div>
@@ -326,7 +327,7 @@ export function BeachBattleRegisterForm() {
             <div className="md:flex md:items-center md:justify-center md:gap-8 mb-6">
               <div className="text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] mb-4 md:mb-0 inline-block transition-all duration-700"
                 style={{ filter: `drop-shadow(0 0 40px ${tc.glowColor})` }}>
-                {tc.icon}
+                <TribeIcon tribe={tc.name} size={140} />
               </div>
               <div className="text-center md:text-left">
                 <p className="text-base sm:text-lg md:text-xl uppercase tracking-[0.12em] mb-2"
@@ -363,7 +364,7 @@ export function BeachBattleRegisterForm() {
                 <div className="space-y-3">
                   {[
                     { label: 'Warrior', value: result.name },
-                    { label: 'Tribe', value: `${tc.icon} ${tc.name}` },
+                    { label: 'Tribe', value: tc.name },
                     { label: 'Player #', value: `${tc.name.substring(0, 1)}${String(result.playerNumber).padStart(2, '0')}` },
                   ].map((item, i) => (
                     <div key={i}>
@@ -480,7 +481,7 @@ export function BeachBattleRegisterForm() {
                   <div key={t.name} className="text-center">
                     <div className={`w-10 h-10 sm:w-11 sm:h-11 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-2xl mx-auto mb-1 transition-all ${full ? 'opacity-30 grayscale' : ''}`}
                       style={{ background: `radial-gradient(circle at 40% 35%, ${displayColor(t)}55, ${displayColor(t)}20)`, border: `1px solid ${displayColor(t)}30`, boxShadow: full ? 'none' : `0 0 12px ${displayColor(t)}15` }} title={t.name}>
-                      {t.icon}
+                      <TribeIcon tribe={t.name} size={22} />
                     </div>
                     <p className="text-xs md:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: full ? 'rgba(255,255,255,0.2)' : `${displayColor(t)}80` }}>{count}/4</p>
                     <p className="hidden md:block text-xs uppercase tracking-wider mt-0.5" style={{ fontFamily: "'BlinkerRegular', sans-serif", color: full ? 'rgba(255,255,255,0.15)' : `${displayColor(t)}50` }}>{t.name}</p>

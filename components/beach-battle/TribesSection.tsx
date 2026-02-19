@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { gsap, createTimeline } from '@/lib/gsap'
 import Image from 'next/image'
+import { TribeIcon } from './TribeIcons'
 
 interface TribeData {
   name: string
-  icon: string
   title: string
   color: string
   glowColor: string
@@ -15,14 +15,12 @@ interface TribeData {
   description: string
   element: string
   cardImage: string
-  sealIcon: string
   sealColor: string
 }
 
 const tribes: TribeData[] = [
   {
     name: 'Lava',
-    icon: '🔥',
     title: 'Bearer of the Flame',
     color: '#ef4444',
     glowColor: 'rgba(239, 68, 68, 0.6)',
@@ -31,12 +29,10 @@ const tribes: TribeData[] = [
     description: 'From the depths of volcanic fury, the Lava tribe channels raw destructive force. Their fire consumes all that stands before them.',
     element: 'fire',
     cardImage: '/Cards Png/Lava.png',
-    sealIcon: '🌋',
     sealColor: '#dc2626',
   },
   {
     name: 'Rain',
-    icon: '🌧️',
     title: 'Child of the Storm',
     color: '#3b82f6',
     glowColor: 'rgba(59, 130, 246, 0.6)',
@@ -45,12 +41,10 @@ const tribes: TribeData[] = [
     description: 'Born from the tempest above the ocean, Rain warriors command the downpour. They douse flames and erode mountains.',
     element: 'water',
     cardImage: '/Cards Png/Rain.png',
-    sealIcon: '⚡',
     sealColor: '#2563eb',
   },
   {
     name: 'Wind',
-    icon: '🌬️',
     title: 'Walker of the Sky',
     color: '#f0f0f0',
     glowColor: 'rgba(240, 240, 240, 0.45)',
@@ -59,12 +53,10 @@ const tribes: TribeData[] = [
     description: 'Unseen and untouchable, the Wind tribe bends the battlefield itself. Their gusts redirect fate and scatter strategy.',
     element: 'air',
     cardImage: '/Cards Png/Wind.png',
-    sealIcon: '🌀',
     sealColor: '#d4d4d4',
   },
   {
     name: 'Mountain',
-    icon: '🏔️',
     title: 'Keeper of Stone',
     color: '#1a1a1a',
     glowColor: 'rgba(80, 80, 80, 0.6)',
@@ -73,7 +65,6 @@ const tribes: TribeData[] = [
     description: 'Immovable and ancient, the Mountain tribe endures all. They are the shield against chaos, the wall that never breaks.',
     element: 'earth',
     cardImage: '/Cards Png/Mountain.png',
-    sealIcon: '⛰️',
     sealColor: '#525252',
   },
 ]
@@ -357,10 +348,9 @@ export function TribesSection() {
                           border: `2px solid ${tribe.color}40`,
                         }}>
                         {/* Seal symbol */}
-                        <span className="text-2xl sm:text-3xl"
-                          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
-                          {tribe.sealIcon}
-                        </span>
+                        <div style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+                          <TribeIcon tribe={tribe.name} size={32} />
+                        </div>
                         {/* Seal wax drip decorations */}
                         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
                           style={{ background: `${tribe.sealColor}60` }} />
@@ -469,7 +459,7 @@ export function TribesSection() {
                       color: getTextColor(tribe, 'name'),
                       textShadow: `0 0 10px ${tribe.glowColor.replace('0.6', '0.2')}`,
                     }}>
-                    {tribe.icon} {tribe.name}
+                    {tribe.name}
                   </p>
                 </div>
               </div>
@@ -518,7 +508,7 @@ export function TribesSection() {
                   border: `1px solid ${tribe.borderColor.replace('0.5', '0.15').replace('0.4', '0.12').replace('0.35', '0.12')}`,
                 }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">{tribe.icon}</span>
+                  <TribeIcon tribe={tribe.name} size={20} />
                   <h4 className="text-sm sm:text-base font-bold uppercase"
                     style={{ fontFamily: "'TheWalkyrDemo', serif", color: getTextColor(tribe, 'name') }}>
                     {tribe.name}

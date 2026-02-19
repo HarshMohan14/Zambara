@@ -11,15 +11,27 @@ interface BattleStep {
   color: string
 }
 
+// SVG icon paths (cinematic battle-themed, not childish emojis)
+const STEP_ICONS: Record<string, string> = {
+  warriors: 'M12 2C8 2 4 4.5 4 8c0 2.5 2 5 8 12 6-7 8-9.5 8-12 0-3.5-4-6-8-6z', // shield entry
+  swords: 'M6.5 2L1 7.5 3.5 10l5-5L12 8.5 15.5 5l5 5L23 7.5 17.5 2 12 7.5 6.5 2zM12 10l-5 5 2.5 2.5L12 15l2.5 2.5L17 15l-5-5zM12 17l-4 5h8l-4-5z', // crossed swords
+  timer: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z', // clock
+  bracelet: 'M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14 7 7 0 010-14zm0 2a5 5 0 100 10 5 5 0 000-10z', // ring
+  flame: 'M12 2C8 6 4 10 4 14a8 8 0 0016 0c0-4-4-8-8-12zm0 16a4 4 0 01-4-4c0-2 2-5 4-8 2 3 4 6 4 8a4 4 0 01-4 4z', // flame
+  crown: 'M2 20h20v2H2v-2zm1-7l4 3V8l5 6 5-6v8l4-3-1 7H4l-1-7zm9-11l3 4h-6l3-4z', // crown
+  trophy: 'M18 2H6v6a6 6 0 005 5.91V18H8v2h8v-2h-3v-4.09A6 6 0 0018 8V2zM4 4V8a2 2 0 004 0V4H4zm16 0h-4v4a2 2 0 004 0V4z', // trophy
+  star: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z', // star
+}
+
 const steps: BattleStep[] = [
-  { icon: '🌊', label: 'Warriors Enter', value: '16', detail: 'Players seated across 4 elemental tables', color: '#0891b2' },
-  { icon: '⚔️', label: 'Per Table', value: '4 vs 4', detail: 'Head-to-head tribal showdowns', color: '#06b6d4' },
-  { icon: '⏱️', label: 'Round Time', value: '3 min', detail: 'Fast-paced, high-stakes decisions', color: '#22d3ee' },
-  { icon: '💎', label: 'Bracelets', value: '4', detail: 'Collect 4 bracelets to advance', color: '#0e7490' },
-  { icon: '🔥', label: 'Survivors', value: '4', detail: 'One warrior per table qualifies', color: '#ef4444' },
-  { icon: '👑', label: 'Zampion Clash', value: 'Top 4', detail: 'The ultimate final showdown', color: '#fbbf24' },
-  { icon: '🏆', label: 'Champion', value: '1', detail: 'The Zampion of the Tides is crowned', color: '#fbbf24' },
-  { icon: '🌟', label: 'Grand Prize', value: '₹1000+', detail: 'Robe + Ocean Bracelet + Cash', color: '#d1a058' },
+  { icon: 'warriors', label: 'Warriors Enter', value: '16', detail: 'Players seated across 4 elemental tables', color: '#0891b2' },
+  { icon: 'swords', label: 'Per Table', value: '4 vs 4', detail: 'Head-to-head tribal showdowns', color: '#06b6d4' },
+  { icon: 'timer', label: 'Round Time', value: '3 min', detail: 'Fast-paced, high-stakes decisions', color: '#22d3ee' },
+  { icon: 'bracelet', label: 'Bracelets', value: '4', detail: 'Collect 4 bracelets to advance', color: '#0e7490' },
+  { icon: 'flame', label: 'Survivors', value: '4', detail: 'One warrior per table qualifies', color: '#ef4444' },
+  { icon: 'crown', label: 'Zampion Clash', value: 'Top 4', detail: 'The ultimate final showdown', color: '#fbbf24' },
+  { icon: 'trophy', label: 'Champion', value: '1', detail: 'The Zampion of the Tides is crowned', color: '#fbbf24' },
+  { icon: 'star', label: 'Grand Prize', value: '₹1000+', detail: 'Robe + Ocean Bracelet + Cash', color: '#d1a058' },
 ]
 
 export function BattleWorksSection() {
@@ -120,7 +132,9 @@ export function BattleWorksSection() {
                   {/* Icon */}
                   <div className="text-xl sm:text-2xl lg:text-3xl mb-2 transition-transform duration-300"
                     style={{ transform: isActive ? 'scale(1.15)' : 'scale(1)' }}>
-                    {step.icon}
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill={isActive ? step.color : '#06b6d4'} opacity={0.85}>
+                      <path d={STEP_ICONS[step.icon] || STEP_ICONS.star} />
+                    </svg>
                   </div>
 
                   {/* Value */}

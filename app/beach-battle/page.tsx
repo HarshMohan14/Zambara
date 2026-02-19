@@ -5,6 +5,9 @@ import { TribesSection } from '@/components/beach-battle/TribesSection'
 import { BattleWorksSection } from '@/components/beach-battle/BattleWorksSection'
 import { QRRegistrationSection } from '@/components/beach-battle/QRRegistrationSection'
 import { BracketSection } from '@/components/beach-battle/BracketSection'
+import { LiveArenaSection } from '@/components/beach-battle/LiveArenaSection'
+import { HallOfFameSection } from '@/components/beach-battle/HallOfFameSection'
+import { TribeScorecardSection } from '@/components/beach-battle/TribeScorecardSection'
 import { FinalCTASection } from '@/components/beach-battle/FinalCTASection'
 import { BeachBattleFooter } from '@/components/beach-battle/BeachBattleFooter'
 import { BeachBattleBackground } from '@/components/beach-battle/BeachBattleBackground'
@@ -102,8 +105,11 @@ export default function BeachBattlePage() {
         {/* Remaining sections — all transparent, bg shows through */}
         <TribesSection />
         <BattleWorksSection />
+        <LiveArenaSection />
         <QRRegistrationSection />
         <BracketSection />
+        <HallOfFameSection />
+        <TribeScorecardSection />
         <FinalCTASection />
         <BeachBattleFooter />
       </div>

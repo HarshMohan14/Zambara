@@ -4,12 +4,13 @@ import { useEffect, useRef } from 'react'
 import { gsap, createTimeline } from '@/lib/gsap'
 import Link from 'next/link'
 import Image from 'next/image'
+import { TribeIcon } from './TribeIcons'
 
 const tribeColors = [
-  { name: 'Lava', color: '#ef4444', icon: '🔥' },
-  { name: 'Rain', color: '#3b82f6', icon: '🌧️' },
-  { name: 'Wind', color: '#e0e0e0', icon: '🌬️' },
-  { name: 'Mountain', color: '#555555', icon: '🏔️' },
+  { name: 'Lava', color: '#ef4444' },
+  { name: 'Rain', color: '#3b82f6' },
+  { name: 'Wind', color: '#e0e0e0' },
+  { name: 'Mountain', color: '#555555' },
 ]
 
 const runeLinks = [
@@ -229,7 +230,7 @@ export function BeachBattleFooter() {
                   border: `1.5px solid ${tribe.color}30`,
                   boxShadow: `0 0 12px ${tribe.color}15`,
                 }}>
-                <span className="text-sm lg:text-lg">{tribe.icon}</span>
+                <span className="text-sm lg:text-lg"><TribeIcon tribe={tribe.name} size={20} /></span>
               </div>
               <span className="text-[9px] sm:text-xs uppercase tracking-wider"
                 style={{

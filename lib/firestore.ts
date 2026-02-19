@@ -1416,3 +1416,242 @@ export async function deleteBeachBattleRegistration(id: string) {
   const docRef = doc(db, 'beachBattleRegistrations', id)
   await deleteDoc(docRef)
 }
+
+// ═══════════════════════════════════════════════════════════
+// Beach Battle GAMES – Live arena, matchups, winners, slots
+// ═══════════════════════════════════════════════════════════
+export const beachBattleGamesCollection = collection(db, 'beachBattleGames')
+
+export interface BeachBattleMatchup {
+  table: number
+  player1: string // name
+  player2: string // name
+  player1Id?: string // registration id
+  player2Id?: string // registration id
+  status: 'pending' | 'live' | 'completed'
+  winner?: string
+  winnerId?: string
+}
+
+export interface BeachBattleGame {
+  id: string
+  slotNumber: number
+  tribe: string
+  status: 'pending' | 'live' | 'completed'
+  matchups: BeachBattleMatchup[]
+  // Round 1 warrior (the one who qualifies from this tribe game)
+  warrior?: string
+  warriorId?: string
+  // Zampion round: ultimate winner across all tribes for this slot
+  zampion?: string
+  zampionId?: string
+  zampionTribe?: string
+  createdAt: string
+  updatedAt: string
+}
+
+/** Get all games, optionally filtered */
+export async function getBeachBattleGames(params?: {
+  tribe?: string
+  status?: string
+  slotNumber?: number
+  limit?: number
+  offset?: number
+}): Promise<{ games: BeachBattleGame[]; total: number }> {
+  try {
+    const constraints: QueryConstraint[] = []
+    if (params?.tribe) constraints.push(where('tribe', '==', params.tribe))
+    if (params?.status) constraints.push(where('status', '==', params.status))
+    if (params?.slotNumber !== undefined) constraints.push(where('slotNumber', '==', params.slotNumber))
+    
+    let q = constraints.length > 0
+      ? query(beachBattleGamesCollection, ...constraints)
+      : query(beachBattleGamesCollection)
+    
+    try { q = query(q, orderBy('createdAt', 'desc')) } catch (_) {}
+    
+    const snapshot = await getDocs(q)
+    let games = snapshot.docs.map(d => ({ id: d.id, ...convertTimestamps(d.data()) })) as BeachBattleGame[]
+    
+    // Client-side sort fallback
+    games.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    
+    const total = games.length
+    const offset = params?.offset || 0
+    const limitVal = params?.limit || games.length
+    games = games.slice(offset, offset + limitVal)
+    
+    return { games, total }
+  } catch (error: any) {
+    console.error('[getBeachBattleGames]', error)
+    return { games: [], total: 0 }
+  }
+}
+
+/** Get single game */
+export async function getBeachBattleGame(id: string): Promise<BeachBattleGame | null> {
+  const docRef = doc(db, 'beachBattleGames', id)
+  const snap = await getDoc(docRef)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } as BeachBattleGame : null
+}
+
+/** Admin creates / starts a game for a tribe (when 4 players are filled) */
+export async function createBeachBattleGame(data: {
+  slotNumber: number
+  tribe: string
+  matchups: BeachBattleMatchup[]
+}): Promise<BeachBattleGame | null> {
+  const docData = {
+    slotNumber: data.slotNumber,
+    tribe: data.tribe,
+    status: 'pending' as const,
+    matchups: data.matchups,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  const ref = await addDoc(beachBattleGamesCollection, docData)
+  const snap = await getDoc(ref)
+  return snap.exists() ? { id: snap.id, ...convertTimestamps(snap.data()) } as BeachBattleGame : null
+}
+
+/** Admin starts a game (sets status to live) */
+export async function startBeachBattleGame(id: string): Promise<BeachBattleGame | null> {
+  const docRef = doc(db, 'beachBattleGames', id)
+  await updateDoc(docRef, {
+    status: 'live',
+    updatedAt: Timestamp.now(),
+  })
+  return getBeachBattleGame(id)
+}
+
+/** Admin ends a game + sets warrior (round 1 qualifier) */
+export async function endBeachBattleGame(id: string, data: {
+  warrior?: string
+  warriorId?: string
+}): Promise<BeachBattleGame | null> {
+  const docRef = doc(db, 'beachBattleGames', id)
+  const updateData: any = {
+    status: 'completed',
+    updatedAt: Timestamp.now(),
+  }
+  if (data.warrior) updateData.warrior = data.warrior
+  if (data.warriorId) updateData.warriorId = data.warriorId
+  await updateDoc(docRef, updateData)
+  return getBeachBattleGame(id)
+}
+
+/** Admin updates matchup status / winner */
+export async function updateBeachBattleMatchup(
+  gameId: string,
+  matchupIndex: number,
+  data: { status?: string; winner?: string; winnerId?: string }
+): Promise<BeachBattleGame | null> {
+  const game = await getBeachBattleGame(gameId)
+  if (!game) throw new Error('Game not found')
+  
+  const matchups = [...game.matchups]
+  if (matchupIndex < 0 || matchupIndex >= matchups.length) throw new Error('Invalid matchup index')
+  
+  matchups[matchupIndex] = {
+    ...matchups[matchupIndex],
+    ...(data.status && { status: data.status as any }),
+    ...(data.winner && { winner: data.winner }),
+    ...(data.winnerId && { winnerId: data.winnerId }),
+  }
+  
+  const docRef = doc(db, 'beachBattleGames', gameId)
+  await updateDoc(docRef, { matchups, updatedAt: Timestamp.now() })
+  return getBeachBattleGame(gameId)
+}
+
+/** Admin sets the Zampion (ultimate winner) for all games in a slot */
+export async function setBeachBattleZampion(slotNumber: number, data: {
+  zampion: string
+  zampionId?: string
+  zampionTribe: string
+}): Promise<void> {
+  const { games } = await getBeachBattleGames({ slotNumber })
+  for (const game of games) {
+    const docRef = doc(db, 'beachBattleGames', game.id)
+    await updateDoc(docRef, {
+      zampion: data.zampion,
+      zampionId: data.zampionId || '',
+      zampionTribe: data.zampionTribe,
+      updatedAt: Timestamp.now(),
+    })
+  }
+}
+
+/** Update a game (general) */
+export async function updateBeachBattleGame(id: string, data: Partial<{
+  status: string
+  matchups: BeachBattleMatchup[]
+  warrior: string
+  warriorId: string
+  zampion: string
+  zampionId: string
+  zampionTribe: string
+}>): Promise<BeachBattleGame | null> {
+  const docRef = doc(db, 'beachBattleGames', id)
+  const updateData: any = { updatedAt: Timestamp.now() }
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.matchups !== undefined) updateData.matchups = data.matchups
+  if (data.warrior !== undefined) updateData.warrior = data.warrior
+  if (data.warriorId !== undefined) updateData.warriorId = data.warriorId
+  if (data.zampion !== undefined) updateData.zampion = data.zampion
+  if (data.zampionId !== undefined) updateData.zampionId = data.zampionId
+  if (data.zampionTribe !== undefined) updateData.zampionTribe = data.zampionTribe
+  await updateDoc(docRef, updateData)
+  return getBeachBattleGame(id)
+}
+
+/** Delete a game */
+export async function deleteBeachBattleGame(id: string): Promise<void> {
+  const docRef = doc(db, 'beachBattleGames', id)
+  await deleteDoc(docRef)
+}
+
+/** Get live games (for public display) */
+export async function getLiveBeachBattleGames(): Promise<BeachBattleGame[]> {
+  const q = query(beachBattleGamesCollection, where('status', '==', 'live'))
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map(d => ({ id: d.id, ...convertTimestamps(d.data()) })) as BeachBattleGame[]
+}
+
+/** Get completed games with warriors/zampions (for hall of fame) */
+export async function getCompletedBeachBattleGames(): Promise<BeachBattleGame[]> {
+  const q = query(beachBattleGamesCollection, where('status', '==', 'completed'))
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map(d => ({ id: d.id, ...convertTimestamps(d.data()) })) as BeachBattleGame[]
+}
+
+/** Get tribe scorecard: count of zampions per tribe across all completed games */
+export async function getBeachBattleTribeScorecard(): Promise<{ tribe: string; zampionCount: number; warriorCount: number }[]> {
+  const completed = await getCompletedBeachBattleGames()
+  const scorecard: Record<string, { zampionCount: number; warriorCount: number }> = {}
+  for (const t of BEACH_BATTLE_TRIBES) {
+    scorecard[t] = { zampionCount: 0, warriorCount: 0 }
+  }
+  for (const game of completed) {
+    if (game.tribe && scorecard[game.tribe]) {
+      if (game.warrior) scorecard[game.tribe].warriorCount++
+    }
+    if (game.zampionTribe && scorecard[game.zampionTribe]) {
+      // Only count zampion once per slot, not per game
+      // We use a Set to dedupe by slotNumber
+    }
+  }
+  // Dedupe zampion counts by slot
+  const zampionSlots: Record<string, Set<number>> = {}
+  for (const t of BEACH_BATTLE_TRIBES) zampionSlots[t] = new Set()
+  for (const game of completed) {
+    if (game.zampionTribe && game.zampion) {
+      zampionSlots[game.zampionTribe]?.add(game.slotNumber)
+    }
+  }
+  return BEACH_BATTLE_TRIBES.map(t => ({
+    tribe: t,
+    zampionCount: zampionSlots[t]?.size || 0,
+    warriorCount: scorecard[t]?.warriorCount || 0,
+  }))
+}

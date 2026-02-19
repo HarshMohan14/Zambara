@@ -4,13 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { gsap } from '@/lib/gsap'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
+import { TribeIcon, TRIBES as TRIBE_DATA } from './TribeIcons'
 
-const TRIBES = [
-  { name: 'Lava', color: '#ef4444', icon: '\uD83D\uDD25', element: 'Fire' },
-  { name: 'Rain', color: '#3b82f6', icon: '\uD83C\uDF27\uFE0F', element: 'Water' },
-  { name: 'Wind', color: '#e0e0e0', icon: '\uD83C\uDF2C\uFE0F', element: 'Air' },
-  { name: 'Mountain', color: '#a78bfa', icon: '\uD83C\uDFD4\uFE0F', element: 'Earth' },
-]
+const TRIBES = TRIBE_DATA.map(t => ({ name: t.name, color: t.color, element: t.element }))
 
 interface SlotStatus {
   total: number
@@ -138,13 +134,13 @@ export function QRRegistrationSection() {
                 const full = count >= 4
                 return (
                   <div key={t.name} className="text-center">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl mx-auto mb-1.5 transition-all ${full ? 'opacity-30 grayscale' : ''}`}
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mx-auto mb-1.5 transition-all ${full ? 'opacity-30 grayscale' : ''}`}
                       style={{
                         background: `radial-gradient(circle at 40% 35%, ${displayColor(t)}55, ${displayColor(t)}20)`,
                         border: `1px solid ${displayColor(t)}${full ? '15' : '30'}`,
                         boxShadow: full ? 'none' : `0 0 14px ${displayColor(t)}15`,
                       }}>
-                      {t.icon}
+                      <TribeIcon tribe={t.name} size={22} />
                     </div>
                     <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold"
                       style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: full ? 'rgba(255,255,255,0.2)' : `${displayColor(t)}` }}>

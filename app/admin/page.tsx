@@ -355,6 +355,23 @@ export default function AdminDashboard() {
               View and manage beach battle sign-ups
             </div>
           </a>
+          <a
+            href="/admin/beach-battle-games"
+            className="block p-4 bg-green-500/10 border border-green-500/30 rounded-lg hover:bg-green-500/20 transition-all"
+          >
+            <div
+              className="font-semibold text-white"
+              style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+            >
+              Arena Games
+            </div>
+            <div
+              className="text-sm text-white/60 mt-1"
+              style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
+            >
+              Start/end tribe games, manage matchups & Zampions
+            </div>
+          </a>
         </div>
       </div>
     </div>
