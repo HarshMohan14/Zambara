@@ -186,11 +186,11 @@ export function BeachHero() {
       <div ref={dropletContainerRef} className="absolute inset-0 z-20 pointer-events-none overflow-hidden" />
 
       {/* Content - bottom-weighted for mobile thumb reach */}
-      <div className="relative z-30 h-full flex flex-col items-center justify-end pb-24 sm:pb-28 md:justify-center md:pb-0 px-5 sm:px-6 text-center">
+      <div className="relative z-30 h-full flex flex-col items-center justify-end pb-24 sm:pb-28 md:justify-center md:pb-0 px-5 sm:px-6 lg:px-8 text-center max-w-7xl mx-auto">
         {/* Title */}
         <h1
           ref={titleRef}
-          className="text-[2.2rem] leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold uppercase tracking-wider mb-3 sm:mb-5"
+          className="text-[2.2rem] leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-[5.5rem] font-bold uppercase tracking-wider mb-3 sm:mb-5"
           style={{
             fontFamily: "'TheWalkyrDemo', serif",
             color: '#e2e8f0',
@@ -203,7 +203,7 @@ export function BeachHero() {
         {/* Subtitle */}
         <p
           ref={subtitleRef}
-          className="text-base sm:text-xl md:text-2xl lg:text-3xl mb-7 sm:mb-9 max-w-[320px] sm:max-w-xl opacity-0"
+          className="text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl mb-7 sm:mb-9 max-w-[320px] sm:max-w-xl lg:max-w-2xl opacity-0"
           style={{
             fontFamily: "'BlinkerRegular', sans-serif",
             color: 'rgba(148, 216, 240, 0.85)',
@@ -215,9 +215,9 @@ export function BeachHero() {
         </p>
 
         {/* CTA Buttons - stacked on mobile, touch-friendly sizes */}
-        <div ref={ctaRef} className="flex flex-col sm:flex-row gap-3 sm:gap-5 w-full sm:w-auto max-w-[280px] sm:max-w-none">
+        <div ref={ctaRef} className="flex flex-col sm:flex-row gap-3 sm:gap-5 lg:gap-6 w-full sm:w-auto max-w-[280px] sm:max-w-none">
           <a href="/beach-battle/register"
-            className="group relative px-6 py-4 sm:px-8 sm:py-4 rounded-xl font-semibold uppercase tracking-wider text-sm overflow-hidden transition-all duration-500 text-center active:scale-95"
+            className="group relative px-6 py-4 sm:px-8 sm:py-4 lg:px-10 lg:py-5 rounded-xl font-semibold uppercase tracking-wider text-sm lg:text-base overflow-hidden transition-all duration-500 text-center active:scale-95"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",
               background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(14, 116, 144, 0.4) 100%)',
@@ -240,7 +240,7 @@ export function BeachHero() {
           </a>
 
           <a href="#tribes"
-            className="group relative px-6 py-4 sm:px-8 sm:py-4 rounded-xl font-semibold uppercase tracking-wider text-sm overflow-hidden transition-all duration-500 text-center active:scale-95"
+            className="group relative px-6 py-4 sm:px-8 sm:py-4 lg:px-10 lg:py-5 rounded-xl font-semibold uppercase tracking-wider text-sm lg:text-base overflow-hidden transition-all duration-500 text-center active:scale-95"
             style={{
               fontFamily: "'BlinkerSemiBold', sans-serif",
               background: 'linear-gradient(135deg, rgba(209, 160, 88, 0.15) 0%, rgba(180, 120, 60, 0.25) 100%)',

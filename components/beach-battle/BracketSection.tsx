@@ -134,7 +134,7 @@ export function BracketSection() {
     <section
       ref={sectionRef}
       id="bracket"
-      className="relative w-full py-14 sm:py-20 md:py-28 overflow-hidden"
+      className="relative w-full py-14 sm:py-20 md:py-28 lg:py-32 overflow-hidden"
       aria-label="Tournament Structure"
     >
       {/* Subtle section overlay — transparent, unified bg shows through */}
@@ -153,29 +153,29 @@ export function BracketSection() {
             Tournament Structure
           </p>
           <h2 ref={titleRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase mb-3 opacity-0"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3 opacity-0"
             style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#e2e8f0', textShadow: '0 0 40px rgba(6, 182, 212, 0.2), 2px 4px 8px rgba(0,0,0,0.6)' }}>
             The Battle Bracket
           </h2>
-          <p className="text-base sm:text-lg text-white/50 max-w-xs sm:max-w-md mx-auto"
+          <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-white/50 max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl mx-auto"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
-            16 warriors enter. Only 1 emerges as Zampion.
+            16 warriors enter. Only 1 becomes the Zampion.
           </p>
         </div>
 
         {/* Visual Flow: 16 → 4 → 1 — cinematic number display */}
-        <div ref={flowRef} className="flex justify-center items-center gap-3 sm:gap-5 mb-10 sm:mb-14">
+        <div ref={flowRef} className="flex justify-center items-center gap-3 sm:gap-5 lg:gap-8 xl:gap-10 mb-10 sm:mb-14 lg:mb-16">
           {/* 16 Warriors */}
           <div className="flow-item text-center" style={{ opacity: 0 }}>
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-2 relative"
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full flex items-center justify-center mx-auto mb-2 relative"
               style={{
                 background: 'linear-gradient(145deg, rgba(8, 145, 178, 0.15), rgba(0,0,0,0.6))',
                 border: '2px solid rgba(8, 145, 178, 0.35)',
                 boxShadow: '0 0 30px rgba(8, 145, 178, 0.1)',
               }}>
-              <span className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#0891b2' }}>16</span>
+              <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#0891b2' }}>16</span>
             </div>
-            <div className="text-xs sm:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(8, 145, 178, 0.7)' }}>Warriors</div>
+            <div className="text-xs sm:text-sm lg:text-base xl:text-lg uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(8, 145, 178, 0.7)' }}>Warriors</div>
           </div>
 
           {/* Arrow */}
@@ -194,15 +194,15 @@ export function BracketSection() {
 
           {/* 4 Qualifiers */}
           <div className="flow-item text-center" style={{ opacity: 0 }}>
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-2 relative"
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full flex items-center justify-center mx-auto mb-2 relative"
               style={{
                 background: 'linear-gradient(145deg, rgba(6, 182, 212, 0.15), rgba(0,0,0,0.6))',
                 border: '2px solid rgba(6, 182, 212, 0.35)',
                 boxShadow: '0 0 30px rgba(6, 182, 212, 0.1)',
               }}>
-              <span className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#06b6d4' }}>4</span>
+              <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#06b6d4' }}>4</span>
             </div>
-            <div className="text-xs sm:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.7)' }}>Qualifiers</div>
+            <div className="text-xs sm:text-sm lg:text-base xl:text-lg uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(6, 182, 212, 0.7)' }}>Qualifiers</div>
           </div>
 
           {/* Arrow */}
@@ -221,21 +221,21 @@ export function BracketSection() {
 
           {/* 1 Champion */}
           <div className="flow-item text-center" style={{ opacity: 0 }}>
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-2 relative"
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full flex items-center justify-center mx-auto mb-2 relative"
               style={{
                 background: 'linear-gradient(145deg, rgba(251, 191, 36, 0.15), rgba(0,0,0,0.6))',
                 border: '2px solid rgba(251, 191, 36, 0.4)',
                 boxShadow: '0 0 35px rgba(251, 191, 36, 0.1)',
               }}>
-              <span className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#fbbf24' }}>1</span>
+              <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold" style={{ fontFamily: "'TheWalkyrDemo', serif", color: '#fbbf24' }}>1</span>
               <span className="absolute -top-1 -right-1 text-lg">👑</span>
             </div>
-            <div className="text-xs sm:text-sm uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.7)' }}>Zampion</div>
+            <div className="text-xs sm:text-sm lg:text-base xl:text-lg uppercase tracking-wider" style={{ fontFamily: "'BlinkerSemiBold', sans-serif", color: 'rgba(251, 191, 36, 0.7)' }}>Zampion</div>
           </div>
         </div>
 
-        {/* Animated Timeline - vertical for mobile */}
-        <div ref={timelineRef} className="max-w-md sm:max-w-lg mx-auto mb-14 sm:mb-18 relative">
+        {/* Animated Timeline - vertical mobile, wider desktop */}
+        <div ref={timelineRef} className="max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto mb-14 sm:mb-18 lg:mb-20 relative">
           {/* Vertical timeline line */}
           <div className="absolute left-5 sm:left-7 top-0 bottom-0 w-px"
             style={{ background: 'linear-gradient(to bottom, #0891b2, #06b6d4, #fbbf24)' }} />
@@ -432,7 +432,7 @@ export function BracketSection() {
           </div>
 
           {/* Desktop grid for Hall of Fame */}
-          <div className="hidden sm:grid grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto">
+          <div className="hidden sm:grid grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
             {hallOfFame.map((entry) => (
               <div key={entry.rank}
                 className="text-center p-4 sm:p-5 rounded-xl transition-all duration-300 group cursor-default relative overflow-hidden"
