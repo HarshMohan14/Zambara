@@ -5,7 +5,7 @@ import { TribesSection } from '@/components/beach-battle/TribesSection'
 import { BattleWorksSection } from '@/components/beach-battle/BattleWorksSection'
 import { QRRegistrationSection } from '@/components/beach-battle/QRRegistrationSection'
 import { BracketSection } from '@/components/beach-battle/BracketSection'
-import { LiveArenaSection } from '@/components/beach-battle/LiveArenaSection'
+import { LiveBattleArena } from '@/components/beach-battle/LiveBattleArena'
 import { HallOfFameSection } from '@/components/beach-battle/HallOfFameSection'
 import { TribeScorecardSection } from '@/components/beach-battle/TribeScorecardSection'
 import { FinalCTASection } from '@/components/beach-battle/FinalCTASection'
@@ -105,7 +105,11 @@ export default function BeachBattlePage() {
         {/* Remaining sections — all transparent, bg shows through */}
         <TribesSection />
         <BattleWorksSection />
-        <LiveArenaSection />
+
+        {/* LIVE: Full battle arena with tribe fights, matchups, Zampion round
+            — auto-hides when no games exist; auto-refreshes every 8s */}
+        <LiveBattleArena />
+
         <QRRegistrationSection />
         <BracketSection />
         <HallOfFameSection />
