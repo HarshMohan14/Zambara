@@ -10,15 +10,72 @@ interface TribeScore {
   warriorCount: number
 }
 
+interface Game {
+  id: string
+  slotNumber: number
+  tribe: string
+  status: string
+  warrior?: string
+  warriorId?: string
+  zampion?: string
+  zampionId?: string
+  zampionTribe?: string
+}
+
+const TRIBE_NAMES = ['Lava', 'Rain', 'Wind', 'Mountain']
+
+/** Compute scorecard from games — same logic as server-side getBeachBattleTribeScorecard */
+function computeScorecard(games: Game[]): TribeScore[] {
+  const completed = games.filter(g => g.status === 'completed')
+  const scorecard: Record<string, { zampionCount: number; warriorCount: number }> = {}
+  const zampionSlots: Record<string, Set<number>> = {}
+  for (const t of TRIBE_NAMES) {
+    scorecard[t] = { zampionCount: 0, warriorCount: 0 }
+    zampionSlots[t] = new Set()
+  }
+  for (const game of completed) {
+    if (game.tribe && scorecard[game.tribe] && game.warrior) {
+      scorecard[game.tribe].warriorCount++
+    }
+    if (game.zampionTribe && game.zampion && zampionSlots[game.zampionTribe]) {
+      zampionSlots[game.zampionTribe].add(game.slotNumber)
+    }
+  }
+  return TRIBE_NAMES.map(t => ({
+    tribe: t,
+    zampionCount: zampionSlots[t]?.size || 0,
+    warriorCount: scorecard[t]?.warriorCount || 0,
+  }))
+}
+
 export function TribeScorecardSection() {
-  const [scores, setScores] = useState<TribeScore[]>([])
+  const [games, setGames] = useState<Game[]>([])
   const titleRef = useRef<HTMLHeadingElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
 
+  // Fetch from /api/beach-battle/games — same endpoint as admin panel
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const res = await fetch('/api/beach-battle/games?limit=100')
+        const json = await res.json()
+        if (json.success && json.data) {
+          setGames(json.data.games || [])
+        }
+      } catch { /* silent */ }
+    }
+    fetchGames()
+    const interval = setInterval(fetchGames, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Compute scores client-side from games — same logic as server
+  const scores = computeScorecard(games)
+
   // GSAP scroll-triggered entrance animations — runs once after scores load
   useEffect(() => {
-    if (scores.length === 0 || hasAnimated.current) return
+    if (games.length === 0 || hasAnimated.current) return
     hasAnimated.current = true
 
     if (titleRef.current) {
@@ -51,23 +108,10 @@ export function TribeScorecardSection() {
         },
       })
     }
-  }, [scores])
-
-  useEffect(() => {
-    const fetchScorecard = async () => {
-      try {
-        const res = await fetch('/api/beach-battle/scorecard')
-        const json = await res.json()
-        if (json.success && json.data) setScores(json.data)
-      } catch { /* silent */ }
-    }
-    fetchScorecard()
-    const interval = setInterval(fetchScorecard, 30000)
-    return () => clearInterval(interval)
-  }, [])
+  }, [games])
 
 
-  if (scores.length === 0) return null
+  if (games.length === 0) return null
 
   const totalZampions = scores.reduce((sum, s) => sum + s.zampionCount, 0)
   if (totalZampions === 0 && scores.every(s => s.warriorCount === 0)) return null
