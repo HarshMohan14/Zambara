@@ -6,6 +6,7 @@ import { BattleWorksSection } from '@/components/beach-battle/BattleWorksSection
 import { QRRegistrationSection } from '@/components/beach-battle/QRRegistrationSection'
 import { BracketSection } from '@/components/beach-battle/BracketSection'
 import { LiveBattleArena } from '@/components/beach-battle/LiveBattleArena'
+import { HallOfFameSection } from '@/components/beach-battle/HallOfFameSection'
 import { TribeScorecardSection } from '@/components/beach-battle/TribeScorecardSection'
 import { FinalCTASection } from '@/components/beach-battle/FinalCTASection'
 import { BeachBattleFooter } from '@/components/beach-battle/BeachBattleFooter'
@@ -111,6 +112,7 @@ export default function BeachBattlePage() {
 
         <QRRegistrationSection />
         <BracketSection />
+        <HallOfFameSection />
         <TribeScorecardSection />
         <FinalCTASection />
         <BeachBattleFooter />

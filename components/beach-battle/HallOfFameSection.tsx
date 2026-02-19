@@ -57,7 +57,7 @@ export function HallOfFameSection() {
           { opacity: 0, y: 50, filter: 'blur(8px)' },
           {
             opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'power3.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none reverse' }
+            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' }
           }
         )
       }
@@ -66,7 +66,7 @@ export function HallOfFameSection() {
           { opacity: 0, y: 40, scale: 0.95 },
           {
             opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.15, ease: 'back.out(1.2)',
-            scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none reverse' }
+            scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none none' }
           }
         )
       }
@@ -125,7 +125,7 @@ export function HallOfFameSection() {
           </div>
 
           <h2 ref={titleRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3 opacity-0"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
               color: '#fbbf24',
