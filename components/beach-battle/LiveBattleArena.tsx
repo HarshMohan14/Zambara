@@ -73,7 +73,7 @@ export function LiveBattleArena() {
           { opacity: 0, y: 50, filter: 'blur(8px)' },
           {
             opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'power3.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none reverse' }
+            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' }
           }
         )
       }
@@ -82,7 +82,7 @@ export function LiveBattleArena() {
           { opacity: 0, y: 30 },
           {
             opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power2.out',
-            scrollTrigger: { trigger: contentRef.current, start: 'top 82%', toggleActions: 'play none none reverse' }
+            scrollTrigger: { trigger: contentRef.current, start: 'top 82%', toggleActions: 'play none none none' }
           }
         )
       }
@@ -170,7 +170,7 @@ export function LiveBattleArena() {
           </div>
 
           <h2 ref={titleRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3 opacity-0"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase mb-3"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
               color: '#e2e8f0',
@@ -287,7 +287,7 @@ export function LiveBattleArena() {
 
         {/* ── HAS GAMES: LIVE ARENA — synced with admin panel ── */}
         {hasAny && (
-          <div ref={contentRef} className="opacity-0">
+          <div ref={contentRef}>
             {/* 4 Tribe Status Cards — each shows its real status from admin */}
             <div className="max-w-5xl mx-auto mb-8">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
