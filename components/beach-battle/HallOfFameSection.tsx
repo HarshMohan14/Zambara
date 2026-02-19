@@ -89,26 +89,37 @@ export function HallOfFameSection() {
     }
   }, [games])
 
-  // Derive completed games from all games — same data as admin panel
-  const completedGames = games.filter(g => g.status === 'completed')
+  // ── Derive state from games — same data flow as admin panel ──
+  const hasAny = games.length > 0
 
+  // Active slot = latest slot with any games
+  const activeSlot = hasAny
+    ? Math.max(...games.map(g => g.slotNumber))
+    : 1
 
-  // Derive warriors from completed games (one per tribe)
+  // Only look at the active (latest) slot
+  const slotGames = games.filter(g => g.slotNumber === activeSlot)
+  const slotCompleted = slotGames.filter(g => g.status === 'completed')
+
+  // Warriors from completed games in the active slot (one per tribe)
   const warriors: { name: string; tribe: string }[] = []
   const seenTribes = new Set<string>()
-  for (const g of completedGames) {
+  for (const g of slotCompleted) {
     if (g.warrior && !seenTribes.has(g.tribe)) {
       warriors.push({ name: g.warrior, tribe: g.tribe })
       seenTribes.add(g.tribe)
     }
   }
 
-  // Check for Zampion
-  const zampionGame = completedGames.find(g => g.zampion && g.zampionTribe)
-  const zampion = zampionGame ? { name: zampionGame.zampion!, tribe: zampionGame.zampionTribe! } : null
+  // Zampion — setBeachBattleZampion stamps ALL games in the slot with the same
+  // zampion/zampionTribe, so we just pick any game that has it
+  const zampionGame = slotGames.find(g => g.zampion && g.zampionTribe)
+  const zampion = zampionGame
+    ? { name: zampionGame.zampion!, tribe: zampionGame.zampionTribe! }
+    : null
 
   // States
-  const hasData = completedGames.length > 0
+  const hasData = slotCompleted.length > 0
   const allTribesCompleted = warriors.length >= 4
   const hasZampion = !!zampion
 

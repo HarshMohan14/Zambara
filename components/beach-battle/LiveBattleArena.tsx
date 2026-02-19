@@ -91,37 +91,35 @@ export function LiveBattleArena() {
     }
   }, [games])
 
-  // Derive pending/live/completed from games — same logic as admin panel
-  const pendingGames = games.filter(g => g.status === 'pending')
-  const liveGames = games.filter(g => g.status === 'live')
-  const completedGames = games.filter(g => g.status === 'completed')
+  // ── Derive state from games — same data as admin panel ──
   const hasAny = games.length > 0
-  const hasLive = liveGames.length > 0
 
-  // Derive the current slot (latest slot that has games)
-  const activeSlot = games.length > 0
+  // Active slot = latest slot with any games
+  const activeSlot = hasAny
     ? Math.max(...games.map(g => g.slotNumber))
     : 1
 
-  // Get games for the active slot
+  // Only show games for the active (latest) slot
   const slotGames = games.filter(g => g.slotNumber === activeSlot)
   const slotLive = slotGames.filter(g => g.status === 'live')
   const slotCompleted = slotGames.filter(g => g.status === 'completed')
   const slotPending = slotGames.filter(g => g.status === 'pending')
+  const hasLive = slotLive.length > 0
 
-  // Warriors from completed games
+  // Warriors from completed games in the active slot (one per tribe)
   const warriors = slotCompleted
     .filter(g => g.warrior)
     .map(g => ({ name: g.warrior!, tribe: g.tribe, gameId: g.id }))
 
-  // All tribe games that were created are now completed? (no pending/live remain)
+  // All tribe games that were created in this slot are now completed
   const allCreatedTribesCompleted = slotGames.length > 0 && slotLive.length === 0 && slotPending.length === 0
 
-  // Zampion for this slot (if set)
+  // Zampion — setBeachBattleZampion stamps ALL games in the slot with the same
+  // zampion/zampionTribe, so we just pick any game that has it
   const zampionGame = slotGames.find(g => g.zampion)
-  const zampion = zampionGame ? { name: zampionGame.zampion!, tribe: zampionGame.zampionTribe || '' } : null
-
-  // Determine overall state for the header
+  const zampion = zampionGame
+    ? { name: zampionGame.zampion!, tribe: zampionGame.zampionTribe || zampionGame.tribe }
+    : null
   const hasZampion = !!zampion
 
   return (
