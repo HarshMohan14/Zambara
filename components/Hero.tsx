@@ -164,8 +164,8 @@ export function Hero() {
       </button>
 
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center justify-center w-full h-full">
-        {/* Images Container - Positioned to overlap */}
-        <div className="relative mb-8 w-full max-w-4xl flex justify-center items-center">
+        {/* Images Container - Positioned to overlap and scaled for responsiveness */}
+        <div className="relative mb-6 md:mb-4 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px] flex justify-center items-center">
           {/* Hero Video (hero.mp4) - Infinite loop */}
           <div
             ref={meteorImageRef}
@@ -203,11 +203,11 @@ export function Hero() {
         </div>
 
         {/* Text Content */}
-        <div className="text-center w-full max-w-5xl relative z-40">
+        <div className="text-center w-full max-w-3xl relative z-40">
           {/* Welcome Text */}
           <h2
             ref={welcomeTextRef}
-            className="text-lg md:text-xl uppercase tracking-wider opacity-0 mb-2"
+            className="text-base md:text-lg uppercase tracking-wider opacity-0 mb-1"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
               color: '#d1a058',
@@ -219,7 +219,7 @@ export function Hero() {
           {/* Main Title */}
           <div
             ref={titleTextRef}
-            className="mb-12 flex justify-center"
+            className="mb-6 md:mb-8 flex justify-center"
             style={{ opacity: 0 }}
           >
             <Image
@@ -227,7 +227,7 @@ export function Hero() {
               alt="ZAMBAARA"
               width={600}
               height={240}
-              className="w-full max-w-[500px] md:max-w-[700px] lg:max-w-[900px] h-auto object-contain"
+              className="w-full max-w-[260px] sm:max-w-[340px] md:max-w-[400px] lg:max-w-[460px] h-auto object-contain"
               priority
             />
           </div>
@@ -235,31 +235,31 @@ export function Hero() {
           {/* Taglines */}
           <div 
             ref={taglineRef} 
-            className="space-y-4"
+            className="space-y-3 md:space-y-4"
             style={{
               fontFamily: "'BlinkerRegular', sans-serif",
             }}
           >
             {/* Line above first tagline */}
-            <div className="w-full border-t border-yellow-400 mb-4" style={{ borderColor: '#d1a058' }}></div>
+            <div className="w-full border-t border-yellow-400 mb-3 md:mb-4" style={{ borderColor: '#d1a058' }}></div>
             
             <div className="opacity-0">
-              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
+              <p className="text-base md:text-lg lg:text-xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
                 MASTER THE ELEMENTS
               </p>
-              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
+              <div className="w-full border-b border-yellow-400 mt-1 md:mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
+              <p className="text-base md:text-lg lg:text-xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
                 WIN THE BRACELETS
               </p>
-              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
+              <div className="w-full border-b border-yellow-400 mt-1 md:mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
             <div className="opacity-0">
-              <p className="text-lg md:text-xl lg:text-2xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
+              <p className="text-base md:text-lg lg:text-xl uppercase font-semibold inline-block" style={{ color: '#FFFFFF', fontFamily: "'BlinkerRegular', sans-serif" }}>
                 BECOME THE ZAMPION
               </p>
-              <div className="w-full border-b border-yellow-400 mt-2" style={{ borderColor: '#d1a058' }}></div>
+              <div className="w-full border-b border-yellow-400 mt-1 md:mt-2" style={{ borderColor: '#d1a058' }}></div>
             </div>
           </div>
         </div>

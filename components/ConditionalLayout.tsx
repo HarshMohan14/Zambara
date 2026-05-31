@@ -12,8 +12,9 @@ export function ConditionalLayout({
 }) {
   const pathname = usePathname()
   const isAdminRoute = pathname?.startsWith('/admin')
+  const isKioskRoute = pathname?.startsWith('/reveal') || pathname?.startsWith('/tagcon')
 
-  if (isAdminRoute) {
+  if (isAdminRoute || isKioskRoute) {
     return <>{children}</>
   }
 

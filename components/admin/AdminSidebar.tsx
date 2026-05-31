@@ -15,6 +15,7 @@ const menuItems = [
   { href: '/admin/beach-battle', label: 'Beach Battle', icon: '🏖️' },
   { href: '/admin/contact', label: 'Contact', icon: '📧' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📬' },
+  { href: '/admin/tagcon', label: 'TagCon', icon: '🔮' },
 ]
 
 interface AdminSidebarProps {
