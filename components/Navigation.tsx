@@ -24,6 +24,7 @@ const NAV_LINKS: NavLink[] = [
   { label: 'Pre-Book', homeHref: '#cave', globalHref: '/#cave' },
   { label: 'How to Play', homeHref: '/how-to-play', globalHref: '/how-to-play', isPage: true },
   { label: 'Beach Battle', homeHref: '/beach-battle', globalHref: '/beach-battle', isPage: true, highlight: 'teal' },
+  { label: 'Tournaments', homeHref: '/tournaments', globalHref: '/tournaments', isPage: true, highlight: 'gold' },
   { label: 'Rankings', homeHref: '#rankings', globalHref: '/#rankings' },
   { label: 'Contact', homeHref: '#contact', globalHref: '/#contact' },
 ]
@@ -35,6 +36,7 @@ const BEACH_BATTLE_LINKS: NavLink[] = [
   { label: 'How It Works', homeHref: '#battle-works', globalHref: '#battle-works' },
   { label: 'Register', homeHref: '#qr-register', globalHref: '#qr-register', highlight: 'teal' },
   { label: 'Tournament', homeHref: '#bracket', globalHref: '#bracket' },
+  { label: 'Tournaments', homeHref: '/tournaments', globalHref: '/tournaments', isPage: true, highlight: 'gold' },
   { label: 'How to Play', homeHref: '/how-to-play', globalHref: '/how-to-play', isPage: true },
   { label: 'Game Cards', homeHref: '/#cards', globalHref: '/#cards' },
 ]

@@ -110,8 +110,13 @@ export default function ThumbScanner({ onScanStart, onScanComplete, onScanCancel
       })
     }
 
-    const animate = () => {
-      progressRef.current += 1.0 // Incremental speed
+    const startTime = performance.now()
+    const duration = 1800 // 1.8 seconds (40% reduction from 3s)
+
+    const animate = (timestamp: number) => {
+      const elapsed = timestamp - startTime
+      const progress = Math.min((elapsed / duration) * 100, 100)
+      progressRef.current = progress
       
       // Spawn spirit particles rapidly
       createSparks()
@@ -119,16 +124,19 @@ export default function ThumbScanner({ onScanStart, onScanComplete, onScanCancel
         createSparks()
       }
 
-      if (progressRef.current >= 100) {
+      if (progress >= 100) {
         progressRef.current = 100
         setScanProgress(100)
         onScanProgress(100)
         setIsScanning(false)
         onScanComplete()
-        cancelAnimationFrame(animationRef.current!)
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current)
+          animationRef.current = null
+        }
       } else {
-        setScanProgress(progressRef.current)
-        onScanProgress(progressRef.current)
+        setScanProgress(progress)
+        onScanProgress(progress)
         animationRef.current = requestAnimationFrame(animate)
       }
     }

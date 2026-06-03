@@ -398,60 +398,80 @@ const playRevealingSound = () => {
   }
 };
 
+const getTribeColorGlow = (t: Tribe) => {
+  switch (t) {
+    case 'lava': return 'rgba(239, 68, 68, 0.25)' // red glow
+    case 'rain': return 'rgba(59, 130, 246, 0.25)' // blue glow
+    case 'mountain': return 'rgba(209, 160, 88, 0.2)' // gold glow
+    case 'wind': return 'rgba(16, 185, 129, 0.25)' // green glow
+    default: return 'rgba(0, 0, 0, 0)'
+  }
+}
+
+const getTribeDetails = (tribeName: Tribe | null) => {
+  switch (tribeName) {
+    case 'lava':
+      return { 
+        title: 'LAVA', 
+        image: '/new_LAVA.png',
+        traits: 'AGGRESSIVE ◈ CHAOTIC ◈ OFFENSIVE',
+        color: '#ff4400',
+        borderColor: '#882200'
+      }
+    case 'rain':
+      return { 
+        title: 'RAIN', 
+        image: '/new_Rain.png',
+        traits: 'ADAPTIVE ◈ COOLING ◈ TACTICAL',
+        color: '#00aaff',
+        borderColor: '#004488'
+      }
+    case 'mountain':
+      return { 
+        title: 'MOUNTAIN', 
+        image: '/new_Mountain.png',
+        traits: 'DEFENSIVE ◈ STABLE ◈ POWERFUL',
+        color: '#eebb77',
+        borderColor: '#664422'
+      }
+    case 'wind':
+      return { 
+        title: 'WIND', 
+        image: '/new_Wind.png',
+        traits: 'FAST ◈ UNPREDICTABLE ◈ DISRUPTIVE',
+        color: '#00ff88',
+        borderColor: '#006622'
+      }
+    default:
+      return { title: '', image: '', traits: '', color: '', borderColor: '' }
+  }
+}
+
 export default function RevealPage() {
-  const [scanState, setScanState] = useState<'idle' | 'scanning' | 'revealing' | 'done' | 'error'>('idle')
+  const [scanState, setScanState] = useState<'idle' | 'scanning' | 'done' | 'error'>('idle')
   const [tribe, setTribe] = useState<Tribe | null>(null)
   const [userData, setUserData] = useState<{name: string, number: string} | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [showFlash, setShowFlash] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  
+  const details = getTribeDetails(tribe)
   
   const titleRef = useRef<HTMLHeadingElement>(null)
   const scannerContainerRef = useRef<HTMLDivElement>(null)
   const revealContainerRef = useRef<HTMLDivElement>(null)
+  const bgOverlayRef = useRef<HTMLDivElement>(null)
   const backgroundRef = useRef<HTMLDivElement>(null)
   const firefliesRef = useRef<HTMLDivElement>(null)
-  const flashRef = useRef<HTMLDivElement>(null)
+  const cardWrapperRef = useRef<HTMLDivElement>(null)
+  const cardFrontRef = useRef<HTMLDivElement>(null)
+  const plaqueRef = useRef<HTMLDivElement>(null)
+  const descriptionRef = useRef<HTMLDivElement>(null)
 
   const activeSynthRef = useRef<MysticSynth | null>(null)
   const lastVibrateRef = useRef(0)
   const prefetchedDataRef = useRef<any>(null)
   const fetchPromiseRef = useRef<Promise<any> | null>(null)
-
-  const [dismissOverlay, setDismissOverlay] = useState(false)
-  const overlayRef = useRef<HTMLDivElement>(null)
-
-  const handleAwaken = () => {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate([80, 50, 150])
-    }
-    
-    // Play a nice wake sound
-    playRevealingSound()
-
-    if (overlayRef.current) {
-      gsap.to(overlayRef.current, {
-        opacity: 0,
-        scale: 1.15,
-        duration: 1.2,
-        ease: 'power3.inOut',
-        onComplete: () => {
-          setDismissOverlay(true)
-          // Entrance animations for the main elements once awakened
-          const targets = [titleRef.current, scannerContainerRef.current].filter(Boolean)
-          if (targets.length > 0) {
-            gsap.fromTo(
-              targets,
-              { opacity: 0, scale: 0.92 },
-              { opacity: 1, scale: 1, duration: 1.8, stagger: 0.25, ease: 'power3.out', overwrite: 'auto' }
-            )
-          }
-        }
-      })
-    } else {
-      setDismissOverlay(true)
-    }
-  }
 
   useEffect(() => {
     setMounted(true)
@@ -462,6 +482,20 @@ export default function RevealPage() {
       const img = new window.Image()
       img.src = path
     })
+
+    // Auto-trigger entrance animations on mount since overlay is skipped
+    const timer = setTimeout(() => {
+      const targets = [titleRef.current, scannerContainerRef.current].filter(Boolean)
+      if (targets.length > 0) {
+        gsap.fromTo(
+          targets,
+          { opacity: 0, scale: 0.92 },
+          { opacity: 1, scale: 1, duration: 1.5, stagger: 0.2, ease: 'power2.out', overwrite: 'auto' }
+        )
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -486,6 +520,125 @@ export default function RevealPage() {
       })
     }
   }, [mounted])
+
+  useEffect(() => {
+    if (scanState !== 'done' || !imageLoaded) return
+
+    const wrapper = cardWrapperRef.current
+    const front = cardFrontRef.current
+    const plaque = plaqueRef.current
+    const description = descriptionRef.current
+    const bgOverlay = bgOverlayRef.current
+    const scanner = scannerContainerRef.current
+
+    if (wrapper && front && plaque && description) {
+      gsap.killTweensOf([wrapper, front, plaque, description, bgOverlay, scanner])
+
+      // Initial hidden state for the reveal card components
+      gsap.set(wrapper, {
+        scale: 0.95,
+        y: 0,
+        opacity: 1
+      })
+      gsap.set(front, {
+        opacity: 0,
+        filter: 'blur(25px) drop-shadow(0 0 0px rgba(0,0,0,0))'
+      })
+      gsap.set(plaque, {
+        scale: 0.8,
+        opacity: 0,
+        y: -20
+      })
+      gsap.set(description, {
+        opacity: 0,
+        y: 20
+      })
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          if (wrapper) {
+            gsap.to(wrapper, {
+              y: -6,
+              duration: 2.5,
+              yoyo: true,
+              repeat: -1,
+              ease: 'sine.inOut'
+            })
+          }
+        }
+      })
+
+      // Step 1: Darken background overlay
+      if (bgOverlay) {
+        tl.to(bgOverlay, {
+          backgroundColor: 'rgba(0, 0, 0, 0.92)',
+          duration: 1.5,
+          ease: 'power2.out'
+        }, 0)
+      }
+
+      // Step 2: Fade out scanner container smoothly using GSAP to prevent inline style overlap
+      if (scanner) {
+        tl.to(scanner, {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.5,
+          ease: 'power2.out',
+          onComplete: () => {
+            scanner.style.display = 'none'
+          }
+        }, 0)
+      }
+
+      // Step 3: Fade in card front opacity quickly (so it becomes visible while blurred)
+      tl.to(front, {
+        opacity: 1,
+        duration: 0.5,
+        ease: 'power1.out'
+      }, 0.1)
+
+      // Step 4: Slowly reveal card front from blur to clear image with tight border drop-shadow glow
+      const filterVal = { blur: 25, glow: 0 }
+      tl.to(filterVal, {
+        blur: 0,
+        glow: 6, // tight border glow radius (reduced to 6 for a crisp border glow)
+        duration: 4.2, // slowly and smoothly unblur so the human eye notices it
+        ease: 'power1.inOut',
+        onUpdate: () => {
+          if (front) {
+            // Using details.color with 'aa' hex suffix for 66% opacity transparent border glow
+            front.style.filter = `blur(${filterVal.blur}px) drop-shadow(0 0 ${filterVal.glow}px ${details.color || '#d1a058'}aa)`
+          }
+        }
+      }, 0.1)
+
+      // Step 5: Plaque entrance at the top (unblurred)
+      tl.to(plaque, {
+        scale: 1,
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'back.out(1.5)'
+      }, 1.2) // start plaque entrance as card becomes recognizable
+
+      // Step 6: Description entrance at the bottom (unblurred)
+      tl.to(description, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power2.out'
+      }, 1.2)
+    } else {
+      console.warn("GSAP Reveal Refs missing, running fallback reveal animation.")
+      if (revealContainerRef.current) {
+        gsap.killTweensOf(revealContainerRef.current)
+        gsap.fromTo(revealContainerRef.current,
+          { opacity: 0, scale: 0.9 },
+          { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out' }
+        )
+      }
+    }
+  }, [scanState, imageLoaded, details.color])
 
   const handleScanStart = () => {
     setScanState('scanning')
@@ -515,16 +668,16 @@ export default function RevealPage() {
         .then(data => {
           if (data.success) {
             prefetchedDataRef.current = data
+            return data
           } else {
-            throw new Error(data.error || 'The elements reject you.')
+            return { success: false, error: data.error || 'The elements reject you.' }
           }
-          return data
         })
         .catch(err => {
           console.error('Prefetch error:', err)
           // Don't save rejected promise to cache, allow retry
           fetchPromiseRef.current = null
-          throw err
+          return { success: false, error: err.message || 'Magical interference detected.' }
         })
       fetchPromiseRef.current = fetchPromise
     }
@@ -574,27 +727,15 @@ export default function RevealPage() {
   }
 
   const handleScanComplete = async () => {
-    setScanState('revealing')
-    
-    // Play build-up sound effect while revealing
-    playRevealingSound()
-    
-    gsap.to(scannerContainerRef.current, {
-      opacity: 0,
-      scale: 0.85,
-      duration: 0.8,
-      ease: 'power2.inOut'
-    })
-
-    // Trigger complete vibration burst (double-pulse rumble)
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate([150, 100, 550])
-    }
-
     // Stop charge sound
     if (activeSynthRef.current) {
       activeSynthRef.current.stop()
       activeSynthRef.current = null
+    }
+
+    // Trigger complete vibration burst (double-pulse rumble)
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([150, 100, 550])
     }
 
     try {
@@ -607,52 +748,32 @@ export default function RevealPage() {
           method: 'POST'
         })
         data = await res.json()
-        if (!data.success) {
-          throw new Error(data.error || 'The elements reject you.')
-        }
+      }
+
+      if (!data || !data.success) {
+        throw new Error(data?.error || 'The elements reject you.')
       }
 
       setTribe(data.tribe)
       setUserData({ name: data.name, number: data.number })
       
+      // Play transition wind sound immediately when scanner disappears
+      playRevealingSound()
+
+      // Transition to done immediately for seamless card reveal
+      setScanState('done')
+
+      // Play epic tribal burst sound after a 1500ms delay, aligned with unblur recognition peak
       setTimeout(() => {
-        // Play mystical reveal explosion sound
         playRevealBurstSound(data.tribe)
+      }, 1500)
 
-        // Fullscreen energy flash
-        setShowFlash(true)
-        setScanState('done')
-        
-        // Animate flash fading
-        setTimeout(() => {
-          if (flashRef.current) {
-            gsap.to(flashRef.current, {
-              opacity: 0,
-              duration: 1.2,
-              onComplete: () => setShowFlash(false)
-            })
-          }
-        }, 50)
-
-        gsap.fromTo(revealContainerRef.current, 
-          { opacity: 0, scale: 0.85, y: 30 },
-          { opacity: 1, scale: 1, y: 0, duration: 1.8, ease: 'power3.out' }
-        )
-        
-        if (revealContainerRef.current) {
-          gsap.fromTo(revealContainerRef.current.children,
-            { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, duration: 1.2, stagger: 0.15, delay: 0.3, ease: 'power2.out' }
-          )
-        }
-
-        gsap.to(backgroundRef.current, {
-          opacity: 0.45,
-          backgroundColor: getTribeColorGlow(data.tribe),
-          duration: 1.5,
-          ease: 'sine.inOut'
-        })
-      }, 1200)
+      gsap.to(backgroundRef.current, {
+        opacity: 0.45,
+        backgroundColor: getTribeColorGlow(data.tribe),
+        duration: 1.5,
+        ease: 'sine.inOut'
+      })
 
     } catch (err: any) {
       console.error('Failed to fetch tribe', err)
@@ -665,88 +786,46 @@ export default function RevealPage() {
     }
   }
 
-  const getTribeColorGlow = (t: Tribe) => {
-    switch (t) {
-      case 'lava': return 'rgba(239, 68, 68, 0.25)' // red glow
-      case 'rain': return 'rgba(59, 130, 246, 0.25)' // blue glow
-      case 'mountain': return 'rgba(209, 160, 88, 0.2)' // gold glow
-      case 'wind': return 'rgba(16, 185, 129, 0.25)' // green glow
-      default: return 'rgba(0, 0, 0, 0)'
-    }
-  }
-
-  const getTribeDetails = (tribeName: Tribe | null) => {
-    switch (tribeName) {
-      case 'lava':
-        return { 
-          title: 'LAVA', 
-          image: '/l.png',
-          traits: 'AGGRESSIVE ◈ CHAOTIC ◈ OFFENSIVE',
-          color: '#ff4400',
-          borderColor: '#882200'
-        }
-      case 'rain':
-        return { 
-          title: 'RAIN', 
-          image: '/r.png',
-          traits: 'ADAPTIVE ◈ COOLING ◈ TACTICAL',
-          color: '#00aaff',
-          borderColor: '#004488'
-        }
-      case 'mountain':
-        return { 
-          title: 'MOUNTAIN', 
-          image: '/m.png',
-          traits: 'DEFENSIVE ◈ STABLE ◈ POWERFUL',
-          color: '#eebb77',
-          borderColor: '#664422'
-        }
-      case 'wind':
-        return { 
-          title: 'WIND', 
-          image: '/w.png',
-          traits: 'FAST ◈ UNPREDICTABLE ◈ DISRUPTIVE',
-          color: '#00ff88',
-          borderColor: '#006622'
-        }
-      default:
-        return { title: '', image: '', traits: '', color: '', borderColor: '' }
-    }
-  }
-
   const resetToIdle = () => {
-    gsap.to(revealContainerRef.current, {
-      opacity: 0, scale: 0.9, y: -20, duration: 0.6, onComplete: () => {
-        setScanState('idle')
-        setTribe(null)
-        setUserData(null)
-        prefetchedDataRef.current = null
-        fetchPromiseRef.current = null
-        gsap.to(backgroundRef.current, { opacity: 0, duration: 0.8 })
-        
-        // Delay GSAP animation by 50ms to allow React to mount the scanner elements
-        setTimeout(() => {
-          const targets = [titleRef.current, scannerContainerRef.current].filter(Boolean)
-          if (targets.length > 0) {
-            gsap.fromTo(targets, 
-              { opacity: 0, scale: 0.92 },
-              { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out', overwrite: 'auto' }
-            )
-          }
-        }, 50)
-      }
-    })
-  }
+    if (cardFrontRef.current) gsap.killTweensOf(cardFrontRef.current)
+    if (cardWrapperRef.current) gsap.killTweensOf(cardWrapperRef.current)
+    if (plaqueRef.current) gsap.killTweensOf(plaqueRef.current)
+    if (descriptionRef.current) gsap.killTweensOf(descriptionRef.current)
+    if (scannerContainerRef.current) {
+      gsap.killTweensOf(scannerContainerRef.current)
+      scannerContainerRef.current.style.display = 'flex'
+    }
+    if (bgOverlayRef.current) {
+      gsap.killTweensOf(bgOverlayRef.current)
+      gsap.to(bgOverlayRef.current, {
+        backgroundColor: 'rgba(0, 0, 0, 0.60)',
+        duration: 0.6,
+        ease: 'power2.out'
+      })
+    }
 
-  const details = getTribeDetails(tribe)
+    setScanState('idle')
+    setTribe(null)
+    setUserData(null)
+    setImageLoaded(false) // Reset image loaded state
+    prefetchedDataRef.current = null
+    fetchPromiseRef.current = null
+    gsap.to(backgroundRef.current, { opacity: 0, duration: 0.8 })
+    
+    // Trigger entrance animations for the title and scanner
+    setTimeout(() => {
+      const targets = [titleRef.current, scannerContainerRef.current].filter(Boolean)
+      if (targets.length > 0) {
+        gsap.fromTo(targets, 
+          { opacity: 0, scale: 0.92 },
+          { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out', overwrite: 'auto' }
+        )
+      }
+    }, 50)
+  }
 
   return (
     <>
-      <Head>
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
-      </Head>
-      
-      {/* Self-contained styling for levitation animation keyframes */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes levitate {
           0% { transform: translateY(0px) rotateY(0deg); }
@@ -763,7 +842,7 @@ export default function RevealPage() {
         }}
       >
         {/* Dark Dimmer Overlay */}
-        <div className="absolute inset-0 bg-black/60 pointer-events-none z-0"></div>
+        <div ref={bgOverlayRef} className="absolute inset-0 bg-black/60 pointer-events-none z-0"></div>
 
         {/* Dynamic Color Glow matching the tribe */}
         <div 
@@ -803,15 +882,6 @@ export default function RevealPage() {
           })}
         </div>
 
-        {/* Fullscreen energy flash overlay */}
-        {showFlash && (
-          <div 
-            ref={flashRef}
-            className="fixed inset-0 bg-white z-[999] opacity-100"
-            style={{ mixBlendMode: 'screen' }}
-          ></div>
-        )}
-
         <div className={`relative z-20 flex flex-col items-center justify-center w-full ${scanState === 'done' ? 'max-w-2xl' : 'max-w-md'} h-[100dvh] sm:h-auto mx-auto p-4 sm:py-8`}>
           
           {/* Header */}
@@ -824,11 +894,6 @@ export default function RevealPage() {
             {scanState === 'scanning' && (
               <h1 ref={titleRef} className="text-2xl md:text-4xl text-center font-black tracking-[0.3em] text-[#06b6d4] uppercase" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 0 25px rgba(6,182,212,0.6)' }}>
                 Channeling...
-              </h1>
-            )}
-            {scanState === 'revealing' && (
-              <h1 ref={titleRef} className="text-xl md:text-3xl text-center font-black tracking-[0.4em] text-white uppercase animate-pulse" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 0 20px rgba(52,211,153,0.7)' }}>
-                The Forest Answers
               </h1>
             )}
             {scanState === 'error' && (
@@ -847,142 +912,118 @@ export default function RevealPage() {
           </div>
 
           {/* Magical Rune Scanner */}
-          {(scanState === 'idle' || scanState === 'scanning' || scanState === 'revealing') && (
-            <div ref={scannerContainerRef} className="flex flex-col items-center">
-              <ThumbScanner 
-                onScanStart={handleScanStart} 
-                onScanComplete={handleScanComplete} 
-                onScanCancel={handleScanCancel} 
-                onScanProgress={handleScanProgress}
-              />
-              <div 
-                className="mt-10 px-6 py-2.5 bg-black/80 rounded-full flex flex-col items-center gap-1.5 pointer-events-none select-none"
-                style={{
-                  border: '1.5px solid rgba(52, 211, 153, 0.45)',
-                  boxShadow: '0 0 15px rgba(52, 211, 153, 0.25), inset 0 0 5px rgba(52, 211, 153, 0.15)'
-                }}
-              >
-                <span className="text-[#34d399] text-[13px] font-black tracking-[0.3em] uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.7)] animate-pulse">
-                  HOLD TO REVEAL
-                </span>
-                <span className="text-white/50 text-[10px] tracking-[0.2em] uppercase font-bold">
-                  YOUR TRIBE
-                </span>
-              </div>
+          <div 
+            ref={scannerContainerRef} 
+            className={`flex flex-col items-center transition-all duration-700 ${
+              scanState === 'done' 
+                ? 'opacity-0 scale-90 pointer-events-none absolute' 
+                : 'opacity-100 scale-100 relative'
+            }`}
+          >
+            <ThumbScanner 
+              onScanStart={handleScanStart} 
+              onScanComplete={handleScanComplete} 
+              onScanCancel={handleScanCancel} 
+              onScanProgress={handleScanProgress}
+            />
+            <div 
+              className="mt-10 px-6 py-2.5 bg-black/80 rounded-full flex flex-col items-center gap-1.5 pointer-events-none select-none"
+              style={{
+                border: '1.5px solid rgba(52, 211, 153, 0.45)',
+                boxShadow: '0 0 15px rgba(52, 211, 153, 0.25), inset 0 0 5px rgba(52, 211, 153, 0.15)'
+              }}
+            >
+              <span className="text-[#34d399] text-[13px] font-black tracking-[0.3em] uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.7)] animate-pulse">
+                HOLD TO REVEAL
+              </span>
+              <span className="text-white/50 text-[10px] tracking-[0.2em] uppercase font-bold">
+                YOUR TRIBE
+              </span>
             </div>
-          )}
+          </div>
 
           {/* High-Fantasy Card Reveal */}
-          {scanState === 'done' && (
+          <div 
+            ref={revealContainerRef} 
+            className={`flex flex-col justify-center items-center w-full pt-4 transition-all duration-1000 ${
+              scanState === 'done' 
+                ? 'opacity-100 scale-100 pointer-events-auto relative' 
+                : 'opacity-0 scale-95 pointer-events-none absolute'
+            }`}
+            style={{ minHeight: scanState === 'done' ? '85vh' : '0px' }}
+          >
+            {/* Name and Mobile Number Plaque - moved to the TOP of the card */}
             <div 
-              ref={revealContainerRef} 
-              className="flex flex-col justify-center items-center w-full h-[82vh] relative"
+              ref={plaqueRef}
+              className="z-20 flex flex-col items-center pointer-events-none mb-6 max-w-xs"
             >
-              {/* Dynamic glowing halo behind the massive card */}
               <div 
-                className="absolute w-[450px] h-[450px] rounded-full blur-3xl pointer-events-none opacity-45 mix-blend-screen"
+                className="px-6 py-2 bg-black/90 border-2 border-[#d1a058] rounded-md text-center shadow-2xl w-auto max-w-[280px]"
                 style={{
-                  background: `radial-gradient(circle, ${details.color} 0%, transparent 70%)`,
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%) scale(1.4)'
+                  boxShadow: '0 8px 25px rgba(0,0,0,0.95), inset 0 0 10px rgba(209,160,88,0.4)'
                 }}
-              />
-              
-              {/* Massive 3D Levitating Card taking maximum viewport height */}
-              <div className="relative w-[330px] sm:w-[370px] h-[520px] sm:h-[580px] z-10 mb-4" style={{ perspective: '1000px' }}>
-                <div 
-                  className="w-full h-full relative"
-                  style={{
-                    transformStyle: 'preserve-3d',
-                    animation: 'levitate 5s ease-in-out infinite',
-                  }}
-                >
+              >
+                <p className="text-[#d1a058] text-[15px] sm:text-[17px] font-black tracking-widest uppercase truncate px-2" style={{ fontFamily: "'Cinzel', serif" }}>
+                  {userData?.name}
+                </p>
+                <p className="text-white/60 text-[10px] sm:text-[11px] font-mono tracking-wider mt-0.5">
+                  {userData?.number}
+                </p>
+              </div>
+            </div>
+            
+            {/* Massive Levitating Card taking proportional height */}
+            <div 
+              ref={cardWrapperRef}
+              className="relative w-[280px] sm:w-[320px] h-[410px] sm:h-[470px] z-10 mb-3" 
+            >
+              {/* Card Front only (revealed from blur to clear) */}
+              <div 
+                ref={cardFrontRef}
+                className="absolute inset-0 w-full h-full z-10 opacity-0"
+                style={{ filter: 'blur(25px)' }}
+              >
+                {details.image && (
                   <Image
                     src={details.image}
                     alt={details.title}
                     fill
-                    className="object-contain filter drop-shadow-[0_10px_35px_rgba(0,0,0,0.95)] hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 330px, 370px"
+                    className="object-contain filter drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)]"
+                    sizes="(max-width: 640px) 280px, 320px"
                     priority
+                    onLoad={() => setImageLoaded(true)}
                   />
-                  
-                  {/* Name and Mobile Number Plaque overlaid directly on the card graphic */}
-                  <div className="absolute bottom-[42px] sm:bottom-[48px] left-1/2 -translate-x-1/2 z-20 w-[78%] flex flex-col items-center pointer-events-none">
-                    <div 
-                      className="px-4 py-1.5 bg-[#000]/95 border-2 border-[#d1a058] rounded-md text-center w-full shadow-2xl"
-                      style={{
-                        boxShadow: '0 8px 25px rgba(0,0,0,0.95), inset 0 0 10px rgba(209,160,88,0.4)'
-                      }}
-                    >
-                      <p className="text-[#d1a058] text-[15px] sm:text-[17px] font-black tracking-widest uppercase truncate" style={{ fontFamily: "'Cinzel', serif" }}>
-                        {userData?.name}
-                      </p>
-                      <p className="text-white/60 text-[10px] sm:text-[11px] font-mono tracking-wider mt-0.5">
-                        {userData?.number}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
-
-              {/* Access Band Instructions Text */}
-              <p className="text-white/90 text-[11px] sm:text-xs text-center tracking-[0.12em] font-bold max-w-sm mb-4 px-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] leading-relaxed uppercase">
-                Show this card to the counter to receive your tribe access band
-              </p>
-
-              {/* Reset Kiosk Button */}
-              <button 
-                onClick={resetToIdle}
-                className="mt-1 group relative px-10 py-3.5 overflow-hidden rounded-full border border-white/20 bg-black/85 hover:border-white/50 transition-colors shadow-2xl z-20"
-              >
-                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <span className="relative font-bold tracking-[0.25em] uppercase text-[11px] transition-colors" style={{ color: details.color }}>
-                  New Warrior
-                </span>
-              </button>
             </div>
-          )}
+
+            {/* Access Band Instructions Text - using new_description image, increased size */}
+            <div 
+              ref={descriptionRef}
+              className="z-10 w-[540px] max-w-[95%] sm:w-[640px] h-28 sm:h-36 relative mt-[-12px] mb-4 pointer-events-none"
+            >
+              <Image
+                src="/new_description.png"
+                alt="Show this card to the counter to receive your tribe access band"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+
+            {/* Reset Kiosk Button */}
+            <button 
+              onClick={resetToIdle}
+              className="group relative px-10 py-3.5 overflow-hidden rounded-full border border-white/20 bg-black/85 hover:border-white/50 transition-colors shadow-2xl z-20"
+            >
+              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <span className="relative font-bold tracking-[0.25em] uppercase text-[11px] transition-colors" style={{ color: details.color }}>
+                New Warrior
+              </span>
+            </button>
+          </div>
         </div>
       </div>
-
-      {!dismissOverlay && (
-        <div 
-          ref={overlayRef}
-          onClick={handleAwaken}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050806]/98 cursor-pointer select-none"
-          style={{ fontFamily: "'Montserrat', sans-serif" }}
-        >
-          {/* Ambient forest glow behind */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15)_0%,transparent_70%)] pointer-events-none" />
-
-          {/* Large pulsing rune */}
-          <div className="relative mb-8 group">
-            <div className="absolute inset-[-20px] rounded-full bg-[#10b981]/10 blur-2xl animate-pulse" />
-            <svg 
-              className="w-32 h-32 text-[#34d399] filter drop-shadow-[0_0_20px_rgba(16,185,129,0.6)] animate-pulse"
-              viewBox="0 0 100 100" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2.5"
-            >
-              <path d="M50 8 L88 28 L88 72 L50 92 L12 72 L12 28 Z" />
-              <path d="M50 18 L78 34 L78 66 L50 82 L22 66 L22 34 Z" strokeDasharray="5 5" />
-              <circle cx="50" cy="50" r="14" />
-              <path d="M50 34 L50 8" />
-              <path d="M50 66 L50 92" />
-            </svg>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl font-black text-[#e0e7e1] tracking-[0.3em] uppercase text-center mb-3" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
-            The Forest Awakens
-          </h2>
-          
-          <p className="text-[#34d399] text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase animate-pulse drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
-            Tap Screen to Summon
-          </p>
-        </div>
-      )}
     </>
   )
 }
