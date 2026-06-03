@@ -217,20 +217,21 @@ export function Hero() {
           </h2>
 
           {/* Main Title */}
-          <div
+          <h1
             ref={titleTextRef}
             className="mb-6 md:mb-8 flex justify-center"
             style={{ opacity: 0 }}
           >
+            <span className="sr-only">Zambaara - Master the Elements, Become the Zampion</span>
             <Image
               src="/Zambaara.png"
-              alt="ZAMBAARA"
+              alt="Zambaara - Elemental Card Game Logo"
               width={600}
               height={240}
               className="w-full max-w-[260px] sm:max-w-[340px] md:max-w-[400px] lg:max-w-[460px] h-auto object-contain"
               priority
             />
-          </div>
+          </h1>
 
           {/* Taglines */}
           <div 
