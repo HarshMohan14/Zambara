@@ -590,7 +590,7 @@ export function CardSlider() {
   return (
     <section
       ref={sectionRef}
-      className={`relative w-full bg-black py-8 md:py-12 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
+      className={`relative w-full bg-black pt-0 pb-8 md:pt-0 md:pb-12 ${!isRevealed ? 'overflow-visible' : 'overflow-hidden'}`}
       style={{ transformStyle: 'preserve-3d' }}
     >
       {/* Hidden audio element for shuffle sound - optional, won't error if file doesn't exist */}

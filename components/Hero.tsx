@@ -117,7 +117,8 @@ export function Hero() {
       className="relative flex items-center justify-center overflow-hidden bg-black"
       style={{
         width: '100vw',
-        height: '100vh',
+        height: '80vh',
+        minHeight: '550px',
       }}
     >
       {/* Audio Control Button */}
@@ -180,8 +181,8 @@ export function Hero() {
               playsInline
               className="object-contain"
               style={{
-                width: '480px',
-                height: '848px',
+                width: '552px',
+                height: '975px',
               }}
             />
           </div>

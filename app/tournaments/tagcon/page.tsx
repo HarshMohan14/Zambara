@@ -283,9 +283,6 @@ export default function TagconTournamentPage() {
                     <p className="text-[#d1a058] text-[17px] font-black tracking-widest uppercase truncate" style={{ fontFamily: "'Cinzel', serif" }}>
                       {zampion.userName}
                     </p>
-                    <p className="text-white/60 text-[10px] font-mono tracking-wider mt-0.5">
-                      {zampion.userMobile}
-                    </p>
                   </div>
                 </div>
               )}

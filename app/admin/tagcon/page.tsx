@@ -60,6 +60,7 @@ const TRIBES = [
 export default function AdminTagconPage() {
   const [users, setUsers] = useState<TagconUser[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedTribeFilter, setSelectedTribeFilter] = useState('all')
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'queue' | 'tournaments' | 'booking'>('queue')
 
@@ -410,6 +411,16 @@ export default function AdminTagconPage() {
 
   // Filter queue users
   const filteredUsers = users.filter(user => {
+    // 1. Tribe filter
+    if (selectedTribeFilter !== 'all') {
+      if (selectedTribeFilter === 'none') {
+        if (user.tribe) return false
+      } else {
+        if (user.tribe !== selectedTribeFilter) return false
+      }
+    }
+
+    // 2. Search query filter
     const q = searchQuery.toLowerCase().trim()
     if (!q) return true
     const nameMatch = user.name?.toLowerCase().includes(q)
@@ -425,17 +436,56 @@ export default function AdminTagconPage() {
       toast.error('No records to export')
       return
     }
+
+    // Determine the label for the applied tribe filter
+    let tribeFilterText = 'All'
+    if (selectedTribeFilter === 'none') {
+      tribeFilterText = 'No Tribe (Unrevealed)'
+    } else if (selectedTribeFilter !== 'all') {
+      const tribeObj = TRIBES.find(t => t.id === selectedTribeFilter)
+      tribeFilterText = tribeObj ? tribeObj.label : selectedTribeFilter.toUpperCase()
+    }
+
+    const formattedDate = new Date().toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    })
+
+    // Create a clean header block for the CSV report
+    const titleBlock = [
+      ['ZAMBAARA CARD GAME - TAGCON WARRIORS REGISTRATIONS REPORT'],
+      ['Report Generated:', formattedDate],
+      ['Applied Tribe Filter:', tribeFilterText],
+      ['Total Records in View:', `${filteredUsers.length} player(s)`],
+      []
+    ]
+
     const headers = ['Name', 'Mobile Number', 'Status', 'Tribe', 'Registered At', 'Has Bought']
     const rows = filteredUsers.map(user => [
-      user.name,
-      user.mobile || user.number,
+      user.name || 'Anonymous',
+      user.mobile || user.number || 'N/A',
       user.status === 'pending' ? 'Waiting' : 'Revealed',
-      user.tribe ? user.tribe.toUpperCase() : 'NONE',
-      user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A',
+      user.tribe ? (TRIBES.find(t => t.id === user.tribe)?.label || user.tribe.toUpperCase()) : 'None',
+      user.createdAt ? new Date(user.createdAt).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }) : 'N/A',
       user.hasBought ? 'Yes' : 'No'
     ])
+
     const csvContent = [
-      headers.join(','),
+      ...titleBlock.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(',')),
+      headers.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','),
       ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
     ].join('\n')
 
@@ -443,7 +493,10 @@ export default function AdminTagconPage() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.setAttribute('href', url)
-    link.setAttribute('download', `tagcon_registrations_${new Date().toISOString().split('T')[0]}.csv`)
+
+    const dateStr = new Date().toISOString().split('T')[0]
+    const tribeFileNamePart = selectedTribeFilter === 'all' ? 'all_tribes' : selectedTribeFilter
+    link.setAttribute('download', `zambaara_tagcon_${tribeFileNamePart}_${dateStr}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -536,17 +589,31 @@ export default function AdminTagconPage() {
       {activeTab === 'queue' && (
         <div className="bg-black/40 border border-[#d1a058]/30 rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(209,160,88,0.1)]">
           <div className="p-6 border-b border-[#d1a058]/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-md w-full">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name, tribe, or mobile..."
-                className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#d1a058] pr-10"
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-3 text-white/40 hover:text-white">✕</button>
-              )}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-xl w-full">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by name, tribe, or mobile..."
+                  className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#d1a058] pr-10"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-3 text-white/40 hover:text-white">✕</button>
+                )}
+              </div>
+              <select
+                value={selectedTribeFilter}
+                onChange={(e) => setSelectedTribeFilter(e.target.value)}
+                className="bg-black/60 border border-[#d1a058]/40 rounded px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058] cursor-pointer min-w-[160px]"
+              >
+                <option value="all">All Tribes</option>
+                <option value="lava">Lava Tribe</option>
+                <option value="rain">Rain Tribe</option>
+                <option value="mountain">Mountain Tribe</option>
+                <option value="wind">Wind Tribe</option>
+                <option value="none">No Tribe (Unrevealed)</option>
+              </select>
             </div>
             <div className="flex items-center gap-4 justify-between md:justify-end w-full md:w-auto">
               <button

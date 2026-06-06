@@ -4,6 +4,7 @@ import { CardSlider } from '@/components/CardSlider'
 import { RankingsSlider } from '@/components/RankingsSlider'
 import { BattlePackSection } from '@/components/BattlePackSection'
 import { CaveSection } from '@/components/CaveSection'
+import { HowToPlaySection } from '@/components/HowToPlaySection'
 import { ImageSlider } from '@/components/ImageSlider'
 import { Gallery } from '@/components/Gallery'
 import { ContactForm } from '@/components/ContactForm'
@@ -111,6 +112,9 @@ export default function Home() {
         </section>
         <section id="cards" aria-label="Game Cards">
           <CardSlider />
+        </section>
+        <section id="how-to-play" aria-label="How to Play Zambaara">
+          <HowToPlaySection />
         </section>
         <section id="battle-pack" aria-label="Battle Pack">
           <BattlePackSection />

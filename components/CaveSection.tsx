@@ -17,6 +17,7 @@ export function CaveSection() {
     phone: '',
     pack: '2-4' as '2-4' | '5-8'
   })
+  const [isImageHovered, setIsImageHovered] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const tabsRef = useRef<HTMLDivElement>(null)
@@ -142,166 +143,176 @@ export function CaveSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen flex flex-col items-center overflow-hidden bg-black"
+      className="relative w-full min-h-screen flex items-center justify-center bg-black py-16 md:py-24"
     >
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/Cave.jpg"
-          alt="Cave background"
-          fill
-          className="object-cover object-center"
-          sizes="100vw"
-          priority
-        />
-      </div>
+      {/* Background radial glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(209,160,88,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
 
       {/* Content */}
       <div
         ref={contentRef}
-        className="relative z-10 container mx-auto px-4 py-12 text-center mt-[40vh]"
+        className="relative z-10 container mx-auto px-4 flex flex-col lg:flex-row items-center gap-12 lg:gap-16 max-w-6xl w-full"
       >
-        {/* Player Count Tabs */}
-        <div
-          ref={tabsRef}
-          className="flex justify-center gap-4 mb-6 opacity-0"
+        {/* Left Column: Visual Image (No parent card wrapper, larger dimensions) */}
+        <div 
+          className="w-full lg:w-1/2 flex justify-center order-1"
+          onMouseEnter={() => setIsImageHovered(true)}
+          onMouseLeave={() => setIsImageHovered(false)}
         >
-          <button
-            onClick={() => setActiveTab('2-4')}
-            className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
+          <img
+            src="/Cave.jpg"
+            alt="Zambaara Battle Pack Cards Fan"
+            className="w-full h-auto object-contain transition-transform duration-500 ease-out"
             style={{
-              fontFamily: "'BlinkerSemiBold', sans-serif",
-              backgroundColor: activeTab === '2-4' ? '#d1a058' : 'transparent',
-              border: activeTab === '2-4' ? 'none' : '2px solid #d1a058',
-              color: activeTab === '2-4' ? '#000' : '#d1a058',
-              textShadow: activeTab === '2-4' ? 'none' : '1px 1px 4px rgba(0, 0, 0, 0.8)',
-              boxShadow: activeTab === '2-4' ? '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)' : 'none',
+              transform: isImageHovered ? 'scale(1.03)' : 'scale(1)',
             }}
-            onMouseEnter={(e) => {
-              if (activeTab !== '2-4') {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== '2-4') {
-                e.currentTarget.style.backgroundColor = 'transparent'
-              }
-            }}
-          >
-            2-4 PLAYERS
-          </button>
-          <button
-            onClick={() => setActiveTab('5-8')}
-            className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
-            style={{
-              fontFamily: "'BlinkerSemiBold', sans-serif",
-              backgroundColor: activeTab === '5-8' ? '#FFFFFF' : 'transparent',
-              border: '2px solid #d1a058',
-              color: activeTab === '5-8' ? '#000' : '#d1a058',
-              textShadow: activeTab === '5-8' ? 'none' : '1px 1px 4px rgba(0, 0, 0, 0.8)',
-              boxShadow: activeTab === '5-8' ? '0 4px 15px rgba(255, 255, 255, 0.3)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (activeTab !== '5-8') {
-                e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== '5-8') {
-                e.currentTarget.style.backgroundColor = 'transparent'
-              }
-            }}
-          >
-            5-8 PLAYERS
-          </button>
+          />
         </div>
 
-        {/* Description */}
-        <p
-          ref={descriptionRef}
-          className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 opacity-0 leading-relaxed"
-          style={{
-            fontFamily: "'BlinkerRegular', sans-serif",
-            textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
-          }}
-        >
-          {activeTab === '2-4'
-            ? 'Perfect for intimate gaming sessions. Experience the thrill of elemental mastery with a smaller group of players.'
-            : 'Ideal for larger gatherings. Battle with more players and unlock the full potential of the Zambaara experience.'}
-        </p>
+        {/* Right Column: Pre-booking selection and pricing */}
+        <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left order-2">
+          {/* Player Count Tabs */}
+          <div
+            ref={tabsRef}
+            className="flex justify-center lg:justify-start gap-4 mb-6 opacity-0"
+          >
+            <button
+              onClick={() => setActiveTab('2-4')}
+              className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
+              style={{
+                fontFamily: "'BlinkerSemiBold', sans-serif",
+                backgroundColor: activeTab === '2-4' ? '#d1a058' : 'transparent',
+                border: activeTab === '2-4' ? 'none' : '2px solid #d1a058',
+                color: activeTab === '2-4' ? '#000' : '#d1a058',
+                textShadow: activeTab === '2-4' ? 'none' : '1px 1px 4px rgba(0, 0, 0, 0.8)',
+                boxShadow: activeTab === '2-4' ? '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)' : 'none',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== '2-4') {
+                  e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== '2-4') {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }
+              }}
+            >
+              2-4 PLAYERS
+            </button>
+            <button
+              onClick={() => setActiveTab('5-8')}
+              className="px-6 py-3 rounded-lg font-semibold uppercase tracking-wide transition-all"
+              style={{
+                fontFamily: "'BlinkerSemiBold', sans-serif",
+                backgroundColor: activeTab === '5-8' ? '#FFFFFF' : 'transparent',
+                border: '2px solid #d1a058',
+                color: activeTab === '5-8' ? '#000' : '#d1a058',
+                textShadow: activeTab === '5-8' ? 'none' : '1px 1px 4px rgba(0, 0, 0, 0.8)',
+                boxShadow: activeTab === '5-8' ? '0 4px 15px rgba(255, 255, 255, 0.3)' : 'none',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== '5-8') {
+                  e.currentTarget.style.backgroundColor = 'rgba(209, 160, 88, 0.1)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== '5-8') {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }
+              }}
+            >
+              5-8 PLAYERS
+            </button>
+          </div>
 
-        {/* Price */}
-        <div
-          ref={priceRef}
-          className="mb-8 opacity-0"
-        >
+          {/* Description */}
           <p
-            className="text-6xl md:text-7xl lg:text-8xl font-bold"
+            ref={descriptionRef}
+            className="text-lg md:text-xl text-white/90 mb-8 opacity-0 leading-relaxed"
             style={{
-              fontFamily: "'TheWalkyrDemo', serif",
-              color: '#d1a058',
-              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
-              textTransform: 'lowercase',
-            }}
-          >
-            {activeTab === '2-4' ? '₹799' : '₹899'}
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div
-          ref={buttonsRef}
-          className="flex flex-col sm:flex-row justify-center gap-4 opacity-0"
-        >
-          <Link
-            href="/how-to-play"
-            className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide inline-block text-center"
-            style={{
-              fontFamily: "'BlinkerSemiBold', sans-serif",
-              backgroundColor: '#000000',
-              border: '2px solid #d1a058',
-              color: '#FFFFFF',
+              fontFamily: "'BlinkerRegular', sans-serif",
               textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
-              boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2)',
-              letterSpacing: '1px',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)'
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)'
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2)'
             }}
           >
-            HOW TO PLAY
-          </Link>
-          <button 
-            onClick={() => {
-              setFormData({ ...formData, pack: activeTab })
-              setShowPreBookForm(true)
-            }}
-            className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide"
-            style={{
-              fontFamily: "'BlinkerSemiBold', sans-serif",
-              background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
-              border: 'none',
-              color: '#000000',
-              boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-              letterSpacing: '1px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)'
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)'
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
-            }}
+            {activeTab === '2-4'
+              ? 'Perfect for intimate gaming sessions. Experience the thrill of elemental mastery with a smaller group of players.'
+              : 'Ideal for larger gatherings. Battle with more players and unlock the full potential of the Zambaara experience.'}
+          </p>
+
+          {/* Price */}
+          <div
+            ref={priceRef}
+            className="mb-8 opacity-0"
           >
-            PRE BOOK NOW
-          </button>
+            <p
+              className="text-6xl md:text-7xl lg:text-8xl font-bold"
+              style={{
+                fontFamily: "'TheWalkyrDemo', serif",
+                color: '#d1a058',
+                textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(209, 160, 88, 0.2)',
+                textTransform: 'lowercase',
+              }}
+            >
+              {activeTab === '2-4' ? '₹799' : '₹899'}
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div
+            ref={buttonsRef}
+            className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 opacity-0 w-full"
+          >
+            <Link
+              href="/how-to-play"
+              className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide inline-block text-center sm:flex-1 lg:flex-none"
+              style={{
+                fontFamily: "'BlinkerSemiBold', sans-serif",
+                backgroundColor: '#000000',
+                border: '2px solid #d1a058',
+                color: '#FFFFFF',
+                textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
+                boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2)',
+                letterSpacing: '1px',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2)'
+              }}
+            >
+              HOW TO PLAY
+            </Link>
+            <button 
+              onClick={() => {
+                setFormData({ ...formData, pack: activeTab })
+                setShowPreBookForm(true)
+              }}
+              className="px-8 py-4 font-semibold rounded-lg transition-all uppercase tracking-wide sm:flex-1 lg:flex-none"
+              style={{
+                fontFamily: "'BlinkerSemiBold', sans-serif",
+                background: 'linear-gradient(180deg, #f4d03f 0%, #d1a058 100%)',
+                border: 'none',
+                color: '#000000',
+                boxShadow: '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                letterSpacing: '1px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(209, 160, 88, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(209, 160, 88, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+              }}
+            >
+              PRE BOOK NOW
+            </button>
+          </div>
         </div>
       </div>
 

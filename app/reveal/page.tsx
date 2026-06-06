@@ -952,7 +952,7 @@ export default function RevealPage() {
             }`}
             style={{ minHeight: scanState === 'done' ? '85vh' : '0px' }}
           >
-            {/* Name and Mobile Number Plaque - moved to the TOP of the card */}
+            {/* Name Plaque - moved to the TOP of the card */}
             <div 
               ref={plaqueRef}
               className="z-20 flex flex-col items-center pointer-events-none mb-6 max-w-xs"
@@ -965,9 +965,6 @@ export default function RevealPage() {
               >
                 <p className="text-[#d1a058] text-[15px] sm:text-[17px] font-black tracking-widest uppercase truncate px-2" style={{ fontFamily: "'Cinzel', serif" }}>
                   {userData?.name}
-                </p>
-                <p className="text-white/60 text-[10px] sm:text-[11px] font-mono tracking-wider mt-0.5">
-                  {userData?.number}
                 </p>
               </div>
             </div>
