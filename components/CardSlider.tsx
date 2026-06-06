@@ -398,8 +398,9 @@ export function CardSlider() {
     }
     
     const sliderWidth = sliderRef.current.offsetWidth
-    const slideWidth = sliderWidth * 0.75 // 75% width for each card
-    const gap = sliderWidth * 0.05 // 5% gap between cards
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : true
+    const slideWidth = isMobile ? (sliderWidth * 0.75) : 300 // Use 300px for desktop, 75% for mobile
+    const gap = isMobile ? (sliderWidth * 0.05) : 24 // Use 24px gap for desktop, 5% for mobile
     const totalSlideWidth = slideWidth + gap
     
     // On initial mount (after reveal), set translateX immediately without transition
@@ -427,19 +428,24 @@ export function CardSlider() {
     
     const updateLayout = () => {
       const sliderWidth = slider.offsetWidth
-      const slideWidth = sliderWidth * 0.75
-      const gap = sliderWidth * 0.05
+      const isMobile = window.innerWidth < 768
+      const slideWidth = isMobile ? (sliderWidth * 0.75) : 300
+      const gap = isMobile ? (sliderWidth * 0.05) : 24
 
       // Set gap on container
       container.style.gap = `${gap}px`
 
-      // Set width for each slide element
+      // Set width and height for each slide element to maintain aspect ratio
       const slides = container.children
       Array.from(slides).forEach((slide) => {
         if (slide instanceof HTMLElement) {
           slide.style.width = `${slideWidth}px`
+          slide.style.height = `${slideWidth * 1.46}px`
         }
       })
+      
+      // Update min-height of the slider container dynamically to avoid clipping the absolute details button
+      slider.style.minHeight = `${slideWidth * 1.46 + 120}px`
       
       // Update translateX position on resize
       const totalSlideWidth = slideWidth + gap
