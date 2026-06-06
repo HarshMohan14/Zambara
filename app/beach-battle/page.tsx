@@ -15,7 +15,9 @@ import { BeachBattleBackground } from '@/components/beach-battle/BeachBattleBack
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zambaara.com'
 
 export const metadata: Metadata = {
-  title: 'Beach Battle - Where the Elements Clash by the Sea',
+  title: {
+    absolute: 'Zambaara Beach Battle - Elemental Live Tournament',
+  },
   description: 'Join the Zambaara Beach Battle — a mythic live tournament where four elemental tribes clash by the ocean. Battle for glory, win the Ocean Bracelet, and become the Zampion of the Tides. Pre-register now!',
   keywords: [
     'Zambaara Beach Battle',

@@ -13,7 +13,9 @@ import { generateFAQSchema, generateProductSchema } from '@/lib/seo'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zambaara.com'
 
 export const metadata: Metadata = {
-  title: 'Home - Master the Elements, Become the Zampion',
+  title: {
+    absolute: 'Zambaara - Master the Elements, Become the Zampion',
+  },
   description: 'Welcome to Zambaara - The ultimate elemental card game. Master Lava, Rain, Wind, Mountain and special power cards. Strategic gameplay for 2-8 players. Pre-book now starting at ₹799!',
   keywords: [
     'Zambaara home',
