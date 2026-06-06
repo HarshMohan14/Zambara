@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/firebase'
 import { collection, addDoc, Timestamp, getDocs, query, where } from 'firebase/firestore'
-import { sendWhatsAppNotification } from '@/lib/whatsapp'
 
 export async function POST(req: Request) {
   try {
@@ -31,13 +30,6 @@ export async function POST(req: Request) {
       hasBought: false, // default
       createdAt: Timestamp.now()
     })
-
-    // Trigger WhatsApp notification asynchronously but catch errors to ensure registration reliability
-    try {
-      await sendWhatsAppNotification(mobile, name)
-    } catch (waError) {
-      console.error('Error invoking WhatsApp notification:', waError)
-    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
