@@ -40,3 +40,7 @@ next-env.d.ts
 firebase-debug.log
 firestore-debug.log
 core
+
+# Large assets
+*.psd
+public/TESTIMONIAL_*.mp4
