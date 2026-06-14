@@ -61,12 +61,10 @@ function ActiveTimer({ startTime }: { startTime: any }) {
 export default function BeatTheHostPage() {
   const [activeGames, setActiveGames] = useState<BthGame[]>([])
   const [leaderboard, setLeaderboard] = useState<BthGame[]>([])
-  const [history, setHistory] = useState<BthGame[]>([])
   const [loading, setLoading] = useState(true)
   
-  // Interactive search & filters
+  // Interactive search query
   const [searchQuery, setSearchQuery] = useState('')
-  const [historyFilter, setHistoryFilter] = useState<'all' | 'player_win' | 'host_win'>('all')
 
   // Real-time listeners
   useEffect(() => {
@@ -89,7 +87,7 @@ export default function BeatTheHostPage() {
       setLoading(false)
     })
 
-    // 2. Listen Ended Games (for leaderboard and history)
+    // 2. Listen Ended Games (for leaderboard)
     const qEnded = query(collection(db, 'bth_games'), where('status', '==', 'ended'))
     const unsubscribeEnded = onSnapshot(qEnded, (snapshot) => {
       const endedData: BthGame[] = []
@@ -101,14 +99,6 @@ export default function BeatTheHostPage() {
       const winners = endedData.filter(g => g.winnerName && g.winnerName !== 'Host')
       winners.sort((a, b) => (a.duration || 0) - (b.duration || 0))
       setLeaderboard(winners)
-
-      // History: sorted by end time desc
-      endedData.sort((a, b) => {
-        const tA = a.endTime?.seconds || 0
-        const tB = b.endTime?.seconds || 0
-        return tB - tA
-      })
-      setHistory(endedData)
     }, (err) => {
       console.error('Ended games listener error:', err)
     })
@@ -132,15 +122,6 @@ export default function BeatTheHostPage() {
       g.winnerName?.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }, [leaderboard, searchQuery])
-
-  // Filtered match history based on selection
-  const filteredHistory = useMemo(() => {
-    return history.filter(g => {
-      if (historyFilter === 'player_win') return g.winnerName !== 'Host'
-      if (historyFilter === 'host_win') return g.winnerName === 'Host'
-      return true
-    })
-  }, [history, historyFilter])
 
   // Top 3 winners for the podium layout
   const topThree = useMemo(() => {
@@ -294,144 +275,166 @@ export default function BeatTheHostPage() {
           )}
         </section>
 
-        {/* 2. Leaderboard and History Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* 2. Leaderboard Section */}
+        <section className="space-y-6">
           
-          {/* Left Side: Hall of Fame (8 Cols on Large Screens) */}
-          <div className="lg:col-span-7 space-y-6">
-            
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#d1a058]/20 pb-3">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🏆</span>
-                <h2 className="text-2xl md:text-3xl font-bold uppercase text-[#d1a058]" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
-                  Hall of Fame
-                </h2>
-              </div>
-              
-              {/* Leaderboard Search */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search Zampions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-black/80 border border-[#d1a058]/30 hover:border-[#d1a058]/50 focus:border-[#d1a058] rounded px-3 py-1 text-xs text-white placeholder-white/40 focus:outline-none transition-all w-full sm:w-48"
-                  style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
-                />
-                {searchQuery && (
-                  <button 
-                    onClick={() => setSearchQuery('')} 
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-xs"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#d1a058]/20 pb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🏆</span>
+              <h2 className="text-2xl md:text-3xl font-bold uppercase text-[#d1a058]" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
+                Hall of Fame
+              </h2>
             </div>
+            
+            {/* Leaderboard Search */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Zampions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-black/80 border border-[#d1a058]/30 hover:border-[#d1a058]/50 focus:border-[#d1a058] rounded px-3 py-1 text-xs text-white placeholder-white/40 focus:outline-none transition-all w-full sm:w-48"
+                style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')} 
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-xs"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
 
-            {leaderboard.length === 0 ? (
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-8 text-center text-white/40 text-sm">
-                No record-breaking player victories logged yet. Be the first to defeat the host!
-              </div>
-            ) : (
-              <div className="space-y-6">
-                
-                {/* Top 3 Podium Layout (Only visible if search query is empty) */}
-                {!searchQuery && topThree.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    
-                    {/* Rank 2 (First column on medium+ for podium aesthetics, or simple order. Let's do Rank 1, 2, 3 ordered logically but with distinct heights/effects) */}
-                    
-                    {/* 1st Place Card */}
-                    <div className="bg-gradient-to-b from-yellow-950/40 via-black/80 to-black border-2 border-yellow-500/80 rounded-2xl p-6 text-center shadow-[0_0_25px_rgba(234,179,8,0.25)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                      <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[9px] font-black tracking-widest px-3 py-0.5 rounded-bl uppercase">
-                        CHAMPION
-                      </div>
-                      <div className="text-4xl mb-2 animate-bounce">👑</div>
-                      <span className="text-[10px] uppercase tracking-widest text-yellow-500 font-bold block mb-1">Rank 1</span>
-                      <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[0].winnerName}>
-                        {topThree[0].winnerName}
+          {leaderboard.length === 0 ? (
+            <div className="bg-black/40 border border-white/5 rounded-2xl p-8 text-center text-white/40 text-sm">
+              No record-breaking player victories logged yet. Be the first to defeat the host!
+            </div>
+          ) : (
+            <div className="space-y-6">
+              
+              {/* Top 3 Podium Layout (Only visible if search query is empty) */}
+              {!searchQuery && topThree.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  
+                  {/* 1st Place Card */}
+                  <div className="bg-gradient-to-b from-yellow-950/40 via-black/80 to-black border-2 border-yellow-500/80 rounded-2xl p-6 text-center shadow-[0_0_25px_rgba(234,179,8,0.25)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
+                    <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[9px] font-black tracking-widest px-3 py-0.5 rounded-bl uppercase">
+                      CHAMPION
+                    </div>
+                    <div className="text-4xl mb-2 animate-bounce">👑</div>
+                    <span className="text-[10px] uppercase tracking-widest text-yellow-500 font-bold block mb-1">Rank 1</span>
+                    <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[0].winnerName}>
+                      {topThree[0].winnerName}
+                    </h3>
+                    <div className="text-2xl font-black text-yellow-400 font-mono mt-2">
+                      {topThree[0].duration ? formatDuration(topThree[0].duration) : '00:00'}
+                    </div>
+                    <div className="text-[10px] text-white/40 mt-3 font-mono">
+                      SET ON {topThree[0].endTime instanceof Timestamp
+                        ? topThree[0].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                        : (topThree[0].endTime?.seconds ? new Date(topThree[0].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
+                    </div>
+                  </div>
+
+                  {/* 2nd Place Card */}
+                  {topThree[1] && (
+                    <div className="bg-gradient-to-b from-slate-900/40 via-black/85 to-black border-2 border-slate-400/60 rounded-2xl p-6 text-center shadow-[0_0_20px_rgba(148,163,184,0.15)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
+                      <div className="text-4xl mb-2">🥈</div>
+                      <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">Rank 2</span>
+                      <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[1].winnerName}>
+                        {topThree[1].winnerName}
                       </h3>
-                      <div className="text-2xl font-black text-yellow-400 font-mono mt-2">
-                        {topThree[0].duration ? formatDuration(topThree[0].duration) : '00:00'}
+                      <div className="text-2xl font-black text-slate-300 font-mono mt-2">
+                        {topThree[1].duration ? formatDuration(topThree[1].duration) : '00:00'}
                       </div>
                       <div className="text-[10px] text-white/40 mt-3 font-mono">
-                        SET ON {topThree[0].endTime instanceof Timestamp
-                          ? topThree[0].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                          : (topThree[0].endTime?.seconds ? new Date(topThree[0].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
+                        SET ON {topThree[1].endTime instanceof Timestamp
+                          ? topThree[1].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                          : (topThree[1].endTime?.seconds ? new Date(topThree[1].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
                       </div>
                     </div>
+                  )}
 
-                    {/* 2nd Place Card */}
-                    {topThree[1] && (
-                      <div className="bg-gradient-to-b from-slate-900/40 via-black/85 to-black border-2 border-slate-400/60 rounded-2xl p-6 text-center shadow-[0_0_20px_rgba(148,163,184,0.15)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                        <div className="text-4xl mb-2">🥈</div>
-                        <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">Rank 2</span>
-                        <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[1].winnerName}>
-                          {topThree[1].winnerName}
-                        </h3>
-                        <div className="text-2xl font-black text-slate-300 font-mono mt-2">
-                          {topThree[1].duration ? formatDuration(topThree[1].duration) : '00:00'}
-                        </div>
-                        <div className="text-[10px] text-white/40 mt-3 font-mono">
-                          SET ON {topThree[1].endTime instanceof Timestamp
-                            ? topThree[1].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                            : (topThree[1].endTime?.seconds ? new Date(topThree[1].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
-                        </div>
+                  {/* 3rd Place Card */}
+                  {topThree[2] && (
+                    <div className="bg-gradient-to-b from-orange-950/40 via-black/85 to-black border-2 border-orange-700/50 rounded-2xl p-6 text-center shadow-[0_0_20px_rgba(194,65,12,0.15)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
+                      <div className="text-4xl mb-2">🥉</div>
+                      <span className="text-[10px] uppercase tracking-widest text-orange-500 font-bold block mb-1">Rank 3</span>
+                      <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[2].winnerName}>
+                        {topThree[2].winnerName}
+                      </h3>
+                      <div className="text-2xl font-black text-orange-400 font-mono mt-2">
+                        {topThree[2].duration ? formatDuration(topThree[2].duration) : '00:00'}
                       </div>
-                    )}
-
-                    {/* 3rd Place Card */}
-                    {topThree[2] && (
-                      <div className="bg-gradient-to-b from-orange-950/40 via-black/85 to-black border-2 border-orange-700/50 rounded-2xl p-6 text-center shadow-[0_0_20px_rgba(194,65,12,0.15)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                        <div className="text-4xl mb-2">🥉</div>
-                        <span className="text-[10px] uppercase tracking-widest text-orange-500 font-bold block mb-1">Rank 3</span>
-                        <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[2].winnerName}>
-                          {topThree[2].winnerName}
-                        </h3>
-                        <div className="text-2xl font-black text-orange-400 font-mono mt-2">
-                          {topThree[2].duration ? formatDuration(topThree[2].duration) : '00:00'}
-                        </div>
-                        <div className="text-[10px] text-white/40 mt-3 font-mono">
-                          SET ON {topThree[2].endTime instanceof Timestamp
-                            ? topThree[2].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                            : (topThree[2].endTime?.seconds ? new Date(topThree[2].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
-                        </div>
+                      <div className="text-[10px] text-white/40 mt-3 font-mono">
+                        SET ON {topThree[2].endTime instanceof Timestamp
+                          ? topThree[2].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                          : (topThree[2].endTime?.seconds ? new Date(topThree[2].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                  </div>
-                )}
+                </div>
+              )}
 
-                {/* Leaderboard Table (Remaining and/or searched) */}
-                <div className="bg-black/40 border border-[#d1a058]/25 rounded-2xl overflow-hidden shadow-lg">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="border-b border-[#d1a058]/20 bg-black/60">
-                          <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Rank</th>
-                          <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Warrior Challenger</th>
-                          <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Duration</th>
-                          <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider text-right">Date</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {/* If searching, render all matching. Else render 4th+ place */}
-                        {searchQuery ? (
-                          filteredLeaderboard.length === 0 ? (
-                            <tr>
-                              <td colSpan={4} className="p-8 text-center text-white/40 text-xs">
-                                No matching challengers found.
+              {/* Leaderboard Table (Remaining and/or searched) */}
+              <div className="bg-black/40 border border-[#d1a058]/25 rounded-2xl overflow-hidden shadow-lg">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-[#d1a058]/20 bg-black/60">
+                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Rank</th>
+                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Warrior Challenger</th>
+                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Duration</th>
+                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider text-right">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* If searching, render all matching. Else render 4th+ place */}
+                      {searchQuery ? (
+                        filteredLeaderboard.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} className="p-8 text-center text-white/40 text-xs">
+                              No matching challengers found.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredLeaderboard.map((game, index) => (
+                            <tr key={game.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                              <td className="p-4 font-mono font-bold text-xs text-white/80">
+                                {index === 0 && '🥇'}
+                                {index === 1 && '🥈'}
+                                {index === 2 && '🥉'}
+                                {index > 2 && `${index + 1}`}
+                              </td>
+                              <td className="p-4 text-xs font-semibold text-white">{game.winnerName}</td>
+                              <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
+                                {game.duration ? formatDuration(game.duration) : '00:00'}
+                              </td>
+                              <td className="p-4 text-[10px] font-mono text-white/40 text-right">
+                                {game.endTime instanceof Timestamp
+                                  ? game.endTime.toDate().toLocaleDateString()
+                                  : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
                               </td>
                             </tr>
-                          ) : (
-                            filteredLeaderboard.map((game, index) => (
+                          ))
+                        )
+                      ) : (
+                        remainingLeaderboard.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} className="p-6 text-center text-white/40 text-xs">
+                              Elite records podium displayed above.
+                            </td>
+                          </tr>
+                        ) : (
+                          remainingLeaderboard.map((game, index) => {
+                            const rank = index + 4
+                            return (
                               <tr key={game.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                 <td className="p-4 font-mono font-bold text-xs text-white/80">
-                                  {index === 0 && '🥇'}
-                                  {index === 1 && '🥈'}
-                                  {index === 2 && '🥉'}
-                                  {index > 2 && `${index + 1}`}
+                                  #{rank}
                                 </td>
                                 <td className="p-4 text-xs font-semibold text-white">{game.winnerName}</td>
                                 <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
@@ -443,155 +446,18 @@ export default function BeatTheHostPage() {
                                     : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
                                 </td>
                               </tr>
-                            ))
-                          )
-                        ) : (
-                          remainingLeaderboard.length === 0 ? (
-                            <tr>
-                              <td colSpan={4} className="p-6 text-center text-white/40 text-xs">
-                                Elite records podium displayed above.
-                              </td>
-                            </tr>
-                          ) : (
-                            remainingLeaderboard.map((game, index) => {
-                              const rank = index + 4
-                              return (
-                                <tr key={game.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                  <td className="p-4 font-mono font-bold text-xs text-white/80">
-                                    #{rank}
-                                  </td>
-                                  <td className="p-4 text-xs font-semibold text-white">{game.winnerName}</td>
-                                  <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
-                                    {game.duration ? formatDuration(game.duration) : '00:00'}
-                                  </td>
-                                  <td className="p-4 text-[10px] font-mono text-white/40 text-right">
-                                    {game.endTime instanceof Timestamp
-                                      ? game.endTime.toDate().toLocaleDateString()
-                                      : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
-                                  </td>
-                                </tr>
-                              )
-                            })
-                          )
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                            )
+                          })
+                        )
+                      )}
+                    </tbody>
+                  </table>
                 </div>
+              </div>
 
-              </div>
-            )}
-          </div>
-
-          {/* Right Side: Battle Archive / Match History (5 Cols on Large Screens) */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-[#d1a058]/20 pb-3">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📜</span>
-                <h2 className="text-2xl md:text-3xl font-bold uppercase text-[#d1a058]" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
-                  Battle History
-                </h2>
-              </div>
-              
-              {/* Outcome filter buttons */}
-              <div className="flex gap-1 bg-black/60 p-0.5 rounded border border-white/10 self-start">
-                <button
-                  onClick={() => setHistoryFilter('all')}
-                  className={`px-2 py-0.5 text-[10px] uppercase font-bold rounded transition-all ${
-                    historyFilter === 'all' 
-                      ? 'bg-[#d1a058] text-black' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
-                  style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setHistoryFilter('player_win')}
-                  className={`px-2 py-0.5 text-[10px] uppercase font-bold rounded transition-all ${
-                    historyFilter === 'player_win' 
-                      ? 'bg-[#d1a058] text-black' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
-                  style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
-                >
-                  Wins
-                </button>
-                <button
-                  onClick={() => setHistoryFilter('host_win')}
-                  className={`px-2 py-0.5 text-[10px] uppercase font-bold rounded transition-all ${
-                    historyFilter === 'host_win' 
-                      ? 'bg-[#d1a058] text-black' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
-                  style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
-                >
-                  Losses
-                </button>
-              </div>
             </div>
-
-            {filteredHistory.length === 0 ? (
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-8 text-center text-white/40 text-sm">
-                No past match history recorded for selected outcome filter.
-              </div>
-            ) : (
-              <div className="space-y-4 max-h-[620px] overflow-y-auto pr-1">
-                {filteredHistory.map((game) => {
-                  const isHostWinner = game.winnerName === 'Host'
-                  return (
-                    <div 
-                      key={game.id} 
-                      className={`bg-black/50 border rounded-xl p-4 space-y-3 transition-colors hover:bg-black/70 ${
-                        isHostWinner ? 'border-red-500/10' : 'border-green-500/15'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <span className={`px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold ${
-                          isHostWinner 
-                            ? 'bg-red-500/10 border border-red-500/20 text-red-400' 
-                            : 'bg-green-500/10 border border-green-500/20 text-green-400'
-                        }`}>
-                          {isHostWinner ? '👹 Host Victory' : '🏆 Challenger Victory'}
-                        </span>
-                        <span className="text-[10px] font-mono text-white/40">
-                          {game.endTime instanceof Timestamp
-                            ? game.endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
-                            : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
-                        </span>
-                      </div>
-                      
-                      <div className="text-xs">
-                        <span className="text-white/30 block mb-0.5">MATCHUP</span>
-                        <div className="text-white font-semibold flex items-center gap-1.5 flex-wrap">
-                          <span className="text-yellow-500/90">{game.players.map(p => p.name).join(', ')}</span>
-                          <span className="text-white/30 text-[10px] font-mono">VS</span>
-                          <span className="text-red-400">THE HOST</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center text-xs border-t border-white/5 pt-2">
-                        <div>
-                          <span className="text-white/30 mr-1">WINNER:</span>
-                          <span className={isHostWinner ? 'text-red-400 font-bold' : 'text-green-400 font-bold'}>
-                            {game.winnerName}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 font-mono text-[#d1a058]">
-                          <span>⏱️</span>
-                          <span className="font-bold">{game.duration ? formatDuration(game.duration) : '00:00'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-
-          </div>
-
-        </div>
+          )}
+        </section>
 
       </div>
 
