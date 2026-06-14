@@ -16,6 +16,7 @@ const menuItems = [
   { href: '/admin/contact', label: 'Contact', icon: '📧' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📬' },
   { href: '/admin/tagcon', label: 'TagCon', icon: '🔮' },
+  { href: '/admin/beat-the-host', label: 'Beat the Host', icon: '⚔️' },
 ]
 
 interface AdminSidebarProps {

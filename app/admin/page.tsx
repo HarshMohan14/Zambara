@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api-client'
+import { db } from '@/lib/firebase'
+import { collection, getCountFromServer, query, where } from 'firebase/firestore'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -14,12 +16,29 @@ export default function AdminDashboard() {
     contacts: 0,
     newsletter: 0,
     beachBattle: 0,
+    bthQueue: 0,
+    bthGames: 0,
   })
   const [loading, setLoading] = useState(true)
 
   const fetchStats = async () => {
     try {
-      const [gamesRes, scoresRes, eventsRes, hostsRes, bookingsRes, preBookingsRes, contactsRes, newsletterRes, beachBattleRes] = await Promise.all([
+      const bthQueueCol = collection(db, 'bth_queue')
+      const bthActiveGamesQuery = query(collection(db, 'bth_games'), where('status', '==', 'active'))
+
+      const [
+        gamesRes, 
+        scoresRes, 
+        eventsRes, 
+        hostsRes, 
+        bookingsRes, 
+        preBookingsRes, 
+        contactsRes, 
+        newsletterRes, 
+        beachBattleRes,
+        bthQueueCount,
+        bthActiveCount
+      ] = await Promise.all([
         apiClient.getGames({ limit: 1 }),
         apiClient.getScores({ limit: 1 }),
         apiClient.getEvents({ limit: 1 }),
@@ -29,6 +48,8 @@ export default function AdminDashboard() {
         apiClient.getContactMessages({ limit: 1 }),
         apiClient.getNewsletterSubscribers({ limit: 1 }),
         apiClient.getBeachBattleRegistrations({ limit: 1 }),
+        getCountFromServer(bthQueueCol),
+        getCountFromServer(bthActiveGamesQuery)
       ])
 
       console.log('Dashboard stats responses:', {
@@ -63,6 +84,8 @@ export default function AdminDashboard() {
         contacts: contactsData?.total || 0,
         newsletter: newsletterData?.total || 0,
         beachBattle: beachBattleData?.total || 0,
+        bthQueue: bthQueueCount.data().count || 0,
+        bthGames: bthActiveCount.data().count || 0,
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -141,6 +164,18 @@ export default function AdminDashboard() {
       value: stats.beachBattle,
       color: '#06b6d4',
       icon: '🏖️',
+    },
+    {
+      title: 'BTH Queue',
+      value: stats.bthQueue,
+      color: '#d1a058',
+      icon: '⚔️',
+    },
+    {
+      title: 'Active BTH Games',
+      value: stats.bthGames,
+      color: '#d1a058',
+      icon: '🎮',
     },
   ]
 
@@ -370,6 +405,23 @@ export default function AdminDashboard() {
               style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
             >
               Start/end tribe games, manage matchups & Zampions
+            </div>
+          </a>
+          <a
+            href="/admin/beat-the-host"
+            className="block p-4 bg-[#d1a058]/10 border border-[#d1a058]/30 rounded-lg hover:bg-[#d1a058]/20 transition-all"
+          >
+            <div
+              className="font-semibold text-white"
+              style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+            >
+              Beat the Host Arena
+            </div>
+            <div
+              className="text-sm text-white/60 mt-1"
+              style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
+            >
+              Manage queue, run live battles, and view fastest winner records
             </div>
           </a>
         </div>

@@ -25,6 +25,7 @@ const NAV_LINKS: NavLink[] = [
   { label: 'How to Play', homeHref: '/how-to-play', globalHref: '/how-to-play', isPage: true },
   { label: 'Beach Battle', homeHref: '/beach-battle', globalHref: '/beach-battle', isPage: true, highlight: 'teal' },
   { label: 'Tournaments', homeHref: '/tournaments', globalHref: '/tournaments', isPage: true, highlight: 'gold' },
+  { label: 'Beat the Host', homeHref: '/beat-the-host', globalHref: '/beat-the-host', isPage: true, highlight: 'gold' },
   { label: 'Rankings', homeHref: '#rankings', globalHref: '/#rankings' },
   { label: 'Contact', homeHref: '#contact', globalHref: '/#contact' },
 ]
