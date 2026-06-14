@@ -58,6 +58,63 @@ function ActiveTimer({ startTime }: { startTime: any }) {
   return <span className="font-mono text-xl md:text-2xl text-[#d1a058] tracking-widest font-black drop-shadow-[0_0_10px_rgba(209,160,88,0.5)]">{elapsed}</span>
 }
 
+// Elite Tournament Crown Icon Component
+function TournamentCrown({ tier }: { tier: 'gold' | 'silver' | 'bronze' }) {
+  const colors = {
+    gold: {
+      stroke: '#d1a058',
+      glow: 'rgba(209, 160, 88, 0.4)',
+      fill: 'url(#goldGradient)'
+    },
+    silver: {
+      stroke: '#94a3b8',
+      glow: 'rgba(148, 163, 184, 0.2)',
+      fill: 'url(#silverGradient)'
+    },
+    bronze: {
+      stroke: '#c2410c',
+      glow: 'rgba(194, 65, 12, 0.2)',
+      fill: 'url(#bronzeGradient)'
+    }
+  }
+
+  const activeColor = colors[tier]
+
+  return (
+    <svg 
+      className="w-10 h-10 filter drop-shadow-[0_0_6px_var(--glow-color)]" 
+      style={{ '--glow-color': activeColor.glow } as React.CSSProperties}
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke={activeColor.stroke} 
+      strokeWidth="1.5"
+    >
+      <defs>
+        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fef08a" />
+          <stop offset="50%" stopColor="#d1a058" />
+          <stop offset="100%" stopColor="#a16207" />
+        </linearGradient>
+        <linearGradient id="silverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f8fafc" />
+          <stop offset="50%" stopColor="#94a3b8" />
+          <stop offset="100%" stopColor="#475569" />
+        </linearGradient>
+        <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffedd5" />
+          <stop offset="50%" stopColor="#c2410c" />
+          <stop offset="100%" stopColor="#7c2d12" />
+        </linearGradient>
+      </defs>
+      <path strokeLinecap="round" strokeLinejoin="round" fill={activeColor.fill} d="M2 4.5l3 9h14l3-9-5 3.5-5-5.5-5 5.5-5-3.5z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 18.5h18" strokeWidth="2" />
+      <circle cx="2" cy="4.5" r="1.2" fill={activeColor.stroke} />
+      <circle cx="12" cy="2.5" r="1.2" fill={activeColor.stroke} />
+      <circle cx="22" cy="4.5" r="1.2" fill={activeColor.stroke} />
+    </svg>
+  )
+}
+
 export default function BeatTheHostPage() {
   const [activeGames, setActiveGames] = useState<BthGame[]>([])
   const [leaderboard, setLeaderboard] = useState<BthGame[]>([])
@@ -134,20 +191,20 @@ export default function BeatTheHostPage() {
   }, [leaderboard])
 
   return (
-    <main className="min-h-screen relative pt-24 pb-20 px-4 overflow-hidden bg-black/90">
+    <main className="min-h-screen relative pt-24 pb-20 px-4 overflow-hidden bg-black/95">
       
       {/* Floating Particles/Embers Backdrop */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-1/4 left-1/10 w-2 h-2 bg-[#d1a058]/30 rounded-full animate-float-slow-1" />
-        <div className="absolute top-1/2 left-3/4 w-3 h-3 bg-red-500/20 rounded-full animate-float-slow-2" />
-        <div className="absolute top-4/5 left-1/3 w-1.5 h-1.5 bg-[#d1a058]/40 rounded-full animate-float-slow-3" />
-        <div className="absolute top-1/10 left-4/5 w-2.5 h-2.5 bg-yellow-500/20 rounded-full animate-float-slow-4" />
+        <div className="absolute top-1/4 left-1/10 w-2 h-2 bg-[#d1a058]/20 rounded-full animate-float-slow-1" />
+        <div className="absolute top-1/2 left-3/4 w-3 h-3 bg-red-500/10 rounded-full animate-float-slow-2" />
+        <div className="absolute top-4/5 left-1/3 w-1.5 h-1.5 bg-[#d1a058]/35 rounded-full animate-float-slow-3" />
+        <div className="absolute top-1/10 left-4/5 w-2.5 h-2.5 bg-yellow-500/15 rounded-full animate-float-slow-4" />
       </div>
 
-      <div className="container mx-auto max-w-6xl relative z-10 space-y-12">
+      <div className="container mx-auto max-w-5xl relative z-10 space-y-16">
         
         {/* Navigation Breadcrumb & Back Link */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center border-b border-[#d1a058]/10 pb-4">
           <Link
             href="/#hero"
             className="inline-flex items-center gap-2 transition-all duration-300 hover:opacity-80 group text-[#d1a058] text-sm"
@@ -162,21 +219,21 @@ export default function BeatTheHostPage() {
 
         {/* Hero Banner Header */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-block px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-semibold uppercase tracking-widest rounded-full animate-pulse">
-            🔥 Live Tournament Event 🔥
+          <div className="inline-block px-3 py-1 bg-red-500/10 border border-red-500/25 text-red-500 text-[10px] font-bold uppercase tracking-widest rounded">
+            Live Tournament Event
           </div>
           <h1
             className="text-4xl md:text-6xl font-black text-center tracking-wide uppercase"
             style={{
               fontFamily: "'TheWalkyrDemo', serif",
               color: '#d1a058',
-              textShadow: '0 0 15px rgba(209, 160, 88, 0.4), 2px 2px 4px rgba(0, 0, 0, 0.9)',
+              textShadow: '0 0 15px rgba(209, 160, 88, 0.35), 2px 2px 4px rgba(0, 0, 0, 0.95)',
             }}
           >
             Beat the Host
           </h1>
           <p
-            className="text-white/80 max-w-2xl mx-auto text-sm md:text-base leading-relaxed"
+            className="text-white/70 max-w-xl mx-auto text-sm md:text-base leading-relaxed"
             style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
           >
             Do you have what it takes to vanquish the Host? Track live active battles as warriors challenge the reigning champion, and check the Hall of Fame for the fastest winners of the night.
@@ -186,7 +243,7 @@ export default function BeatTheHostPage() {
         {/* 1. Active Battles Section */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 border-b border-[#d1a058]/20 pb-3">
-            <span className="text-2xl">⚔️</span>
+            <span className="text-2xl">⚔</span>
             <h2 className="text-2xl md:text-3xl font-bold uppercase text-[#d1a058]" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
               Live Arena Matchups
             </h2>
@@ -198,7 +255,7 @@ export default function BeatTheHostPage() {
               <p className="text-white/60 font-semibold tracking-wider uppercase text-xs animate-pulse">Syncing Arena Data...</p>
             </div>
           ) : activeGames.length === 0 ? (
-            <div className="bg-black/40 border border-[#d1a058]/20 rounded-2xl p-10 text-center relative overflow-hidden shadow-2xl backdrop-blur-md group hover:border-[#d1a058]/40 transition-colors">
+            <div className="bg-black/40 border border-[#d1a058]/20 rounded-xl p-10 text-center relative overflow-hidden shadow-2xl backdrop-blur-md group hover:border-[#d1a058]/40 transition-colors">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#d1a058]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               <div className="text-4xl mb-3 animate-bounce">👹</div>
               <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
@@ -213,7 +270,7 @@ export default function BeatTheHostPage() {
               {activeGames.map((game) => (
                 <div 
                   key={game.id} 
-                  className="bg-black border-2 border-red-500/30 hover:border-red-500/50 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(239,68,68,0.1)] relative backdrop-blur-md transition-all duration-300 transform hover:-translate-y-1"
+                  className="bg-black border-2 border-red-500/30 hover:border-red-500/50 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(239,68,68,0.1)] relative backdrop-blur-md transition-all duration-300 transform hover:-translate-y-0.5"
                 >
                   {/* Energy border gradient backdrop */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-500 via-red-500 to-purple-600 animate-pulse" />
@@ -276,7 +333,7 @@ export default function BeatTheHostPage() {
         </section>
 
         {/* 2. Leaderboard Section */}
-        <section className="space-y-6">
+        <section className="space-y-8">
           
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#d1a058]/20 pb-3">
             <div className="flex items-center gap-3">
@@ -293,7 +350,7 @@ export default function BeatTheHostPage() {
                 placeholder="Search Zampions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-black/80 border border-[#d1a058]/30 hover:border-[#d1a058]/50 focus:border-[#d1a058] rounded px-3 py-1 text-xs text-white placeholder-white/40 focus:outline-none transition-all w-full sm:w-48"
+                className="bg-black/80 border border-[#d1a058]/30 hover:border-[#d1a058]/55 focus:border-[#d1a058] rounded px-3 py-1.5 text-xs text-white placeholder-white/35 focus:outline-none transition-all w-full sm:w-48"
                 style={{ fontFamily: "'BlinkerRegular', sans-serif" }}
               />
               {searchQuery && (
@@ -308,70 +365,130 @@ export default function BeatTheHostPage() {
           </div>
 
           {leaderboard.length === 0 ? (
-            <div className="bg-black/40 border border-white/5 rounded-2xl p-8 text-center text-white/40 text-sm">
+            <div className="bg-black/40 border border-[#d1a058]/20 rounded-xl p-8 text-center text-white/40 text-sm">
               No record-breaking player victories logged yet. Be the first to defeat the host!
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-10">
               
-              {/* Top 3 Podium Layout (Only visible if search query is empty) */}
+              {/* Premium Top 3 Legends Roll */}
               {!searchQuery && topThree.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-4">
                   
-                  {/* 1st Place Card */}
-                  <div className="bg-gradient-to-b from-yellow-950/40 via-black/80 to-black border-2 border-yellow-500/80 rounded-2xl p-6 text-center shadow-[0_0_25px_rgba(234,179,8,0.25)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                    <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[9px] font-black tracking-widest px-3 py-0.5 rounded-bl uppercase">
-                      CHAMPION
+                  {/* Legend Rank 1 Card */}
+                  <div className="bg-gradient-to-r from-yellow-950/20 via-black/80 to-yellow-950/10 border border-yellow-500/40 rounded-xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 shadow-[0_0_35px_rgba(209,160,88,0.15)] relative overflow-hidden transition-all duration-300 hover:border-yellow-500/70 hover:shadow-[0_0_40px_rgba(209,160,88,0.22)] group">
+                    {/* Background linear glow */}
+                    <div className="absolute -inset-px bg-gradient-to-r from-yellow-500/0 via-yellow-500/10 to-yellow-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    
+                    <div className="flex items-center gap-6 relative z-10 w-full md:w-auto">
+                      <div className="flex-shrink-0 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                        <TournamentCrown tier="gold" />
+                      </div>
+                      <div className="text-left space-y-1">
+                        <span className="text-[10px] tracking-widest text-yellow-500 font-extrabold uppercase font-mono block">
+                          I // SUPREME CHAMPION
+                        </span>
+                        <h3 
+                          className="text-2xl md:text-3xl font-extrabold uppercase tracking-wide gold-shimmer-text"
+                          style={{ fontFamily: "'TheWalkyrDemo', serif" }}
+                        >
+                          {topThree[0].winnerName}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="text-4xl mb-2 animate-bounce">👑</div>
-                    <span className="text-[10px] uppercase tracking-widest text-yellow-500 font-bold block mb-1">Rank 1</span>
-                    <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[0].winnerName}>
-                      {topThree[0].winnerName}
-                    </h3>
-                    <div className="text-2xl font-black text-yellow-400 font-mono mt-2">
-                      {topThree[0].duration ? formatDuration(topThree[0].duration) : '00:00'}
-                    </div>
-                    <div className="text-[10px] text-white/40 mt-3 font-mono">
-                      SET ON {topThree[0].endTime instanceof Timestamp
-                        ? topThree[0].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                        : (topThree[0].endTime?.seconds ? new Date(topThree[0].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
+
+                    <div className="flex items-center gap-6 relative z-10 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
+                      <div className="text-left md:text-right">
+                        <span className="text-[9px] uppercase tracking-widest text-white/30 font-mono block mb-1">RECORD TIME</span>
+                        <div className="text-3xl font-black text-yellow-400 font-mono drop-shadow-[0_0_10px_rgba(250,204,21,0.3)]">
+                          {topThree[0].duration ? formatDuration(topThree[0].duration) : '00:00'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] uppercase tracking-widest text-white/30 font-mono block mb-1">DATE ACHIEVED</span>
+                        <div className="text-xs font-mono text-white/70">
+                          {topThree[0].endTime instanceof Timestamp
+                            ? topThree[0].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+                            : (topThree[0].endTime?.seconds ? new Date(topThree[0].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'N/A')}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* 2nd Place Card */}
+                  {/* Legend Rank 2 Card */}
                   {topThree[1] && (
-                    <div className="bg-gradient-to-b from-slate-900/40 via-black/85 to-black border-2 border-slate-400/60 rounded-2xl p-6 text-center shadow-[0_0_20px_rgba(148,163,184,0.15)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                      <div className="text-4xl mb-2">🥈</div>
-                      <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">Rank 2</span>
-                      <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[1].winnerName}>
-                        {topThree[1].winnerName}
-                      </h3>
-                      <div className="text-2xl font-black text-slate-300 font-mono mt-2">
-                        {topThree[1].duration ? formatDuration(topThree[1].duration) : '00:00'}
+                    <div className="bg-gradient-to-r from-slate-900/10 via-black/80 to-slate-900/5 border border-slate-400/25 rounded-xl p-5 md:p-6 flex flex-col md:flex-row justify-between items-center gap-6 shadow-[0_0_20px_rgba(148,163,184,0.05)] relative overflow-hidden transition-all duration-300 hover:border-slate-400/50 group">
+                      <div className="flex items-center gap-6 relative z-10 w-full md:w-auto">
+                        <div className="flex-shrink-0 p-2.5 bg-slate-400/5 border border-slate-400/20 rounded-lg">
+                          <TournamentCrown tier="silver" />
+                        </div>
+                        <div className="text-left space-y-1">
+                          <span className="text-[10px] tracking-widest text-slate-400 font-bold uppercase font-mono block">
+                            II // ELITE VANGUARD
+                          </span>
+                          <h3 
+                            className="text-xl md:text-2xl font-bold uppercase text-white/95"
+                            style={{ fontFamily: "'TheWalkyrDemo', serif" }}
+                          >
+                            {topThree[1].winnerName}
+                          </h3>
+                        </div>
                       </div>
-                      <div className="text-[10px] text-white/40 mt-3 font-mono">
-                        SET ON {topThree[1].endTime instanceof Timestamp
-                          ? topThree[1].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                          : (topThree[1].endTime?.seconds ? new Date(topThree[1].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
+
+                      <div className="flex items-center gap-6 relative z-10 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
+                        <div className="text-left md:text-right">
+                          <span className="text-[9px] uppercase tracking-widest text-white/30 font-mono block mb-1">RECORD TIME</span>
+                          <div className="text-2xl font-bold text-slate-300 font-mono">
+                            {topThree[1].duration ? formatDuration(topThree[1].duration) : '00:00'}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[9px] uppercase tracking-widest text-white/30 font-mono block mb-1">DATE ACHIEVED</span>
+                          <div className="text-xs font-mono text-white/60">
+                            {topThree[1].endTime instanceof Timestamp
+                              ? topThree[1].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+                              : (topThree[1].endTime?.seconds ? new Date(topThree[1].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'N/A')}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* 3rd Place Card */}
+                  {/* Legend Rank 3 Card */}
                   {topThree[2] && (
-                    <div className="bg-gradient-to-b from-orange-950/40 via-black/85 to-black border-2 border-orange-700/50 rounded-2xl p-6 text-center shadow-[0_0_20px_rgba(194,65,12,0.15)] relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                      <div className="text-4xl mb-2">🥉</div>
-                      <span className="text-[10px] uppercase tracking-widest text-orange-500 font-bold block mb-1">Rank 3</span>
-                      <h3 className="text-xl font-bold text-white truncate max-w-full px-2" title={topThree[2].winnerName}>
-                        {topThree[2].winnerName}
-                      </h3>
-                      <div className="text-2xl font-black text-orange-400 font-mono mt-2">
-                        {topThree[2].duration ? formatDuration(topThree[2].duration) : '00:00'}
+                    <div className="bg-gradient-to-r from-orange-950/10 via-black/80 to-orange-950/5 border border-orange-700/20 rounded-xl p-5 md:p-6 flex flex-col md:flex-row justify-between items-center gap-6 shadow-[0_0_20px_rgba(194,65,12,0.05)] relative overflow-hidden transition-all duration-300 hover:border-orange-700/40 group">
+                      <div className="flex items-center gap-6 relative z-10 w-full md:w-auto">
+                        <div className="flex-shrink-0 p-2.5 bg-orange-700/5 border border-orange-700/15 rounded-lg">
+                          <TournamentCrown tier="bronze" />
+                        </div>
+                        <div className="text-left space-y-1">
+                          <span className="text-[10px] tracking-widest text-orange-500 font-bold uppercase font-mono block">
+                            III // ELITE GLADIATOR
+                          </span>
+                          <h3 
+                            className="text-xl md:text-2xl font-bold uppercase text-white/90"
+                            style={{ fontFamily: "'TheWalkyrDemo', serif" }}
+                          >
+                            {topThree[2].winnerName}
+                          </h3>
+                        </div>
                       </div>
-                      <div className="text-[10px] text-white/40 mt-3 font-mono">
-                        SET ON {topThree[2].endTime instanceof Timestamp
-                          ? topThree[2].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                          : (topThree[2].endTime?.seconds ? new Date(topThree[2].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'N/A')}
+
+                      <div className="flex items-center gap-6 relative z-10 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
+                        <div className="text-left md:text-right">
+                          <span className="text-[9px] uppercase tracking-widest text-white/30 font-mono block mb-1">RECORD TIME</span>
+                          <div className="text-2xl font-bold text-orange-400 font-mono">
+                            {topThree[2].duration ? formatDuration(topThree[2].duration) : '00:00'}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[9px] uppercase tracking-widest text-white/30 font-mono block mb-1">DATE ACHIEVED</span>
+                          <div className="text-xs font-mono text-white/60">
+                            {topThree[2].endTime instanceof Timestamp
+                              ? topThree[2].endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+                              : (topThree[2].endTime?.seconds ? new Date(topThree[2].endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'N/A')}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -379,16 +496,16 @@ export default function BeatTheHostPage() {
                 </div>
               )}
 
-              {/* Leaderboard Table (Remaining and/or searched) */}
-              <div className="bg-black/40 border border-[#d1a058]/25 rounded-2xl overflow-hidden shadow-lg">
+              {/* Roster Leaderboard Table (Remaining/Searched) */}
+              <div className="bg-black/50 border border-[#d1a058]/15 rounded-xl overflow-hidden shadow-2xl relative">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-[#d1a058]/20 bg-black/60">
-                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Rank</th>
-                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Warrior Challenger</th>
-                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider">Duration</th>
-                        <th className="p-4 font-semibold text-white/80 uppercase text-[10px] tracking-wider text-right">Date</th>
+                      <tr className="border-b border-[#d1a058]/20 bg-black/80">
+                        <th className="p-4 font-bold text-white/90 uppercase text-[10px] tracking-widest font-mono">Rank</th>
+                        <th className="p-4 font-bold text-white/90 uppercase text-[10px] tracking-widest font-mono">Warrior Name</th>
+                        <th className="p-4 font-bold text-white/90 uppercase text-[10px] tracking-widest font-mono">Duration</th>
+                        <th className="p-4 font-bold text-white/90 uppercase text-[10px] tracking-widest font-mono text-right">Date Set</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -402,21 +519,21 @@ export default function BeatTheHostPage() {
                           </tr>
                         ) : (
                           filteredLeaderboard.map((game, index) => (
-                            <tr key={game.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                              <td className="p-4 font-mono font-bold text-xs text-white/80">
-                                {index === 0 && '🥇'}
-                                {index === 1 && '🥈'}
-                                {index === 2 && '🥉'}
-                                {index > 2 && `${index + 1}`}
+                            <tr key={game.id} className="border-b border-white/5 hover:bg-[#d1a058]/5 transition-colors">
+                              <td className="p-4 font-mono text-xs font-bold text-[#d1a058]">
+                                {index === 0 && '👑 01'}
+                                {index === 1 && '🥈 02'}
+                                {index === 2 && '🥉 03'}
+                                {index > 2 && `${(index + 1).toString().padStart(2, '0')}`}
                               </td>
-                              <td className="p-4 text-xs font-semibold text-white">{game.winnerName}</td>
+                              <td className="p-4 text-xs font-semibold text-white tracking-wide">{game.winnerName}</td>
                               <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
                                 {game.duration ? formatDuration(game.duration) : '00:00'}
                               </td>
                               <td className="p-4 text-[10px] font-mono text-white/40 text-right">
                                 {game.endTime instanceof Timestamp
-                                  ? game.endTime.toDate().toLocaleDateString()
-                                  : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
+                                  ? game.endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+                                  : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'N/A')}
                               </td>
                             </tr>
                           ))
@@ -424,26 +541,26 @@ export default function BeatTheHostPage() {
                       ) : (
                         remainingLeaderboard.length === 0 ? (
                           <tr>
-                            <td colSpan={4} className="p-6 text-center text-white/40 text-xs">
-                              Elite records podium displayed above.
+                            <td colSpan={4} className="p-6 text-center text-white/30 text-xs tracking-wider font-semibold">
+                              All top-ranking legends are highlighted in the banners above.
                             </td>
                           </tr>
                         ) : (
                           remainingLeaderboard.map((game, index) => {
                             const rank = index + 4
                             return (
-                              <tr key={game.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                <td className="p-4 font-mono font-bold text-xs text-white/80">
-                                  #{rank}
+                              <tr key={game.id} className="border-b border-white/5 hover:bg-[#d1a058]/5 transition-colors">
+                                <td className="p-4 font-mono text-xs text-white/60 font-semibold">
+                                  #{rank.toString().padStart(2, '0')}
                                 </td>
-                                <td className="p-4 text-xs font-semibold text-white">{game.winnerName}</td>
+                                <td className="p-4 text-xs font-semibold text-white tracking-wide">{game.winnerName}</td>
                                 <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
                                   {game.duration ? formatDuration(game.duration) : '00:00'}
                                 </td>
                                 <td className="p-4 text-[10px] font-mono text-white/40 text-right">
                                   {game.endTime instanceof Timestamp
-                                    ? game.endTime.toDate().toLocaleDateString()
-                                    : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
+                                    ? game.endTime.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+                                    : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'N/A')}
                                 </td>
                               </tr>
                             )
@@ -461,26 +578,39 @@ export default function BeatTheHostPage() {
 
       </div>
 
-      {/* Global CSS for Anime Energy Floating Embers */}
+      {/* Global CSS for Anime Energy Floating Embers & Gold Shimmer Text */}
       <style jsx global>{`
+        @keyframes gold-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .gold-shimmer-text {
+          background: linear-gradient(90deg, #d1a058 10%, #fef08a 50%, #d1a058 90%);
+          background-size: 200% auto;
+          color: transparent;
+          -webkit-background-clip: text;
+          background-clip: text;
+          animation: gold-shimmer 6s infinite linear;
+          text-shadow: 0 0 12px rgba(254, 240, 138, 0.1);
+        }
         @keyframes float-up-1 {
-          0% { transform: translate(0, 0) scale(1); opacity: 0.1; }
-          50% { opacity: 0.4; }
+          0% { transform: translate(0, 0) scale(1); opacity: 0.05; }
+          50% { opacity: 0.3; }
           100% { transform: translate(-30px, -150px) scale(0.6); opacity: 0; }
         }
         @keyframes float-up-2 {
-          0% { transform: translate(0, 0) scale(0.8); opacity: 0.15; }
-          50% { opacity: 0.5; }
+          0% { transform: translate(0, 0) scale(0.8); opacity: 0.1; }
+          50% { opacity: 0.4; }
           100% { transform: translate(40px, -120px) scale(0.4); opacity: 0; }
         }
         @keyframes float-up-3 {
-          0% { transform: translate(0, 0) scale(1.2); opacity: 0.1; }
-          50% { opacity: 0.6; }
+          0% { transform: translate(0, 0) scale(1.2); opacity: 0.05; }
+          50% { opacity: 0.5; }
           100% { transform: translate(-20px, -180px) scale(0.5); opacity: 0; }
         }
         @keyframes float-up-4 {
-          0% { transform: translate(0, 0) scale(0.9); opacity: 0.2; }
-          50% { opacity: 0.4; }
+          0% { transform: translate(0, 0) scale(0.9); opacity: 0.15; }
+          50% { opacity: 0.3; }
           100% { transform: translate(30px, -100px) scale(0.6); opacity: 0; }
         }
         .animate-float-slow-1 {
