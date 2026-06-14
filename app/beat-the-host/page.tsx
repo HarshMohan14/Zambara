@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { db } from '@/lib/firebase'
 import { 
   collection, 
@@ -26,6 +26,51 @@ interface BthGame {
   winnerId?: string
   winnerName?: string
   duration?: number // in seconds
+}
+
+interface SpinnerSlice {
+  id: number
+  label: string
+  description: string
+  angle: number // Slice angle size in degrees
+  color: string // Slice fill gradient/color
+  element: 'lava' | 'wind' | 'water' | 'mountain'
+}
+
+interface SlicesWithAngles extends SpinnerSlice {
+  startAngle: number
+  endAngle: number
+  midAngle: number
+}
+
+// 10 sections with angles summing to exactly 360°
+const SPIN_SLICES: SpinnerSlice[] = [
+  { id: 1, label: '10% OFF', description: '10% Discount Coupon', angle: 60, color: 'url(#sliceLava1)', element: 'lava' },
+  { id: 2, label: '20% OFF', description: '20% Discount Coupon', angle: 45, color: 'url(#sliceWater1)', element: 'water' },
+  { id: 3, label: '10% OFF', description: '10% Discount Coupon', angle: 55, color: 'url(#sliceLava2)', element: 'lava' },
+  { id: 4, label: '20% OFF', description: '20% Discount Coupon', angle: 40, color: 'url(#sliceWater2)', element: 'water' },
+  { id: 5, label: '10% OFF', description: '10% Discount Coupon', angle: 55, color: 'url(#sliceLava3)', element: 'lava' },
+  { id: 6, label: '30% OFF', description: '30% Discount Coupon', angle: 35, color: 'url(#sliceWind1)', element: 'wind' },
+  { id: 7, label: 'EARTH BRACELET', description: 'Official Zambaara Earth Bracelet', angle: 28, color: 'url(#sliceMountain1)', element: 'mountain' },
+  { id: 8, label: 'STICKER', description: 'Collector Edition Sticker', angle: 22, color: 'url(#sliceWind2)', element: 'wind' },
+  { id: 9, label: 'TRY AGAIN', description: 'Better Luck Next Time!', angle: 15, color: 'url(#sliceRain1)', element: 'water' },
+  { id: 10, label: 'FREE GAME', description: 'Free Tournament Entry Ticket', angle: 5, color: 'url(#sliceMajestic)', element: 'lava' }
+]
+
+// Canvas Particle interface for elemental animations
+interface Particle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  size: number
+  color: string
+  alpha: number
+  life: number
+  maxLife: number
+  spinRadius?: number
+  angle?: number
+  speed?: number
 }
 
 // Live timer component for active games
@@ -112,6 +157,541 @@ function TournamentCrown({ tier }: { tier: 'gold' | 'silver' | 'bronze' }) {
       <circle cx="12" cy="2.5" r="1.2" fill={activeColor.stroke} />
       <circle cx="22" cy="4.5" r="1.2" fill={activeColor.stroke} />
     </svg>
+  )
+}
+
+// Elemental Spinner Section Component
+function ElementalSpinner() {
+  const [charge, setCharge] = useState(0)
+  const [isCharging, setIsCharging] = useState(false)
+  const [isSpinning, setIsSpinning] = useState(false)
+  const [rotation, setRotation] = useState(0)
+  const [spinDuration, setSpinDuration] = useState(0)
+  const [winningSlice, setWinningSlice] = useState<SlicesWithAngles | null>(null)
+  const [showRewardModal, setShowRewardModal] = useState(false)
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const particlesRef = useRef<Particle[]>([])
+  const chargeIntervalRef = useRef<any>(null)
+  const requestRef = useRef<number | null>(null)
+  const burstTriggerRef = useRef<'lava' | 'wind' | 'water' | 'mountain' | null>(null)
+
+  // Map starting and ending angles of slices
+  const slicesWithAngles = useMemo<SlicesWithAngles[]>(() => {
+    let currentAngle = 0
+    return SPIN_SLICES.map((slice) => {
+      const startAngle = currentAngle
+      const endAngle = currentAngle + slice.angle
+      currentAngle = endAngle
+      return {
+        ...slice,
+        startAngle,
+        endAngle,
+        midAngle: startAngle + slice.angle / 2
+      }
+    })
+  }, [])
+
+  // Identify current element phase based on charge level
+  const activeElement = useMemo(() => {
+    if (charge < 25) return 'water'
+    if (charge < 50) return 'wind'
+    if (charge < 75) return 'lava'
+    return 'mountain'
+  }, [charge])
+
+  // Canvas animations loop
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = canvas.parentElement?.clientWidth || 400
+    canvas.height = canvas.parentElement?.clientHeight || 400
+
+    const updateParticles = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const particles = particlesRef.current
+
+      // Spawn normal elemental charge sparks
+      if (isCharging) {
+        const cx = canvas.width / 2
+        const cy = canvas.height / 2
+        const colorMap = {
+          water: ['#38bdf8', '#0ea5e9', '#67e8f9'],
+          wind: ['#e2e8f0', '#94a3b8', '#cbd5e1'],
+          lava: ['#ef4444', '#f97316', '#facc15'],
+          mountain: ['#4ade80', '#22c55e', '#d1a058']
+        }
+        const colors = colorMap[activeElement]
+        const randomColor = colors[Math.floor(Math.random() * colors.length)]
+
+        // Swirling particles drawing into the center
+        const pAngle = Math.random() * Math.PI * 2
+        const dist = 160 + Math.random() * 40
+        particles.push({
+          x: cx + Math.cos(pAngle) * dist,
+          y: cy + Math.sin(pAngle) * dist,
+          vx: -Math.cos(pAngle) * (2 + (charge / 20)),
+          vy: -Math.sin(pAngle) * (2 + (charge / 20)),
+          size: 2 + Math.random() * 3,
+          color: randomColor,
+          alpha: 1,
+          life: 0,
+          maxLife: 40 + Math.random() * 20
+        })
+      }
+
+      // Handle custom landing prize burst explosion
+      if (burstTriggerRef.current) {
+        const cx = canvas.width / 2
+        const cy = canvas.height / 2
+        const element = burstTriggerRef.current
+        const colorMap = {
+          lava: ['#f87171', '#f97316', '#fbbf24', '#f43f5e'],
+          wind: ['#ffffff', '#e2e8f0', '#22d3ee', '#38bdf8'],
+          water: ['#60a5fa', '#3b82f6', '#06b6d4', '#0891b2'],
+          mountain: ['#34d399', '#10b981', '#fbbf24', '#d1a058']
+        }
+        const colors = colorMap[element]
+
+        for (let i = 0; i < 120; i++) {
+          const pAngle = Math.random() * Math.PI * 2
+          const speed = 2 + Math.random() * 7
+          particles.push({
+            x: cx,
+            y: cy,
+            vx: Math.cos(pAngle) * speed,
+            vy: Math.sin(pAngle) * speed,
+            size: 2 + Math.random() * 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            alpha: 1,
+            life: 0,
+            maxLife: 60 + Math.random() * 40
+          })
+        }
+        burstTriggerRef.current = null
+      }
+
+      // Render and move particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]
+        p.x += p.vx
+        p.y += p.vy
+        p.life++
+        p.alpha = 1 - (p.life / p.maxLife)
+
+        ctx.save()
+        ctx.globalAlpha = p.alpha
+        ctx.shadowBlur = 8
+        ctx.shadowColor = p.color
+        ctx.fillStyle = p.color
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+
+        if (p.life >= p.maxLife) {
+          particles.splice(i, 1)
+        }
+      }
+
+      requestRef.current = requestAnimationFrame(updateParticles)
+    }
+
+    updateParticles()
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current)
+    }
+  }, [isCharging, activeElement, charge])
+
+  // Start charging power meter on hold
+  const startCharging = () => {
+    if (isSpinning) return
+    setIsCharging(true)
+    setCharge(0)
+
+    chargeIntervalRef.current = setInterval(() => {
+      setCharge((prev) => {
+        if (prev >= 100) {
+          return 100
+        }
+        return prev + 1.8 // Charge speed
+      })
+    }, 20)
+  }
+
+  // Release hold to launch the spin
+  const releaseSpin = () => {
+    if (!isCharging) return
+    setIsCharging(false)
+    clearInterval(chargeIntervalRef.current)
+
+    if (charge < 8) {
+      setCharge(0)
+      return
+    }
+
+    triggerSpin()
+  }
+
+  // Calculate final angle and trigger wheel rotation
+  const triggerSpin = () => {
+    setIsSpinning(true)
+    setWinningSlice(null)
+
+    // Weighted Random Selector based on visual slice sizes (angles)
+    const totalWeights = 360
+    const randVal = Math.random() * totalWeights
+
+    let selected: SlicesWithAngles | null = null
+    for (const slice of slicesWithAngles) {
+      if (randVal >= slice.startAngle && randVal < slice.endAngle) {
+        selected = slice
+        break
+      }
+    }
+    if (!selected) selected = slicesWithAngles[0]
+
+    setWinningSlice(selected)
+
+    // Calculate dynamic spins count based on charge power
+    const extraRotations = 4 + Math.floor(charge / 15) // max ~10 spins
+    const duration = 4.5 + (charge / 35) // max ~7.3s
+    setSpinDuration(duration)
+
+    // Calculate targeted landing point (Top needle is standard 12 o'clock / 0° local)
+    // Pointer points at (360 - landAngle)
+    const padding = selected.angle * 0.15
+    const innerRandomAngle = selected.startAngle + padding + (Math.random() * (selected.angle - padding * 2))
+    const targetAngle = (extraRotations * 360) + (360 - innerRandomAngle)
+
+    setRotation(targetAngle)
+
+    // Set callback timeout when wheel stops
+    setTimeout(() => {
+      setIsSpinning(false)
+      setCharge(0)
+      // Trigger elemental burst
+      if (selected) {
+        burstTriggerRef.current = selected.element
+      }
+      // Open modal
+      setTimeout(() => {
+        setShowRewardModal(true)
+      }, 400)
+    }, duration * 1000)
+  }
+
+  // Helper polar drawing math for SVG arcs
+  const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: number) => {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0
+    return {
+      x: cx + r * Math.cos(angleInRadians),
+      y: cy + r * Math.sin(angleInRadians)
+    }
+  }
+
+  const getArcPath = (cx: number, cy: number, r: number, startAngle: number, endAngle: number) => {
+    const start = polarToCartesian(cx, cy, r, startAngle)
+    const end = polarToCartesian(cx, cy, r, endAngle)
+    return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 0 1 ${end.x} ${end.y} Z`
+  }
+
+  return (
+    <section className="bg-black/50 border border-[#d1a058]/15 rounded-xl p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md">
+      
+      {/* Background radial overlay */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#d1a058]/5 blur-3xl rounded-full pointer-events-none" />
+
+      <div className="text-center space-y-2 mb-8">
+        <h2 className="text-2xl md:text-3xl font-extrabold uppercase text-[#d1a058]" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
+          ⚡ Elemental Wheel of Destiny ⚡
+        </h2>
+        <p className="text-white/60 text-xs md:text-sm max-w-xl mx-auto" style={{ fontFamily: "'BlinkerRegular', sans-serif" }}>
+          Channel the powers of Lava, Wind, Water, and Mountain. Hold the charge button below to gather elemental force, and release to claim your trial reward!
+        </p>
+      </div>
+
+      <div ref={containerRef} className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${charge === 100 ? 'shake-overdrive' : ''}`}>
+        
+        {/* Left: SVG Wheel Graphic */}
+        <div className="lg:col-span-6 flex justify-center relative select-none">
+          
+          {/* Wheel Frame */}
+          <div className="w-[300px] h-[300px] md:w-[350px] md:h-[350px] relative rounded-full border-4 border-[#d1a058] shadow-[0_0_30px_rgba(209,160,88,0.25)] bg-black/90 p-1 flex items-center justify-center">
+            
+            {/* HTML5 Canvas overlay for particles */}
+            <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-20 rounded-full" />
+            
+            {/* SVG Wheel segments rendering */}
+            <svg 
+              className="w-full h-full transform origin-center transition-transform select-none"
+              style={{
+                transform: `rotate(${rotation}deg)`,
+                transition: isSpinning ? `transform ${spinDuration}s cubic-bezier(0.15, 0.85, 0.15, 1)` : 'none'
+              }}
+              viewBox="0 0 400 400"
+            >
+              <defs>
+                {/* Lava Gradients */}
+                <radialGradient id="sliceLava1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#7c2d12" /><stop offset="100%" stopColor="#450a0a" />
+                </radialGradient>
+                <radialGradient id="sliceLava2" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#9a3412" /><stop offset="100%" stopColor="#450a0a" />
+                </radialGradient>
+                <radialGradient id="sliceLava3" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#b91c1c" /><stop offset="100%" stopColor="#450a0a" />
+                </radialGradient>
+                
+                {/* Water Gradients */}
+                <radialGradient id="sliceWater1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#0369a1" /><stop offset="100%" stopColor="#082f49" />
+                </radialGradient>
+                <radialGradient id="sliceWater2" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#0284c7" /><stop offset="100%" stopColor="#082f49" />
+                </radialGradient>
+                
+                {/* Wind Gradients */}
+                <radialGradient id="sliceWind1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#475569" /><stop offset="100%" stopColor="#0f172a" />
+                </radialGradient>
+                <radialGradient id="sliceWind2" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#334155" /><stop offset="100%" stopColor="#0f172a" />
+                </radialGradient>
+
+                {/* Earth / Mountain Gradient */}
+                <radialGradient id="sliceMountain1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#15803d" /><stop offset="100%" stopColor="#14532d" />
+                </radialGradient>
+                
+                {/* Rain / Charcoal Gradient */}
+                <radialGradient id="sliceRain1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#1e293b" /><stop offset="100%" stopColor="#020617" />
+                </radialGradient>
+
+                {/* Free Game (Gold Purple Majestic Gradient) */}
+                <linearGradient id="sliceMajestic" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#a855f7" />
+                  <stop offset="50%" stopColor="#eab308" />
+                  <stop offset="100%" stopColor="#6b21a8" />
+                </linearGradient>
+              </defs>
+
+              {/* Slices Drawing */}
+              {slicesWithAngles.map((slice) => {
+                const pathData = getArcPath(200, 200, 192, slice.startAngle, slice.endAngle)
+                const textPos = polarToCartesian(200, 200, 115, slice.midAngle)
+                
+                return (
+                  <g key={slice.id}>
+                    <path 
+                      d={pathData} 
+                      fill={slice.color} 
+                      stroke="#d1a058" 
+                      strokeWidth="1.2" 
+                      opacity="0.9"
+                      className="transition-opacity hover:opacity-100 cursor-pointer"
+                    />
+                    
+                    {/* Rotated slice labels */}
+                    <g transform={`rotate(${slice.midAngle}, ${textPos.x}, ${textPos.y})`}>
+                      <text
+                        x={textPos.x}
+                        y={textPos.y}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill={slice.id === 10 ? '#fef08a' : 'rgba(255,255,255,0.85)'}
+                        fontSize={slice.angle < 15 ? '7px' : '9px'}
+                        fontWeight="bold"
+                        letterSpacing="0.05em"
+                        style={{
+                          fontFamily: "'BlinkerSemiBold', sans-serif",
+                          textShadow: '1px 1px 2px rgba(0,0,0,0.95)'
+                        }}
+                      >
+                        {slice.label}
+                      </text>
+                    </g>
+                  </g>
+                )
+              })}
+
+              {/* Golden Center Cap */}
+              <circle cx="200" cy="200" r="18" fill="url(#goldGradient)" stroke="#d1a058" strokeWidth="2" />
+              <circle cx="200" cy="200" r="8" fill="#000" />
+            </svg>
+
+            {/* Pointer (Needle) */}
+            <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
+              <svg className="w-6 h-6 text-yellow-500 drop-shadow-[0_2px_8px_rgba(234,179,8,0.7)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21L5 8h14z" />
+              </svg>
+              <div className="w-2.5 h-2.5 bg-red-600 rounded-full border border-black animate-ping absolute top-1.5" />
+            </div>
+            
+          </div>
+        </div>
+
+        {/* Right: Controller charging dashboard */}
+        <div className="lg:col-span-6 space-y-6 flex flex-col justify-center">
+          
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-white uppercase" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+              Elemental Force Charger
+            </h3>
+            
+            {/* Visual Vertical Power Meter */}
+            <div className="h-10 bg-black/60 border border-white/10 rounded-lg overflow-hidden relative flex items-center shadow-inner">
+              
+              {/* Charge gradient bar */}
+              <div 
+                className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-red-500 transition-all ease-out duration-75 relative"
+                style={{
+                  width: `${charge}%`,
+                  backgroundImage: charge === 100 
+                    ? 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6)' 
+                    : activeElement === 'water' 
+                    ? 'linear-gradient(90deg, #06b6d4, #0ea5e9)'
+                    : activeElement === 'wind'
+                    ? 'linear-gradient(90deg, #94a3b8, #cbd5e1)'
+                    : activeElement === 'lava'
+                    ? 'linear-gradient(90deg, #ef4444, #f97316)'
+                    : 'linear-gradient(90deg, #22c55e, #d1a058)'
+                }}
+              >
+                {charge > 0 && (
+                  <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-white/70 blur-xs animate-pulse" />
+                )}
+              </div>
+
+              {/* Status Labels inside the bar */}
+              <div className="absolute inset-0 flex justify-between items-center px-4 pointer-events-none select-none">
+                <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest font-mono">
+                  {charge === 0 && 'READY // STANDBY'}
+                  {charge > 0 && charge < 25 && '💧 RIPPLE CHARGE'}
+                  {charge >= 25 && charge < 50 && '🌀 WIND STORM'}
+                  {charge >= 50 && charge < 75 && '🔥 LAVA IGNITION'}
+                  {charge >= 75 && charge < 100 && '⛰️ EARTH FORCE'}
+                  {charge === 100 && '💥 OVERDRIVE UNLEASHED!'}
+                </span>
+                <span className="text-xs font-black text-white font-mono drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  {Math.floor(charge)}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Button */}
+          <button
+            onMouseDown={startCharging}
+            onMouseUp={releaseSpin}
+            onMouseLeave={releaseSpin}
+            onTouchStart={(e) => { e.preventDefault(); startCharging(); }}
+            onTouchEnd={(e) => { e.preventDefault(); releaseSpin(); }}
+            disabled={isSpinning}
+            className={`w-full py-5 rounded-xl border-2 font-black uppercase text-base tracking-widest transition-all select-none duration-100 transform active:scale-[0.98] ${
+              isSpinning 
+                ? 'bg-gray-800/20 border-gray-700/30 text-gray-500 cursor-not-allowed' 
+                : isCharging 
+                ? 'bg-red-600/20 border-red-500 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.25)] animate-pulse'
+                : 'bg-[#d1a058]/10 hover:bg-[#d1a058]/20 border-[#d1a058] text-[#d1a058] shadow-[0_4px_15px_rgba(209,160,88,0.15)] cursor-pointer'
+            }`}
+            style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+          >
+            {isSpinning 
+              ? '⚡ Spinning elements...' 
+              : isCharging 
+              ? '⚡ RELEASE TO SPIN!' 
+              : '🔥 Press & Hold to Charge Force'}
+          </button>
+
+          {/* Rewards Legends List */}
+          <div className="bg-black/40 border border-white/5 rounded-xl p-4 space-y-2">
+            <span className="text-[10px] tracking-widest font-bold text-white/40 uppercase font-mono block">Rewards Index</span>
+            <div className="grid grid-cols-2 gap-2.5 text-xs text-white/70">
+              <div className="flex items-center gap-1.5"><span className="text-red-500">🔥</span> Free Game (1.4% Rarity)</div>
+              <div className="flex items-center gap-1.5"><span className="text-green-500">⛰️</span> Earth Bracelet (7.8%)</div>
+              <div className="flex items-center gap-1.5"><span className="text-blue-500">🌀</span> 30% OFF Discount (9.7%)</div>
+              <div className="flex items-center gap-1.5"><span className="text-slate-400">💨</span> Sticker Pack (6.1%)</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Victory Reward Modal Dialog */}
+      {showRewardModal && winningSlice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="bg-gradient-to-b from-black via-black to-yellow-950/20 border-2 border-[#d1a058] rounded-2xl max-w-sm w-full p-6 text-center shadow-[0_0_50px_rgba(209,160,88,0.3)] relative overflow-hidden space-y-6">
+            
+            {/* Element specific backing glowing halo */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#d1a058]/10 blur-3xl rounded-full pointer-events-none" />
+            
+            <div className="space-y-2 relative z-10">
+              <span className="text-[10px] tracking-widest text-[#d1a058] font-bold uppercase block font-mono">Arena Prize Unlocked</span>
+              <h3 className="text-2xl font-black text-white uppercase" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
+                Reward Acclaimed!
+              </h3>
+            </div>
+
+            {/* Glowing Reward visual item wrapper */}
+            <div className="w-32 h-32 bg-black/80 border border-[#d1a058]/30 rounded-full mx-auto flex items-center justify-center relative shadow-[0_0_25px_rgba(209,160,88,0.15)] group hover:border-[#d1a058] transition-colors">
+              <div className="absolute inset-0 border border-dashed border-[#d1a058]/20 rounded-full animate-spin-slow" />
+              <div className="z-10 text-4xl">
+                {winningSlice.element === 'lava' && '🔥'}
+                {winningSlice.element === 'wind' && '💨'}
+                {winningSlice.element === 'water' && '💧'}
+                {winningSlice.element === 'mountain' && '⛰️'}
+              </div>
+            </div>
+
+            <div className="space-y-1 relative z-10">
+              <h4 className="text-lg font-bold text-yellow-400 uppercase" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+                {winningSlice.label}
+              </h4>
+              <p className="text-white/60 text-xs px-4">
+                {winningSlice.description}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowRewardModal(false)}
+              className="w-full bg-[#d1a058] hover:bg-[#c09048] text-black font-extrabold py-3 rounded-lg text-xs uppercase tracking-widest transition-colors relative z-10 shadow-[0_4px_10px_rgba(209,160,88,0.2)]"
+              style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+            >
+              Claim to Inventory
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Local keyframes style block */}
+      <style jsx>{`
+        @keyframes spin-slow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 10s infinite linear;
+        }
+        @keyframes shake {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); }
+          10%, 30%, 50%, 70%, 90% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+          20%, 40%, 60%, 80% { transform: translate(1px, -2px) rotate(0.5deg); }
+        }
+        .shake-overdrive {
+          animation: shake 0.1s infinite;
+        }
+        .blur-xs {
+          filter: blur(2px);
+        }
+      `}</style>
+    </section>
   )
 }
 
@@ -332,6 +912,9 @@ export default function BeatTheHostPage() {
           )}
         </section>
 
+        {/* Dynamic Interactive Spinner Wheel Section */}
+        <ElementalSpinner />
+
         {/* 2. Leaderboard Section */}
         <section className="space-y-8">
           
@@ -369,7 +952,7 @@ export default function BeatTheHostPage() {
               No record-breaking player victories logged yet. Be the first to defeat the host!
             </div>
           ) : (
-            <div className="space-y-10">
+            <div className="space-y-6 font-sans">
               
               {/* Premium Top 3 Legends Roll */}
               {!searchQuery && topThree.length > 0 && (
@@ -377,7 +960,6 @@ export default function BeatTheHostPage() {
                   
                   {/* Legend Rank 1 Card */}
                   <div className="bg-gradient-to-r from-yellow-950/20 via-black/80 to-yellow-950/10 border border-yellow-500/40 rounded-xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 shadow-[0_0_35px_rgba(209,160,88,0.15)] relative overflow-hidden transition-all duration-300 hover:border-yellow-500/70 hover:shadow-[0_0_40px_rgba(209,160,88,0.22)] group">
-                    {/* Background linear glow */}
                     <div className="absolute -inset-px bg-gradient-to-r from-yellow-500/0 via-yellow-500/10 to-yellow-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                     
                     <div className="flex items-center gap-6 relative z-10 w-full md:w-auto">
@@ -524,7 +1106,7 @@ export default function BeatTheHostPage() {
                                 {index === 0 && '👑 01'}
                                 {index === 1 && '🥈 02'}
                                 {index === 2 && '🥉 03'}
-                                {index > 2 && `${(index + 1).toString().padStart(2, '0')}`}
+                                {index > 2 && `${index + 1}`}
                               </td>
                               <td className="p-4 text-xs font-semibold text-white tracking-wide">{game.winnerName}</td>
                               <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
