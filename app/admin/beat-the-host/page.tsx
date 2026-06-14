@@ -91,6 +91,20 @@ export default function AdminBeatTheHost() {
   const [selectedWinnerId, setSelectedWinnerId] = useState('')
   const [endingGame, setEndingGame] = useState(false)
 
+  // CRUD Edit/Delete States
+  const [editingQueueUser, setEditingQueueUser] = useState<QueueUser | null>(null)
+  const [editingQueueName, setEditingQueueName] = useState('')
+  const [editingQueueNumber, setEditingQueueNumber] = useState('')
+  const [editingQueueStatus, setEditingQueueStatus] = useState<'waiting' | 'playing' | 'done'>('waiting')
+  const [updatingQueueUser, setUpdatingQueueUser] = useState(false)
+
+  const [editingGame, setEditingGame] = useState<BthGame | null>(null)
+  const [editingGameWinnerId, setEditingGameWinnerId] = useState('')
+  const [editingGameDurationMins, setEditingGameDurationMins] = useState(0)
+  const [editingGameDurationSecs, setEditingGameDurationSecs] = useState(0)
+  const [editingGamePlayers, setEditingGamePlayers] = useState<BthPlayer[]>([])
+  const [updatingGame, setUpdatingGame] = useState(false)
+
   // Listeners for Real-time Firestore Updates
   useEffect(() => {
     // 1. Listen BTH queue
@@ -300,6 +314,96 @@ export default function AdminBeatTheHost() {
     }
   }
 
+  // Start editing queue user
+  const handleStartEditingQueue = (user: QueueUser) => {
+    setEditingQueueUser(user)
+    setEditingQueueName(user.name)
+    setEditingQueueNumber(user.number)
+    setEditingQueueStatus(user.status)
+  }
+
+  // Update queue user
+  const handleUpdateQueueUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingQueueUser) return
+
+    try {
+      setUpdatingQueueUser(true)
+      await updateDoc(doc(db, 'bth_queue', editingQueueUser.id), {
+        name: editingQueueName.trim(),
+        number: editingQueueNumber.trim(),
+        status: editingQueueStatus
+      })
+      toast.success('Queue participant updated successfully')
+      setEditingQueueUser(null)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to update participant')
+    } finally {
+      setUpdatingQueueUser(false)
+    }
+  }
+
+  // Start editing ended game
+  const handleStartEditingGame = (game: BthGame) => {
+    setEditingGame(game)
+    setEditingGameWinnerId(game.winnerId || '')
+    const totalSecs = game.duration || 0
+    setEditingGameDurationMins(Math.floor(totalSecs / 60))
+    setEditingGameDurationSecs(totalSecs % 60)
+    setEditingGamePlayers(game.players || [])
+  }
+
+  // Update game record
+  const handleUpdateGame = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingGame) return
+
+    try {
+      setUpdatingGame(true)
+      const totalSecs = (editingGameDurationMins * 60) + editingGameDurationSecs
+
+      let winnerNameStr = 'Host'
+      if (editingGameWinnerId !== 'host' && editingGameWinnerId !== '') {
+        const foundPlayer = editingGamePlayers.find(p => p.id === editingGameWinnerId)
+        winnerNameStr = foundPlayer ? foundPlayer.name : 'Unknown'
+      }
+
+      await updateDoc(doc(db, 'bth_games', editingGame.id), {
+        players: editingGamePlayers,
+        winnerId: editingGameWinnerId,
+        winnerName: winnerNameStr,
+        duration: totalSecs
+      })
+      toast.success('Game record updated successfully')
+      setEditingGame(null)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to update game record')
+    } finally {
+      setUpdatingGame(false)
+    }
+  }
+
+  // Delete game record (handles active and ended games)
+  const handleDeleteGame = async (game: BthGame) => {
+    if (!confirm('Are you sure you want to delete this battle record? This will permanently delete it.')) return
+    try {
+      if (game.status === 'active') {
+        for (const p of game.players) {
+          await updateDoc(doc(db, 'bth_queue', p.id), {
+            status: 'waiting'
+          })
+        }
+      }
+      await deleteDoc(doc(db, 'bth_games', game.id))
+      toast.success('Battle record deleted successfully')
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to delete battle record')
+    }
+  }
+
   // Helper formatting for durations
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -416,6 +520,13 @@ export default function AdminBeatTheHost() {
                 {activeGames.map((game) => (
                   <div key={game.id} className="bg-black/80 border border-red-500/20 rounded-lg p-4 flex flex-col justify-between space-y-4 shadow-lg relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 blur-2xl rounded-full" />
+                    <button
+                      onClick={() => handleDeleteGame(game)}
+                      className="absolute top-2.5 right-2.5 text-white/40 hover:text-red-500 transition-colors text-xs p-1 z-20"
+                      title="Abort & Delete Battle"
+                    >
+                      🗑️
+                    </button>
                     <div>
                       <div className="flex justify-between items-start">
                         <span className="text-[10px] uppercase tracking-wider font-mono bg-red-950/40 border border-red-500/30 text-red-400 px-2 py-0.5 rounded">
@@ -497,7 +608,14 @@ export default function AdminBeatTheHost() {
                             <span className="inline-flex items-center px-2 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20">Completed</span>
                           )}
                         </td>
-                        <td className="p-4 text-right">
+                        <td className="p-4 text-right space-x-1 whitespace-nowrap">
+                          <button
+                            onClick={() => handleStartEditingQueue(user)}
+                            className="text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 p-2 rounded transition-colors"
+                            title="Edit participant"
+                          >
+                            ✏️
+                          </button>
                           <button
                             onClick={() => handleDeleteQueue(user.id, user.name)}
                             className="text-red-500 hover:text-red-400 hover:bg-red-500/10 p-2 rounded transition-colors"
@@ -585,13 +703,14 @@ export default function AdminBeatTheHost() {
                   <th className="p-4 font-semibold text-white/80 uppercase text-xs tracking-wider">Warriors</th>
                   <th className="p-4 font-semibold text-white/80 uppercase text-xs tracking-wider">Winner</th>
                   <th className="p-4 font-semibold text-white/80 uppercase text-xs tracking-wider">Duration</th>
-                  <th className="p-4 font-semibold text-white/80 uppercase text-xs tracking-wider text-right">Date</th>
+                  <th className="p-4 font-semibold text-white/80 uppercase text-xs tracking-wider">Date</th>
+                  <th className="p-4 font-semibold text-white/80 uppercase text-xs tracking-wider text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {history.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="p-8 text-center text-white/40 text-sm">
+                    <td colSpan={5} className="p-8 text-center text-white/40 text-sm">
                       No matches played yet.
                     </td>
                   </tr>
@@ -613,10 +732,26 @@ export default function AdminBeatTheHost() {
                       <td className="p-4 font-mono text-white/60 text-sm">
                         {game.duration ? formatDuration(game.duration) : '00:00'}
                       </td>
-                      <td className="p-4 font-mono text-white/50 text-right text-xs">
+                      <td className="p-4 font-mono text-white/50 text-xs">
                         {game.endTime instanceof Timestamp
                           ? game.endTime.toDate().toLocaleDateString()
                           : (game.endTime?.seconds ? new Date(game.endTime.seconds * 1000).toLocaleDateString() : 'N/A')}
+                      </td>
+                      <td className="p-4 text-right space-x-1 whitespace-nowrap">
+                        <button
+                          onClick={() => handleStartEditingGame(game)}
+                          className="text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 p-2 rounded transition-colors"
+                          title="Edit match"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleDeleteGame(game)}
+                          className="text-red-500 hover:text-red-400 hover:bg-red-500/10 p-2 rounded transition-colors"
+                          title="Delete match"
+                        >
+                          🗑️
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -682,6 +817,176 @@ export default function AdminBeatTheHost() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Edit Queue User Modal */}
+      {editingQueueUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <form onSubmit={handleUpdateQueueUser} className="bg-black border-2 border-[#d1a058] rounded-xl max-w-md w-full p-6 shadow-2xl space-y-6 animate-fadeIn">
+            <h3 className="text-xl font-bold uppercase text-[#d1a058] text-center" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
+              ✏️ Edit Participant
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-white/80 text-sm font-semibold mb-2" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editingQueueName}
+                  onChange={(e) => setEditingQueueName(e.target.value)}
+                  className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                />
+              </div>
+              <div>
+                <label className="block text-white/80 text-sm font-semibold mb-2" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>Mobile Number</label>
+                <input
+                  type="tel"
+                  required
+                  value={editingQueueNumber}
+                  onChange={(e) => setEditingQueueNumber(e.target.value)}
+                  className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                />
+              </div>
+              <div>
+                <label className="block text-white/80 text-sm font-semibold mb-2" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>Queue Status</label>
+                <select
+                  value={editingQueueStatus}
+                  onChange={(e) => setEditingQueueStatus(e.target.value as any)}
+                  className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                >
+                  <option value="waiting">Waiting</option>
+                  <option value="playing">Playing</option>
+                  <option value="done">Completed</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={updatingQueueUser}
+                className="flex-1 bg-[#d1a058] hover:bg-[#c09048] text-black font-bold py-2.5 rounded text-sm uppercase tracking-wider transition-colors disabled:opacity-50"
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+              >
+                {updatingQueueUser ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingQueueUser(null)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 rounded text-sm uppercase tracking-wider transition-colors"
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Edit Game Record Modal */}
+      {editingGame && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <form onSubmit={handleUpdateGame} className="bg-black border-2 border-[#d1a058] rounded-xl max-w-md w-full p-6 shadow-2xl space-y-6 animate-fadeIn">
+            <h3 className="text-xl font-bold uppercase text-[#d1a058] text-center" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>
+              ✏️ Edit Battle Record
+            </h3>
+            
+            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
+              
+              {/* Players list names editing */}
+              <div className="space-y-3">
+                <span className="text-xs text-white/40 block uppercase tracking-wider font-semibold">Edit Player Names:</span>
+                {editingGamePlayers.map((player, idx) => (
+                  <div key={player.id} className="space-y-1">
+                    <label className="block text-white/70 text-xs font-semibold">Player {idx + 1} Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={player.name}
+                      onChange={(e) => {
+                        const updated = [...editingGamePlayers]
+                        updated[idx] = { ...updated[idx], name: e.target.value }
+                        setEditingGamePlayers(updated)
+                      }}
+                      className="w-full bg-black/60 border border-[#d1a058]/35 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Winner Selector */}
+              <div>
+                <label className="block text-white/80 text-sm font-semibold mb-2" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+                  Winner Outcome:
+                </label>
+                <select
+                  value={editingGameWinnerId}
+                  onChange={(e) => setEditingGameWinnerId(e.target.value)}
+                  className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                >
+                  {editingGamePlayers.map((player) => (
+                    <option key={player.id} value={player.id}>
+                      🏆 {player.name} (Player)
+                    </option>
+                  ))}
+                  <option value="host">👹 The Host (Host Won)</option>
+                </select>
+              </div>
+
+              {/* Duration fields */}
+              <div>
+                <label className="block text-white/80 text-sm font-semibold mb-2" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+                  Completion Duration:
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <span className="text-[10px] text-white/40 block mb-1">MINUTES</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={editingGameDurationMins}
+                      onChange={(e) => setEditingGameDurationMins(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                    />
+                  </div>
+                  <div className="text-white font-bold self-end mb-2">:</div>
+                  <div className="flex-1">
+                    <span className="text-[10px] text-white/40 block mb-1">SECONDS</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={59}
+                      value={editingGameDurationSecs}
+                      onChange={(e) => setEditingGameDurationSecs(Math.min(59, Math.max(0, parseInt(e.target.value) || 0)))}
+                      className="w-full bg-black/60 border border-[#d1a058]/40 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#d1a058]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={updatingGame}
+                className="flex-1 bg-[#d1a058] hover:bg-[#c09048] text-black font-bold py-2.5 rounded text-sm uppercase tracking-wider transition-colors disabled:opacity-50"
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+              >
+                {updatingGame ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingGame(null)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 rounded text-sm uppercase tracking-wider transition-colors"
+                style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>
