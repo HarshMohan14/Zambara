@@ -31,6 +31,7 @@ interface BthGame {
 interface SpinnerSlice {
   id: number
   label: string
+  emoji: string
   description: string
   angle: number // Slice angle size in degrees
   color: string // Slice fill gradient/color
@@ -43,19 +44,18 @@ interface SlicesWithAngles extends SpinnerSlice {
   midAngle: number
 }
 
-// 10 sections with angles summing to exactly 360°
+// 8 sections with angles summing to exactly 360°
 const SPIN_SLICES: SpinnerSlice[] = [
-  { id: 1, label: '10% OFF', description: '10% Discount Coupon', angle: 60, color: 'url(#sliceLava1)', element: 'lava' },
-  { id: 2, label: '20% OFF', description: '20% Discount Coupon', angle: 45, color: 'url(#sliceWater1)', element: 'water' },
-  { id: 3, label: '10% OFF', description: '10% Discount Coupon', angle: 55, color: 'url(#sliceLava2)', element: 'lava' },
-  { id: 4, label: '20% OFF', description: '20% Discount Coupon', angle: 40, color: 'url(#sliceWater2)', element: 'water' },
-  { id: 5, label: '10% OFF', description: '10% Discount Coupon', angle: 55, color: 'url(#sliceLava3)', element: 'lava' },
-  { id: 6, label: '30% OFF', description: '30% Discount Coupon', angle: 35, color: 'url(#sliceWind1)', element: 'wind' },
-  { id: 7, label: 'EARTH BRACELET', description: 'Official Zambaara Earth Bracelet', angle: 28, color: 'url(#sliceMountain1)', element: 'mountain' },
-  { id: 8, label: 'STICKER', description: 'Collector Edition Sticker', angle: 22, color: 'url(#sliceWind2)', element: 'wind' },
-  { id: 9, label: 'TRY AGAIN', description: 'Better Luck Next Time!', angle: 15, color: 'url(#sliceRain1)', element: 'water' },
-  { id: 10, label: 'FREE GAME', description: 'Free Tournament Entry Ticket', angle: 5, color: 'url(#sliceMajestic)', element: 'lava' }
+  { id: 1, label: '10% OFF', emoji: '🔥', description: '10% Discount Coupon', angle: 80, color: 'url(#sliceGold)', element: 'lava' },
+  { id: 2, label: '20% OFF', emoji: '💧', description: '20% Discount Coupon', angle: 60, color: 'url(#sliceBlack)', element: 'water' },
+  { id: 3, label: '10% OFF', emoji: '🔥', description: '10% Discount Coupon', angle: 75, color: 'url(#sliceGold)', element: 'lava' },
+  { id: 4, label: 'BUY 2 AT 850', emoji: '🌀', description: 'Buy 2 tournament entries at 850', angle: 50, color: 'url(#sliceBlack)', element: 'wind' },
+  { id: 5, label: 'EARTH BRACELET', emoji: '⛰️', description: 'Official Zambaara Earth Bracelet', angle: 40, color: 'url(#sliceGold)', element: 'mountain' },
+  { id: 6, label: 'ICE BRACELET', emoji: '❄️', description: 'Official Zambaara Ice Bracelet', angle: 30, color: 'url(#sliceBlack)', element: 'water' },
+  { id: 7, label: 'FREE GAME', emoji: '👑', description: 'Free Tournament Entry Ticket', angle: 6, color: 'url(#sliceGrandGold)', element: 'lava' },
+  { id: 8, label: 'TRY AGAIN', emoji: '🌧️', description: 'Better Luck Next Time!', angle: 19, color: 'url(#sliceBlack)', element: 'water' }
 ]
+
 
 // Canvas Particle interface for elemental animations
 interface Particle {
@@ -329,16 +329,17 @@ function ElementalSpinner() {
     setIsCharging(false)
     clearInterval(chargeIntervalRef.current)
 
-    if (charge < 8) {
-      setCharge(0)
-      return
+    let finalCharge = charge
+    if (finalCharge < 8) {
+      finalCharge = 15
+      setCharge(15)
     }
 
-    triggerSpin()
+    triggerSpin(finalCharge)
   }
 
   // Calculate final angle and trigger wheel rotation
-  const triggerSpin = () => {
+  const triggerSpin = (spinCharge: number) => {
     setIsSpinning(true)
     setWinningSlice(null)
 
@@ -357,9 +358,9 @@ function ElementalSpinner() {
 
     setWinningSlice(selected)
 
-    // Calculate dynamic spins count based on charge power
-    const extraRotations = 4 + Math.floor(charge / 15) // max ~10 spins
-    const duration = 4.5 + (charge / 35) // max ~7.3s
+    // Calculate dynamic spins count based on charge power (longer hold = more force/rotations)
+    const extraRotations = 3 + Math.floor(spinCharge / 8) + Math.floor((spinCharge * spinCharge) / 400)
+    const duration = 3.5 + (spinCharge / 20)
     setSpinDuration(duration)
 
     // Calculate targeted landing point (Top needle is standard 12 o'clock / 0° local)
@@ -415,129 +416,186 @@ function ElementalSpinner() {
         </p>
       </div>
 
-      <div ref={containerRef} className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${charge === 100 ? 'shake-overdrive' : ''}`}>
+      <div ref={containerRef} className="flex flex-col items-center gap-8">
         
-        {/* Left: SVG Wheel Graphic */}
-        <div className="lg:col-span-6 flex justify-center relative select-none">
+        {/* Top: SVG Wheel Graphic */}
+        <div className="w-full max-w-[290px] xs:max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[540px] aspect-square flex justify-center relative select-none">
           
-          {/* Wheel Frame */}
-          <div className="w-[300px] h-[300px] md:w-[350px] md:h-[350px] relative rounded-full border-4 border-[#d1a058] shadow-[0_0_30px_rgba(209,160,88,0.25)] bg-black/90 p-1 flex items-center justify-center">
+          {/* Wheel Frame (Concentric ancient runic gold rings) */}
+          <div className={`w-full h-full relative rounded-full border-4 border-[#d1a058]/40 shadow-[0_0_35px_rgba(209,160,88,0.3)] bg-black/35 backdrop-blur-md p-1.5 md:p-3 flex items-center justify-center ${charge === 100 ? 'shake-overdrive' : ''}`}>
             
             {/* HTML5 Canvas overlay for particles */}
             <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-20 rounded-full" />
             
-            {/* SVG Wheel segments rendering */}
-            <svg 
-              className="w-full h-full transform origin-center transition-transform select-none"
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                transition: isSpinning ? `transform ${spinDuration}s cubic-bezier(0.15, 0.85, 0.15, 1)` : 'none'
-              }}
-              viewBox="0 0 400 400"
-            >
-              <defs>
-                {/* Lava Gradients */}
-                <radialGradient id="sliceLava1" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#7c2d12" /><stop offset="100%" stopColor="#450a0a" />
-                </radialGradient>
-                <radialGradient id="sliceLava2" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#9a3412" /><stop offset="100%" stopColor="#450a0a" />
-                </radialGradient>
-                <radialGradient id="sliceLava3" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#b91c1c" /><stop offset="100%" stopColor="#450a0a" />
-                </radialGradient>
-                
-                {/* Water Gradients */}
-                <radialGradient id="sliceWater1" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#0369a1" /><stop offset="100%" stopColor="#082f49" />
-                </radialGradient>
-                <radialGradient id="sliceWater2" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#0284c7" /><stop offset="100%" stopColor="#082f49" />
-                </radialGradient>
-                
-                {/* Wind Gradients */}
-                <radialGradient id="sliceWind1" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#475569" /><stop offset="100%" stopColor="#0f172a" />
-                </radialGradient>
-                <radialGradient id="sliceWind2" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#334155" /><stop offset="100%" stopColor="#0f172a" />
-                </radialGradient>
+            {/* Inner relative container to align rotating and static SVGs perfectly */}
+            <div className="w-full h-full relative flex items-center justify-center">
+              
+              {/* SVG Wheel segments rendering */}
+              <svg 
+                className="w-full h-full transform origin-center transition-transform select-none"
+                style={{
+                  transform: `rotate(${rotation}deg)`,
+                  transition: isSpinning ? `transform ${spinDuration}s cubic-bezier(0.15, 0.85, 0.15, 1)` : 'none'
+                }}
+                viewBox="0 0 400 400"
+              >
+                <defs>
+                  {/* Zambaara Matte Black Glass Gradient (Radial to dark contrast at outer rim) */}
+                  <radialGradient id="sliceBlack" cx="15%" cy="50%" r="85%">
+                    <stop offset="0%" stopColor="rgba(44, 44, 44, 0.45)" />
+                    <stop offset="50%" stopColor="rgba(20, 20, 20, 0.65)" />
+                    <stop offset="100%" stopColor="rgba(5, 5, 5, 0.88)" />
+                  </radialGradient>
+                  
+                  {/* Zambaara Premium Burnished Gold Glass Gradient (Radial to dark contrast at outer rim) */}
+                  <radialGradient id="sliceGold" cx="15%" cy="50%" r="85%">
+                    <stop offset="0%" stopColor="rgba(254, 240, 138, 0.38)" />
+                    <stop offset="30%" stopColor="rgba(209, 160, 88, 0.48)" />
+                    <stop offset="70%" stopColor="rgba(133, 83, 7, 0.68)" />
+                    <stop offset="100%" stopColor="rgba(30, 15, 2, 0.88)" />
+                  </radialGradient>
 
-                {/* Earth / Mountain Gradient */}
-                <radialGradient id="sliceMountain1" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#15803d" /><stop offset="100%" stopColor="#14532d" />
-                </radialGradient>
-                
-                {/* Rain / Charcoal Gradient */}
-                <radialGradient id="sliceRain1" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#1e293b" /><stop offset="100%" stopColor="#020617" />
-                </radialGradient>
+                  {/* Zambaara Grand Prize Gold Glass Gradient (Radial to dark contrast at outer rim) */}
+                  <radialGradient id="sliceGrandGold" cx="15%" cy="50%" r="85%">
+                    <stop offset="0%" stopColor="rgba(255, 255, 255, 0.55)" />
+                    <stop offset="25%" stopColor="rgba(254, 240, 138, 0.68)" />
+                    <stop offset="55%" stopColor="rgba(209, 160, 88, 0.78)" />
+                    <stop offset="100%" stopColor="rgba(69, 26, 3, 0.93)" />
+                  </radialGradient>
+                </defs>
 
-                {/* Free Game (Gold Purple Majestic Gradient) */}
-                <linearGradient id="sliceMajestic" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#a855f7" />
-                  <stop offset="50%" stopColor="#eab308" />
-                  <stop offset="100%" stopColor="#6b21a8" />
-                </linearGradient>
-              </defs>
+                {/* Slices Drawing */}
+                {slicesWithAngles.map((slice) => {
+                  const pathData = getArcPath(200, 200, 186, slice.startAngle, slice.endAngle)
+                  
+                  // Flip text on the left half to keep it right-side up
+                  const isLeftHalf = slice.midAngle > 180 && slice.midAngle < 360
+                  const textRotation = isLeftHalf ? slice.midAngle - 270 : slice.midAngle - 90
+                  
+                  // Radius midpoint of slice: outer radius is 186, center cap is 38.
+                  // Visible area is from 38 to 186. Midpoint = 38 + (186-38)/2 = 38 + 74 = 112.
+                  // 200 is center. Distance is 112.
+                  const textX = isLeftHalf ? 88 : 312
+                  const textAnchor = "middle"
 
-              {/* Slices Drawing */}
-              {slicesWithAngles.map((slice) => {
-                const pathData = getArcPath(200, 200, 192, slice.startAngle, slice.endAngle)
-                const textPos = polarToCartesian(200, 200, 115, slice.midAngle)
-                
-                return (
-                  <g key={slice.id}>
-                    <path 
-                      d={pathData} 
-                      fill={slice.color} 
-                      stroke="#d1a058" 
-                      strokeWidth="1.2" 
-                      opacity="0.9"
-                      className="transition-opacity hover:opacity-100 cursor-pointer"
-                    />
-                    
-                    {/* Rotated slice labels */}
-                    <g transform={`rotate(${slice.midAngle}, ${textPos.x}, ${textPos.y})`}>
-                      <text
-                        x={textPos.x}
-                        y={textPos.y}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fill={slice.id === 10 ? '#fef08a' : 'rgba(255,255,255,0.85)'}
-                        fontSize={slice.angle < 15 ? '7px' : '9px'}
-                        fontWeight="bold"
-                        letterSpacing="0.05em"
-                        style={{
-                          fontFamily: "'BlinkerSemiBold', sans-serif",
-                          textShadow: '1px 1px 2px rgba(0,0,0,0.95)'
-                        }}
-                      >
-                        {slice.label}
-                      </text>
+                  // Dynamic font size mapping based on slice angle size
+                  const getFontSize = (angle: number) => {
+                    if (angle >= 70) return '19px'
+                    if (angle >= 50) return '17px'
+                    if (angle >= 30) return '15.5px'
+                    if (angle >= 15) return '13.5px'
+                    return '11px'
+                  }
+                  
+                  return (
+                    <g key={slice.id}>
+                      <path 
+                        d={pathData} 
+                        fill={slice.color} 
+                        stroke="#d1a058" 
+                        strokeWidth="1.5" 
+                        opacity="0.95"
+                        className="transition-opacity hover:opacity-100 cursor-pointer"
+                      />
+                      
+                      {/* Radial slice labels: Aligned perfectly with high-contrast text stroke */}
+                      <g transform={`rotate(${textRotation}, 200, 200)`}>
+                        {/* Prize Text Label */}
+                        <text
+                          x={textX}
+                          y="200"
+                          textAnchor={textAnchor}
+                          dominantBaseline="middle"
+                          fill={slice.id === 7 ? '#facc15' : '#ffffff'}
+                          fontSize={getFontSize(slice.angle)}
+                          fontWeight="900"
+                          letterSpacing="0.04em"
+                          stroke="#000000"
+                          strokeWidth="3.6"
+                          paintOrder="stroke fill"
+                          style={{
+                            fontFamily: "'BlinkerSemiBold', sans-serif",
+                            textShadow: '0 0 6px rgba(0,0,0,0.8)'
+                          }}
+                        >
+                          {slice.label}
+                        </text>
+                      </g>
                     </g>
-                  </g>
-                )
-              })}
+                  )
+                })}
 
-              {/* Golden Center Cap */}
-              <circle cx="200" cy="200" r="18" fill="url(#goldGradient)" stroke="#d1a058" strokeWidth="2" />
-              <circle cx="200" cy="200" r="8" fill="#000" />
-            </svg>
-
-            {/* Pointer (Needle) */}
-            <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
-              <svg className="w-6 h-6 text-yellow-500 drop-shadow-[0_2px_8px_rgba(234,179,8,0.7)]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 21L5 8h14z" />
+                {/* Concentric Runic Gold Rings (Adds the Zambaara astronomical layout) */}
+                <circle cx="200" cy="200" r="186" stroke="url(#goldGradient)" strokeWidth="6" fill="none" opacity="0.9" />
+                <circle cx="200" cy="200" r="183" stroke="#000" strokeWidth="1.5" fill="none" />
               </svg>
-              <div className="w-2.5 h-2.5 bg-red-600 rounded-full border border-black animate-ping absolute top-1.5" />
+
+              {/* Static SVG Overlay for Specular Glass Shine and Right-Side Up Cap Logo */}
+              <svg 
+                className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                viewBox="0 0 400 400"
+              >
+                <defs>
+                  {/* Vertical gradient for glass specular reflection */}
+                  <linearGradient id="glassReflection" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+                    <stop offset="30%" stopColor="#ffffff" stopOpacity="0.15" />
+                    <stop offset="60%" stopColor="#ffffff" stopOpacity="0.0" />
+                  </linearGradient>
+
+                  {/* Outer ring gold gradient for Cap */}
+                  <linearGradient id="goldGradientCap" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#fef08a" />
+                    <stop offset="50%" stopColor="#d1a058" />
+                    <stop offset="100%" stopColor="#a16207" />
+                  </linearGradient>
+                </defs>
+
+                {/* Glass Specular Reflection Shine overlay (top half) */}
+                <path 
+                  d="M 14 200 A 186 186 0 0 1 386 200 Z" 
+                  fill="url(#glassReflection)" 
+                  opacity="0.9" 
+                />
+
+                {/* Outer glass highlight rim */}
+                <circle 
+                  cx="200" 
+                  cy="200" 
+                  r="185" 
+                  stroke="rgba(255, 255, 255, 0.15)" 
+                  strokeWidth="1.5" 
+                  fill="none" 
+                />
+
+                {/* Center Medallion Cap (Static, so logo is always right-side up!) */}
+                <circle cx="200" cy="200" r="38" fill="url(#goldGradientCap)" stroke="#d1a058" strokeWidth="2.5" />
+                <circle cx="200" cy="200" r="32" fill="#111" stroke="#d1a058" strokeWidth="1" />
+                <image 
+                  href="/Zambaara.png" 
+                  x="174" 
+                  y="182" 
+                  width="52" 
+                  height="36" 
+                  preserveAspectRatio="xMidYMid meet" 
+                />
+              </svg>
+
+            </div>
+
+            {/* Pointer (Needle: Golden Runic Triangle with Pulsing Crystal Gem) */}
+            <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
+              <svg className="w-7 h-7 text-yellow-500 drop-shadow-[0_2px_12px_rgba(234,179,8,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 22L4 7h16z" />
+              </svg>
+              <div className="w-2.5 h-2.5 bg-red-500 rounded-full border border-black animate-pulse absolute top-1.5 shadow-[0_0_8px_#ef4444]" />
             </div>
             
           </div>
         </div>
 
-        {/* Right: Controller charging dashboard */}
-        <div className="lg:col-span-6 space-y-6 flex flex-col justify-center">
+        {/* Bottom: Controller charging dashboard */}
+        <div className="w-full max-w-xl md:max-w-2xl space-y-6 flex flex-col justify-center">
           
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-white uppercase" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
@@ -609,17 +667,6 @@ function ElementalSpinner() {
               : '🔥 Press & Hold to Charge Force'}
           </button>
 
-          {/* Rewards Legends List */}
-          <div className="bg-black/40 border border-white/5 rounded-xl p-4 space-y-2">
-            <span className="text-[10px] tracking-widest font-bold text-white/40 uppercase font-mono block">Rewards Index</span>
-            <div className="grid grid-cols-2 gap-2.5 text-xs text-white/70">
-              <div className="flex items-center gap-1.5"><span className="text-red-500">🔥</span> Free Game (1.4% Rarity)</div>
-              <div className="flex items-center gap-1.5"><span className="text-green-500">⛰️</span> Earth Bracelet (7.8%)</div>
-              <div className="flex items-center gap-1.5"><span className="text-blue-500">🌀</span> 30% OFF Discount (9.7%)</div>
-              <div className="flex items-center gap-1.5"><span className="text-slate-400">💨</span> Sticker Pack (6.1%)</div>
-            </div>
-          </div>
-
         </div>
 
       </div>
@@ -639,21 +686,32 @@ function ElementalSpinner() {
               </h3>
             </div>
 
-            {/* Glowing Reward visual item wrapper */}
-            <div className="w-32 h-32 bg-black/80 border border-[#d1a058]/30 rounded-full mx-auto flex items-center justify-center relative shadow-[0_0_25px_rgba(209,160,88,0.15)] group hover:border-[#d1a058] transition-colors">
-              <div className="absolute inset-0 border border-dashed border-[#d1a058]/20 rounded-full animate-spin-slow" />
-              <div className="z-10 text-4xl">
-                {winningSlice.element === 'lava' && '🔥'}
-                {winningSlice.element === 'wind' && '💨'}
-                {winningSlice.element === 'water' && '💧'}
-                {winningSlice.element === 'mountain' && '⛰️'}
+            {/* Zambaara Ticket Coupon Design (Rendered for all prizes) */}
+            <div className="w-full max-w-[290px] mx-auto bg-black/80 backdrop-blur-md border-2 border-[#d1a058] rounded-xl p-5 relative shadow-[0_0_30px_rgba(209,160,88,0.3)] flex flex-col items-center justify-center overflow-hidden">
+              {/* Glass shine overlay */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
+              
+              {/* Ticket notches */}
+              <div className="absolute -left-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black border-r-2 border-[#d1a058]" />
+              <div className="absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black border-l-2 border-[#d1a058]" />
+              
+              {/* Dashed inner border */}
+              <div className="w-full border border-dashed border-[#d1a058]/45 rounded-lg py-5 px-3 flex flex-col items-center justify-center space-y-3 relative z-10">
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#d1a058] font-bold font-mono">Zambaara Coupon</span>
+                
+                <div className="text-2xl font-black text-white tracking-wide drop-shadow-[0_0_12px_rgba(255,255,255,0.25)] text-center px-1 font-serif uppercase">
+                  {winningSlice.label}
+                </div>
+                
+                <div className="w-20 h-[1.5px] bg-gradient-to-r from-transparent via-[#d1a058]/50 to-transparent" />
+                
+                <p className="text-[10px] text-yellow-500 font-bold uppercase tracking-wider px-2 text-center leading-relaxed">
+                  {winningSlice.id === 8 ? "Better luck next time!" : "Show to the counter to avail the prize"}
+                </p>
               </div>
             </div>
 
             <div className="space-y-1 relative z-10">
-              <h4 className="text-lg font-bold text-yellow-400 uppercase" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
-                {winningSlice.label}
-              </h4>
               <p className="text-white/60 text-xs px-4">
                 {winningSlice.description}
               </p>
@@ -681,11 +739,11 @@ function ElementalSpinner() {
         }
         @keyframes shake {
           0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          10%, 30%, 50%, 70%, 90% { transform: translate(-2px, 1px) rotate(-0.5deg); }
-          20%, 40%, 60%, 80% { transform: translate(1px, -2px) rotate(0.5deg); }
+          20%, 60% { transform: translate(-0.5px, 0.5px) rotate(-0.1deg); }
+          40%, 80% { transform: translate(0.5px, -0.5px) rotate(0.1deg); }
         }
         .shake-overdrive {
-          animation: shake 0.1s infinite;
+          animation: shake 0.15s infinite ease-in-out;
         }
         .blur-xs {
           filter: blur(2px);
@@ -1106,7 +1164,7 @@ export default function BeatTheHostPage() {
                                 {index === 0 && '👑 01'}
                                 {index === 1 && '🥈 02'}
                                 {index === 2 && '🥉 03'}
-                                {index > 2 && `${index + 1}`}
+                                {index > 2 && `${(index + 1).toString().padStart(2, '0')}`}
                               </td>
                               <td className="p-4 text-xs font-semibold text-white tracking-wide">{game.winnerName}</td>
                               <td className="p-4 text-xs font-mono text-[#d1a058] font-bold">
