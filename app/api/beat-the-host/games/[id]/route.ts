@@ -37,7 +37,7 @@ export async function PATCH(
       await supabase
         .from('beat_the_host_players')
         .update({ status: 'completed', updated_at: new Date().toISOString() })
-        .in('id', gps.map(g => g.player_id))
+        .in('id', gps.map((g: any) => g.player_id))
     }
 
     return successResponse(updated, 'Game ended!')
@@ -63,7 +63,7 @@ export async function DELETE(
       await supabase
         .from('beat_the_host_players')
         .update({ status: 'queued', updated_at: new Date().toISOString() })
-        .in('id', gps.map(g => g.player_id))
+        .in('id', gps.map((g: any) => g.player_id))
     }
     return successResponse(null, 'Game deleted')
   } catch {

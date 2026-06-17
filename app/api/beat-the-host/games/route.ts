@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     const { error: linkErr } = await supabase
       .from('beat_the_host_game_players')
-      .insert(players.map(p => ({ game_id: game.id, player_id: p.id, player_name: p.name })))
+      .insert(players.map((p: any) => ({ game_id: game.id, player_id: p.id, player_name: p.name })))
     if (linkErr) throw linkErr
 
     await supabase
