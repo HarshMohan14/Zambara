@@ -7,6 +7,9 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      return errorResponse('Database not connected', 503)
+    }
     const body = await request.json()
     if (body.action !== 'end') return errorResponse('Invalid action')
     if (!body.winnerId || !body.winnerName) return errorResponse('Winner required')
@@ -16,7 +19,7 @@ export async function PATCH(
       .select('started_at')
       .eq('id', params.id)
       .single()
-    if (fetchErr || !game) return serverErrorResponse('Game not found')
+    if (fetchErr || !game) return errorResponse('Game not found', 404)
 
     const endedAt = new Date()
     const durationSeconds = Math.round((endedAt.getTime() - new Date(game.started_at).getTime()) / 1000)
@@ -41,8 +44,9 @@ export async function PATCH(
     }
 
     return successResponse(updated, 'Game ended!')
-  } catch {
-    return serverErrorResponse('Failed to end game')
+  } catch (err) {
+    console.error('Error ending game:', err)
+    return errorResponse('Failed to end game', 500)
   }
 }
 
@@ -51,6 +55,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      return errorResponse('Database not connected', 503)
+    }
     const { data: gps } = await supabase
       .from('beat_the_host_game_players')
       .select('player_id')
@@ -66,7 +73,8 @@ export async function DELETE(
         .in('id', gps.map((g: any) => g.player_id))
     }
     return successResponse(null, 'Game deleted')
-  } catch {
-    return serverErrorResponse('Failed to delete game')
+  } catch (err) {
+    console.error('Error deleting game:', err)
+    return errorResponse('Failed to delete game', 500)
   }
 }

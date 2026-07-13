@@ -4,6 +4,9 @@ import { successResponse, errorResponse, serverErrorResponse } from '@/lib/api-r
 
 export async function GET() {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      return successResponse({ players: [], total: 0 })
+    }
     const { data, error } = await supabase
       .from('beat_the_host_players')
       .select('*')
@@ -12,12 +15,16 @@ export async function GET() {
     if (error) throw error
     return successResponse({ players: data || [], total: data?.length || 0 })
   } catch (err: any) {
-    return serverErrorResponse('Failed to fetch queue')
+    console.error('Error fetching queue:', err)
+    return successResponse({ players: [], total: 0 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      return errorResponse('Database not connected', 503)
+    }
     const body = await request.json()
     if (!body.name?.trim()) return errorResponse('Name is required')
     if (!body.phone?.trim()) return errorResponse('Phone number is required')
@@ -30,6 +37,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error
     return successResponse(data, 'Player added to queue', 201)
   } catch (err: any) {
-    return serverErrorResponse('Failed to add player')
+    console.error('Error adding player:', err)
+    return errorResponse('Failed to add player', 500)
   }
 }
