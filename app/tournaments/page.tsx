@@ -110,7 +110,7 @@ export default function TournamentsPage() {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto landing-content-anim">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto landing-content-anim">
             {/* Beach Battle card */}
             <Link 
               href="/beach-battle"
@@ -141,6 +141,23 @@ export default function TournamentsPage() {
               </div>
               <div className="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#d1a058] group-hover:translate-x-1 transition-transform">
                 <span>Enter Kiosk Arena</span>
+                <span>→</span>
+              </div>
+            </Link>
+
+            {/* Zambaara card */}
+            <Link 
+              href="/tournaments/zambaara"
+              className="group rounded-2xl border-2 border-white/10 bg-black/45 p-8 transition-all duration-300 hover:border-[#ff4400] hover:bg-red-950/10 hover:shadow-[0_0_30px_rgba(255,68,0,0.2)] hover:scale-[1.03] flex flex-col justify-between min-h-[220px]"
+            >
+              <div>
+                <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">⚔</span>
+                <span className="text-[10px] tracking-[0.2em] font-black text-[#ff4400] uppercase block mb-1">ELEMENTAL ARENA</span>
+                <h3 className="text-2xl font-black uppercase text-white" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>Zambaara Arena</h3>
+                <p className="text-sm text-white/50 mt-2">Double-verified tribe rosters, seating, and live brackets.</p>
+              </div>
+              <div className="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ff4400] group-hover:translate-x-1 transition-transform">
+                <span>Enter Zambaara Arena</span>
                 <span>→</span>
               </div>
             </Link>
