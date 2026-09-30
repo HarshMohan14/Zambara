@@ -1,0 +1,4802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zambara — Master Intelligence & Tournament Contacts Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090E;
+      --bg-surface: #0E131F;
+      --bg-surface-elevated: #141B2D;
+      --bg-glass: rgba(18, 24, 38, 0.7);
+      --gold-primary: #D1A058;
+      --gold-light: #F7D59A;
+      --gold-dark: #9E7432;
+      --gold-glow: rgba(209, 160, 88, 0.35);
+      --border-gold: rgba(209, 160, 88, 0.22);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --lava-color: #FF5722;
+      --lava-bg: rgba(255, 87, 34, 0.12);
+      --rain-color: #00B0FF;
+      --rain-bg: rgba(0, 176, 255, 0.12);
+      --mountain-color: #FFB300;
+      --mountain-bg: rgba(255, 179, 0, 0.12);
+      --wind-color: #00E676;
+      --wind-bg: rgba(0, 230, 118, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(209, 160, 88, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(255, 87, 34, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(0, 176, 255, 0.04) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* Ambient Header */
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-gold);
+      padding-bottom: 1.75rem;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #FFFFFF 20%, var(--gold-light) 60%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 230, 118, 0.12);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--wind-color);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--wind-color);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--wind-color);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    /* Actions Header */
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.15rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      border: none;
+      outline: none;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+      color: #07090E;
+      box-shadow: 0 4px 14px var(--gold-glow);
+    }
+
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #FFFFFF, var(--gold-light));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px var(--gold-glow);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+      border: 1px solid var(--border-gold);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-outline:hover {
+      background: rgba(209, 160, 88, 0.1);
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+    }
+
+    /* KPI Analytics Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 1.25rem 1.2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--gold-primary);
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .kpi-value {
+      font-family: 'Cinzel', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .kpi-sub {
+      font-size: 0.8rem;
+      color: var(--gold-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+    }
+
+    /* Tribe Bar */
+    .tribe-bar-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .tribe-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .tribe-bar-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tribe-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      font-size: 0.82rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .bar-strip {
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      background: #111522;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .bar-segment {
+      height: 100%;
+      transition: width 0.4s ease;
+      position: relative;
+    }
+
+    /* Filters Section */
+    .filter-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 14px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 900px) {
+      .search-row {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+      }
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group input, .input-group select {
+      width: 100%;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 0 3px rgba(209, 160, 88, 0.15);
+    }
+
+    /* Category Pill Selector */
+    .pill-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .pill {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pill:hover {
+      border-color: var(--gold-primary);
+      color: var(--text-main);
+    }
+
+    .pill.active {
+      background: var(--gold-primary);
+      color: #07090E;
+      border-color: var(--gold-primary);
+      font-weight: 700;
+      box-shadow: 0 2px 10px var(--gold-glow);
+    }
+
+    /* Data Table Card */
+    .table-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .table-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .results-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .results-count strong {
+      color: var(--gold-light);
+    }
+
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .page-size-selector select {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead {
+      background: var(--bg-surface-elevated);
+      border-bottom: 2px solid var(--gold-primary);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      padding: 0.95rem 1rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    th:hover {
+      background: rgba(209, 160, 88, 0.08);
+      color: #FFFFFF;
+    }
+
+    th .sort-icon {
+      font-size: 0.7rem;
+      margin-left: 0.35rem;
+      opacity: 0.5;
+    }
+
+    th.sorted .sort-icon {
+      opacity: 1;
+      color: var(--gold-primary);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover {
+      background: rgba(209, 160, 88, 0.05);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    td {
+      padding: 0.95rem 1rem;
+      font-size: 0.88rem;
+      vertical-align: middle;
+      color: var(--text-main);
+    }
+
+    .cell-name {
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+
+    .cell-phone {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      color: var(--gold-light);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .copy-btn:hover {
+      color: var(--gold-primary);
+      background: rgba(209, 160, 88, 0.15);
+    }
+
+    .badge-tribe {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.22rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tribe-LAVA { background: var(--lava-bg); color: var(--lava-color); border: 1px solid rgba(255, 87, 34, 0.3); }
+    .tribe-RAIN { background: var(--rain-bg); color: var(--rain-color); border: 1px solid rgba(0, 176, 255, 0.3); }
+    .tribe-MOUNTAIN { background: var(--mountain-bg); color: var(--mountain-color); border: 1px solid rgba(255, 179, 0, 0.3); }
+    .tribe-WIND { background: var(--wind-bg); color: var(--wind-color); border: 1px solid rgba(0, 230, 118, 0.3); }
+    .tribe-COASTAL { background: rgba(0, 176, 255, 0.12); color: #80D8FF; border: 1px solid rgba(0, 176, 255, 0.25); }
+    .tribe-UNASSIGNED, .tribe-NA { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+    .badge-status {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    .status-booked, .status-seated {
+      background: rgba(0, 230, 118, 0.12);
+      color: var(--wind-color);
+      border-color: rgba(0, 230, 118, 0.3);
+    }
+
+    .status-confirmed {
+      background: rgba(209, 160, 88, 0.15);
+      color: var(--gold-light);
+      border-color: rgba(209, 160, 88, 0.4);
+    }
+
+    .status-waiting {
+      background: rgba(255, 179, 0, 0.1);
+      color: var(--mountain-color);
+      border-color: rgba(255, 179, 0, 0.3);
+    }
+
+    /* Pagination Footer */
+    .pagination-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.15rem 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+      gap: 1rem;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .page-controls {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .page-btn {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      min-width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+    }
+
+    .page-btn.active {
+      background: var(--gold-primary);
+      color: #07090E;
+      border-color: var(--gold-primary);
+      font-weight: 700;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-surface-elevated);
+      color: var(--gold-light);
+      border: 1px solid var(--gold-primary);
+      padding: 0.85rem 1.4rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px var(--gold-glow);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body { background: #FFFFFF; color: #000000; }
+      .header-actions, .filter-panel, .pagination-bar, .page-size-selector { display: none !important; }
+      .kpi-card, .table-card { border: 1px solid #CCC; box-shadow: none; }
+      th { color: #000; border-bottom: 2px solid #000; }
+      td { color: #222; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Top Header -->
+    <header>
+      <div>
+        <div class="badge-live">
+          <span class="pulse-dot"></span>
+          Live Database Sync
+        </div>
+        <h1 class="brand-title">Zambara Master Intelligence</h1>
+        <p class="brand-subtitle">
+          Double-verification participant directory, tournament rosters, and phone outreach console.
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-outline" onclick="copyAllFilteredPhones()">
+          <span>📋</span> Copy Filtered Phones
+        </button>
+        <button class="btn btn-outline" onclick="exportFilteredCSV()">
+          <span>📥</span> Export CSV
+        </button>
+        <a href="/Zambara_Master_Contacts_Directory.xlsx" class="btn btn-gold" download>
+          <span>📊</span> Download Excel
+        </a>
+      </div>
+    </header>
+
+    <!-- Executive KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Participants</div>
+        <div class="kpi-value" id="kpi-total">279</div>
+        <div class="kpi-sub">Across All Tournaments</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Unique Phone Numbers</div>
+        <div class="kpi-value" id="kpi-unique-phones">259</div>
+        <div class="kpi-sub">Verified Mobile Contacts</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Arena Seats Booked</div>
+        <div class="kpi-value" id="kpi-booked">60</div>
+        <div class="kpi-sub">Active Brackets Confirmed</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Zambaara & TagCon Paid</div>
+        <div class="kpi-value" id="kpi-paid">44</div>
+        <div class="kpi-sub">Purchased Entry Passes</div>
+      </div>
+    </div>
+
+    <!-- Elemental Tribe Balance Bar -->
+    <div class="tribe-bar-container">
+      <div class="tribe-bar-header">
+        <div class="tribe-bar-title">Elemental Tribe Balance</div>
+        <div class="tribe-legend" id="tribe-legend">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      <div class="bar-strip" id="tribe-bar">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Filter & Control Panel -->
+    <div class="filter-panel">
+      <div class="search-row">
+        <div class="input-group">
+          <input type="text" id="searchInput" placeholder="Search name, phone (+91...), seat, or event..." oninput="onSearchChange()">
+        </div>
+        <div class="input-group">
+          <select id="tribeFilter" onchange="applyFilters()">
+            <option value="ALL">All Tribes</option>
+            <option value="LAVA">🔥 Lava Tribe</option>
+            <option value="RAIN">💧 Rain Tribe</option>
+            <option value="MOUNTAIN">🏔️ Mountain Tribe</option>
+            <option value="WIND">🌪️ Wind Tribe</option>
+            <option value="COASTAL">🌊 Coastal</option>
+            <option value="UNASSIGNED">Unassigned / Waiting</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <select id="statusFilter" onchange="applyFilters()">
+            <option value="ALL">All Statuses</option>
+            <option value="BOOKED">Seat Booked / Seated</option>
+            <option value="CONFIRMED">Confirmed Pool</option>
+            <option value="REVEALED">Tribe Revealed</option>
+            <option value="WAITING">Waiting Reveal</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <select id="paidFilter" onchange="applyFilters()">
+            <option value="ALL">All Payment States</option>
+            <option value="YES">Paid / Purchased Ticket</option>
+            <option value="NO">Unpaid</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="pill-tabs" id="categoryPills">
+        <button class="pill active" onclick="setCategoryFilter('ALL', this)">All Categories (279)</button>
+        <button class="pill" onclick="setCategoryFilter('Zambaara Tournament', this)">Zambaara Tournament</button>
+        <button class="pill" onclick="setCategoryFilter('TagCon Tournament', this)">TagCon Arena</button>
+        <button class="pill" onclick="setCategoryFilter('Beach Battle', this)">Beach Battle</button>
+        <button class="pill" onclick="setCategoryFilter('Pre-Bookings', this)">VIP Pre-Bookings</button>
+        <button class="pill" onclick="setCategoryFilter('Arena Live Games', this)">Arena Match Scores</button>
+      </div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div class="table-card">
+      <div class="table-topbar">
+        <div class="results-count" id="resultsCount">
+          Showing <strong>0</strong> to <strong>0</strong> of <strong>0</strong> participants
+        </div>
+
+        <div class="page-size-selector">
+          <label for="pageSize">Rows per page:</label>
+          <select id="pageSize" onchange="onPageSizeChange()">
+            <option value="15" selected>15</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="ALL">All</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th onclick="onSort('id')">ID <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('name')">Participant Name <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('phone')">Phone Number <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('category')">Category / Source <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('event')">Tournament / Event <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('tribe')">Tribe <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('seat')">Seat Allocated <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('status')">Verification Status <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('hasBought')">Paid Ticket <span class="sort-icon">⇅</span></th>
+              <th onclick="onSort('date')">Date Logged <span class="sort-icon">⇅</span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="pagination-bar">
+        <div class="results-count" id="paginationSummary">
+          Page 1 of 1
+        </div>
+        <div class="page-controls" id="pageControls">
+          <!-- Page buttons -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast">📋 Copied to clipboard!</div>
+
+  <script>
+    // Embedded Master Data (279 records)
+    const RAW_DATA = [
+  {
+    "id": "ZAM-1",
+    "name": "Raja",
+    "phone": "8008988845",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:51 pm"
+  },
+  {
+    "id": "ZAM-2",
+    "name": "Ujwal",
+    "phone": "9848791790",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 1:32 pm"
+  },
+  {
+    "id": "ZAM-3",
+    "name": "Srikant",
+    "phone": "8106165131",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:17 pm"
+  },
+  {
+    "id": "ZAM-4",
+    "name": "Dimple",
+    "phone": "7780773659",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 2:47 pm"
+  },
+  {
+    "id": "ZAM-5",
+    "name": "Kaajori",
+    "phone": "9849498765",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 3:06 pm"
+  },
+  {
+    "id": "ZAM-6",
+    "name": "Jonathan",
+    "phone": "7075209677",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Confirmed Pool",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 4:09 pm"
+  },
+  {
+    "id": "ZAM-7",
+    "name": "Manish",
+    "phone": "9769637379",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 4:27 pm"
+  },
+  {
+    "id": "ZAM-8",
+    "name": "Yuvraj",
+    "phone": "9256955079",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 4:30 pm"
+  },
+  {
+    "id": "ZAM-9",
+    "name": "Maya",
+    "phone": "9963273351",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 2:21 pm"
+  },
+  {
+    "id": "ZAM-10",
+    "name": "VISHAAL",
+    "phone": "9291856789",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 2:56 pm"
+  },
+  {
+    "id": "ZAM-11",
+    "name": "Nikhil",
+    "phone": "9849075873",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:52 pm"
+  },
+  {
+    "id": "ZAM-12",
+    "name": "Avish",
+    "phone": "9949044655",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 4:08 pm"
+  },
+  {
+    "id": "ZAM-13",
+    "name": "Supraja",
+    "phone": "9448180980",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:50 pm"
+  },
+  {
+    "id": "ZAM-14",
+    "name": "Siddhartha",
+    "phone": "8919108873",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 3:51 pm"
+  },
+  {
+    "id": "ZAM-15",
+    "name": "Snigdha",
+    "phone": "7406748214",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:49 pm"
+  },
+  {
+    "id": "ZAM-16",
+    "name": "Sonali",
+    "phone": "9370402925",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:18 pm"
+  },
+  {
+    "id": "ZAM-17",
+    "name": "Sherly",
+    "phone": "7259634589",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Confirmed Pool",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "23 Jul 2026, 2:15 pm"
+  },
+  {
+    "id": "ZAM-18",
+    "name": "Ish",
+    "phone": "8197562525",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 2:21 pm"
+  },
+  {
+    "id": "ZAM-19",
+    "name": "Anuj",
+    "phone": "8447682848",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 3:03 pm"
+  },
+  {
+    "id": "ZAM-20",
+    "name": "Abhinav",
+    "phone": "9448180980",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:49 pm"
+  },
+  {
+    "id": "ZAM-21",
+    "name": "Abhi",
+    "phone": "7893816429",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 3:04 pm"
+  },
+  {
+    "id": "ZAM-22",
+    "name": "Riyansh",
+    "phone": "9848791790",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 1:31 pm"
+  },
+  {
+    "id": "ZAM-23",
+    "name": "Krit",
+    "phone": "8971462525",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 2:21 pm"
+  },
+  {
+    "id": "ZAM-24",
+    "name": "Rishikesh",
+    "phone": "7386665707",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 4:09 pm"
+  },
+  {
+    "id": "ZAM-25",
+    "name": "Parag",
+    "phone": "9642513839",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:17 pm"
+  },
+  {
+    "id": "ZAM-26",
+    "name": "Gaytri",
+    "phone": "9632933885",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 1:49 pm"
+  },
+  {
+    "id": "ZAM-27",
+    "name": "Rishaan",
+    "phone": "9848791790",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 1:30 pm"
+  },
+  {
+    "id": "ZAM-28",
+    "name": "Krishna Vamsi",
+    "phone": "9550131867",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 3:42 pm"
+  },
+  {
+    "id": "ZAM-29",
+    "name": "Dhanu",
+    "phone": "9618338985",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 12:49 pm"
+  },
+  {
+    "id": "ZAM-30",
+    "name": "Aaron",
+    "phone": "7013758783",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 4:09 pm"
+  },
+  {
+    "id": "ZAM-31",
+    "name": "Khevna",
+    "phone": "9930944560",
+    "category": "Zambaara Tournament",
+    "event": "Hyderabad Arena",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "19 Jul 2026, 1:49 pm"
+  },
+  {
+    "id": "TAG-1",
+    "name": "Sesh",
+    "phone": "9892333681",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:36 pm"
+  },
+  {
+    "id": "TAG-2",
+    "name": "Keren",
+    "phone": "9920110946",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:11 pm"
+  },
+  {
+    "id": "TAG-3",
+    "name": "Mayank",
+    "phone": "8742033425",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:58 am"
+  },
+  {
+    "id": "TAG-4",
+    "name": "Anooj",
+    "phone": "8108122230",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:01 pm"
+  },
+  {
+    "id": "TAG-5",
+    "name": "Mervin",
+    "phone": "9619396892",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "★ Round Winner",
+    "seat": "Seat #4",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:29 pm"
+  },
+  {
+    "id": "TAG-6",
+    "name": "Rushabh",
+    "phone": "9833200601",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:56 pm"
+  },
+  {
+    "id": "TAG-7",
+    "name": "Prathamesh",
+    "phone": "7337814506",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:27 am"
+  },
+  {
+    "id": "TAG-8",
+    "name": "Rohan ",
+    "phone": "8879040757",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:23 am"
+  },
+  {
+    "id": "TAG-9",
+    "name": "Tigran wadia",
+    "phone": "9819923094",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:09 am"
+  },
+  {
+    "id": "TAG-10",
+    "name": "Karan",
+    "phone": "9819987919",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:51 pm"
+  },
+  {
+    "id": "TAG-11",
+    "name": "Dhiren",
+    "phone": "7297009574",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:52 am"
+  },
+  {
+    "id": "TAG-12",
+    "name": "Ritika Patil",
+    "phone": "9850411100",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 4:20 pm"
+  },
+  {
+    "id": "TAG-13",
+    "name": "Shubha",
+    "phone": "9873331204",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:24 am"
+  },
+  {
+    "id": "TAG-14",
+    "name": "Lux",
+    "phone": "8147078437",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:44 pm"
+  },
+  {
+    "id": "TAG-15",
+    "name": "Karan",
+    "phone": "8976080056",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:57 am"
+  },
+  {
+    "id": "TAG-16",
+    "name": "Taneshqa",
+    "phone": "9082110730",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:50 am"
+  },
+  {
+    "id": "TAG-17",
+    "name": "Parth shah",
+    "phone": "9892777478",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:53 pm"
+  },
+  {
+    "id": "TAG-18",
+    "name": "Dhaval",
+    "phone": "9820249168",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "★ Round Winner",
+    "seat": "Seat #3",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:56 pm"
+  },
+  {
+    "id": "TAG-19",
+    "name": "Ashutosh",
+    "phone": "8879446129",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:37 pm"
+  },
+  {
+    "id": "TAG-20",
+    "name": "Aman",
+    "phone": "9769977714",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:11 am"
+  },
+  {
+    "id": "TAG-21",
+    "name": "Harshul ",
+    "phone": "8928463347",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:21 am"
+  },
+  {
+    "id": "TAG-22",
+    "name": "Yash",
+    "phone": "9322241747",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:14 pm"
+  },
+  {
+    "id": "TAG-23",
+    "name": "Shubham",
+    "phone": "9920180832",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:22 pm"
+  },
+  {
+    "id": "TAG-24",
+    "name": "Animesh",
+    "phone": "7774096364",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:42 am"
+  },
+  {
+    "id": "TAG-25",
+    "name": "Rishikesh ",
+    "phone": "7405812078",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:52 am"
+  },
+  {
+    "id": "TAG-26",
+    "name": "Varad",
+    "phone": "7757057924",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #4",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:53 am"
+  },
+  {
+    "id": "TAG-27",
+    "name": "Khushi ",
+    "phone": "9769993454",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:09 pm"
+  },
+  {
+    "id": "TAG-28",
+    "name": "Soha",
+    "phone": "8291541665",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:26 am"
+  },
+  {
+    "id": "TAG-29",
+    "name": "Shaurya ",
+    "phone": "829130584",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:44 pm"
+  },
+  {
+    "id": "TAG-30",
+    "name": "Siddhant ",
+    "phone": "9130213213",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:56 pm"
+  },
+  {
+    "id": "TAG-31",
+    "name": "Vishrut ",
+    "phone": "7057686529",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:15 am"
+  },
+  {
+    "id": "TAG-32",
+    "name": "Sabhya ",
+    "phone": "8968609016",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:09 am"
+  },
+  {
+    "id": "TAG-33",
+    "name": "Yogesh",
+    "phone": "7890807557",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:27 pm"
+  },
+  {
+    "id": "TAG-34",
+    "name": "Aryan",
+    "phone": "1234567890",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 4:14 pm"
+  },
+  {
+    "id": "TAG-35",
+    "name": "Preksha",
+    "phone": "8879911542",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:09 pm"
+  },
+  {
+    "id": "TAG-36",
+    "name": "Sanghamitra",
+    "phone": "8210077221",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:20 pm"
+  },
+  {
+    "id": "TAG-37",
+    "name": "Vastvik",
+    "phone": "7692915434",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 6:19 pm"
+  },
+  {
+    "id": "TAG-38",
+    "name": "Amit",
+    "phone": "9662172523",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:55 am"
+  },
+  {
+    "id": "TAG-39",
+    "name": "Sneha",
+    "phone": "8870506323",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:38 am"
+  },
+  {
+    "id": "TAG-40",
+    "name": "Aarav",
+    "phone": "9920342118",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:47 pm"
+  },
+  {
+    "id": "TAG-41",
+    "name": "Parth magdum",
+    "phone": "8104657519",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:13 pm"
+  },
+  {
+    "id": "TAG-42",
+    "name": "Mihir",
+    "phone": "9930175135",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:23 pm"
+  },
+  {
+    "id": "TAG-43",
+    "name": "Arnav",
+    "phone": "9408597449",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:31 pm"
+  },
+  {
+    "id": "TAG-44",
+    "name": "Aaditi",
+    "phone": "9840112962",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:41 pm"
+  },
+  {
+    "id": "TAG-45",
+    "name": "Hiyaa Jain",
+    "phone": "7777015451",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:48 pm"
+  },
+  {
+    "id": "TAG-46",
+    "name": "Dhruv",
+    "phone": "9820859405",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:40 am"
+  },
+  {
+    "id": "TAG-47",
+    "name": "Shaurya ",
+    "phone": "8291530384",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:45 pm"
+  },
+  {
+    "id": "TAG-48",
+    "name": "Tanvi",
+    "phone": "9019379584",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:45 pm"
+  },
+  {
+    "id": "TAG-49",
+    "name": "Purvang",
+    "phone": "9004693214",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:58 am"
+  },
+  {
+    "id": "TAG-50",
+    "name": "Heeral",
+    "phone": "9820736301",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:39 am"
+  },
+  {
+    "id": "TAG-51",
+    "name": "Amol",
+    "phone": "8806173993",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:33 pm"
+  },
+  {
+    "id": "TAG-52",
+    "name": "Tabish",
+    "phone": "8097071047",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:00 pm"
+  },
+  {
+    "id": "TAG-53",
+    "name": "Nikita sharma",
+    "phone": "9930829752",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:27 am"
+  },
+  {
+    "id": "TAG-54",
+    "name": "Lisa",
+    "phone": "8097584210",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:57 am"
+  },
+  {
+    "id": "TAG-55",
+    "name": "Anushka pillai",
+    "phone": "7987184709",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:55 pm"
+  },
+  {
+    "id": "TAG-56",
+    "name": "Shubhrajit",
+    "phone": "9566185100",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:49 am"
+  },
+  {
+    "id": "TAG-57",
+    "name": "Twisha",
+    "phone": "9321240661",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:40 am"
+  },
+  {
+    "id": "TAG-58",
+    "name": "Ronak",
+    "phone": "9820002546",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:14 pm"
+  },
+  {
+    "id": "TAG-59",
+    "name": "Deepti nair",
+    "phone": "9545522998",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:30 am"
+  },
+  {
+    "id": "TAG-60",
+    "name": "Tahera",
+    "phone": "7660918109",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:28 pm"
+  },
+  {
+    "id": "TAG-61",
+    "name": "Prajakta ",
+    "phone": "882842490",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:29 am"
+  },
+  {
+    "id": "TAG-62",
+    "name": "Kshitij",
+    "phone": "7977606599",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "★ Round Winner",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:08 pm"
+  },
+  {
+    "id": "TAG-63",
+    "name": "Bidish",
+    "phone": "8291473882",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:37 am"
+  },
+  {
+    "id": "TAG-64",
+    "name": "Nandini ",
+    "phone": "7391859060",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:46 am"
+  },
+  {
+    "id": "TAG-65",
+    "name": "Shankravva",
+    "phone": "8356870844",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:07 am"
+  },
+  {
+    "id": "TAG-66",
+    "name": "Purvarth",
+    "phone": "8928286396",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:46 am"
+  },
+  {
+    "id": "TAG-67",
+    "name": "Vedant",
+    "phone": "1234567890",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:35 pm"
+  },
+  {
+    "id": "TAG-68",
+    "name": "Anuttam",
+    "phone": "9833097059",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:31 am"
+  },
+  {
+    "id": "TAG-69",
+    "name": "Ashesh",
+    "phone": "8458813551",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:32 pm"
+  },
+  {
+    "id": "TAG-70",
+    "name": "Anushka",
+    "phone": "9830679109",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:45 pm"
+  },
+  {
+    "id": "TAG-71",
+    "name": "Pallavi ",
+    "phone": "8655695269",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:17 am"
+  },
+  {
+    "id": "TAG-72",
+    "name": "Saarthak",
+    "phone": "7755839781",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:10 am"
+  },
+  {
+    "id": "TAG-73",
+    "name": "dhdghdfgh",
+    "phone": "123456789",
+    "category": "TagCon Tournament",
+    "event": "TagCon Arena",
+    "tribe": "MOUNTAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #3",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "6 Jul 2026, 3:43 pm"
+  },
+  {
+    "id": "TAG-74",
+    "name": "Pratishtha",
+    "phone": "8104493177",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:52 am"
+  },
+  {
+    "id": "TAG-75",
+    "name": "Aditya joshi",
+    "phone": "9594927210",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:54 am"
+  },
+  {
+    "id": "TAG-76",
+    "name": "Sanskar ",
+    "phone": "8871658989",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:55 am"
+  },
+  {
+    "id": "TAG-77",
+    "name": "Nafeesa",
+    "phone": "9007988991",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #3",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:08 pm"
+  },
+  {
+    "id": "TAG-78",
+    "name": "Trupti",
+    "phone": "9011083741",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:58 pm"
+  },
+  {
+    "id": "TAG-79",
+    "name": "Aditi",
+    "phone": "9930277820",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:32 am"
+  },
+  {
+    "id": "TAG-80",
+    "name": "Isha",
+    "phone": "9892012166",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:14 pm"
+  },
+  {
+    "id": "TAG-81",
+    "name": "Raamapriya",
+    "phone": "6381713769",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:29 am"
+  },
+  {
+    "id": "TAG-82",
+    "name": "Ashish ",
+    "phone": "9325793137",
+    "category": "TagCon Tournament",
+    "event": "TagCon Arena",
+    "tribe": "RAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:33 pm"
+  },
+  {
+    "id": "TAG-83",
+    "name": "Mustafa",
+    "phone": "9892072071",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:55 pm"
+  },
+  {
+    "id": "TAG-84",
+    "name": "Srikant",
+    "phone": "7978735317",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:53 am"
+  },
+  {
+    "id": "TAG-85",
+    "name": "Shreenath",
+    "phone": "8433977344",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:19 pm"
+  },
+  {
+    "id": "TAG-86",
+    "name": "Nayomi",
+    "phone": "9833055929",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:09 pm"
+  },
+  {
+    "id": "TAG-87",
+    "name": "Shreeveni",
+    "phone": "9321190110",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:01 pm"
+  },
+  {
+    "id": "TAG-88",
+    "name": "Hozefa ",
+    "phone": "8898075252",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:55 pm"
+  },
+  {
+    "id": "TAG-89",
+    "name": "Mohit goel",
+    "phone": "9820059993",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:21 pm"
+  },
+  {
+    "id": "TAG-90",
+    "name": "Stacy",
+    "phone": "8451899902",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:48 am"
+  },
+  {
+    "id": "TAG-91",
+    "name": "Mayurika ",
+    "phone": "8087079621",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:11 pm"
+  },
+  {
+    "id": "TAG-92",
+    "name": "Aashna gada",
+    "phone": "9969769072",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:47 pm"
+  },
+  {
+    "id": "TAG-93",
+    "name": "Arjun",
+    "phone": "8308643973",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:35 pm"
+  },
+  {
+    "id": "TAG-94",
+    "name": "Prasanna ",
+    "phone": "7019678898",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:55 pm"
+  },
+  {
+    "id": "TAG-95",
+    "name": "Aditya shrungarpure",
+    "phone": "9769513460",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:07 am"
+  },
+  {
+    "id": "TAG-96",
+    "name": "Baban magdum",
+    "phone": "982061861",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:14 pm"
+  },
+  {
+    "id": "TAG-97",
+    "name": "Reetam",
+    "phone": "9999203340",
+    "category": "TagCon Tournament",
+    "event": "TagCon Arena",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #2",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:49 am"
+  },
+  {
+    "id": "TAG-98",
+    "name": "Varun ",
+    "phone": "9619157580",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:22 pm"
+  },
+  {
+    "id": "TAG-99",
+    "name": "Eshaan ",
+    "phone": "9820639937",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:54 am"
+  },
+  {
+    "id": "TAG-100",
+    "name": "Sanjana",
+    "phone": "9892931907",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:45 pm"
+  },
+  {
+    "id": "TAG-101",
+    "name": "Ankit",
+    "phone": "8828994210",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:30 pm"
+  },
+  {
+    "id": "TAG-102",
+    "name": "Rajneesh Gupta",
+    "phone": "9999456156",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:48 pm"
+  },
+  {
+    "id": "TAG-103",
+    "name": "Mansi",
+    "phone": "8762314871",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:29 pm"
+  },
+  {
+    "id": "TAG-104",
+    "name": "Mudita",
+    "phone": "8097202123",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:42 am"
+  },
+  {
+    "id": "TAG-105",
+    "name": "Tavish",
+    "phone": "9920225013",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:52 am"
+  },
+  {
+    "id": "TAG-106",
+    "name": "Anusha",
+    "phone": "9607580368",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 4:11 pm"
+  },
+  {
+    "id": "TAG-107",
+    "name": "Mayank ",
+    "phone": "8005848991",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:18 pm"
+  },
+  {
+    "id": "TAG-108",
+    "name": "Sagarika",
+    "phone": "9594328593",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:54 am"
+  },
+  {
+    "id": "TAG-109",
+    "name": "Furqaan",
+    "phone": "7738030519",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:52 am"
+  },
+  {
+    "id": "TAG-110",
+    "name": "Sahil kangane",
+    "phone": "9146500931",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "👑 Ultimate Zampion",
+    "seat": "Seat #4",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:21 pm"
+  },
+  {
+    "id": "TAG-111",
+    "name": "Jhanvi",
+    "phone": "7710945675",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:09 pm"
+  },
+  {
+    "id": "TAG-112",
+    "name": "Naveen",
+    "phone": "9769687986",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:20 pm"
+  },
+  {
+    "id": "TAG-113",
+    "name": "Kishore ",
+    "phone": "9869437917",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:06 pm"
+  },
+  {
+    "id": "TAG-114",
+    "name": "Avinash ",
+    "phone": "8652468228",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:55 am"
+  },
+  {
+    "id": "TAG-115",
+    "name": "Kshitij",
+    "phone": "7773939719",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:35 pm"
+  },
+  {
+    "id": "TAG-116",
+    "name": "Mansi",
+    "phone": "9619678086",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:14 am"
+  },
+  {
+    "id": "TAG-117",
+    "name": "Richa",
+    "phone": "7573985645",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:20 pm"
+  },
+  {
+    "id": "TAG-118",
+    "name": "Tejas bhosale",
+    "phone": "9324627424",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:23 pm"
+  },
+  {
+    "id": "TAG-119",
+    "name": "Kirti agarwal",
+    "phone": "7028799996",
+    "category": "TagCon Tournament",
+    "event": "TagCon Arena",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:32 pm"
+  },
+  {
+    "id": "TAG-120",
+    "name": "Lubna",
+    "phone": "8898977110",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:47 pm"
+  },
+  {
+    "id": "TAG-121",
+    "name": "Paritosh",
+    "phone": "7999092572",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:49 am"
+  },
+  {
+    "id": "TAG-122",
+    "name": "Varun",
+    "phone": "9004496750",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:32 am"
+  },
+  {
+    "id": "TAG-123",
+    "name": "Purnank",
+    "phone": "9999631963",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:11 am"
+  },
+  {
+    "id": "TAG-124",
+    "name": "Maithilee",
+    "phone": "8097530719",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:28 pm"
+  },
+  {
+    "id": "TAG-125",
+    "name": "Mitansh",
+    "phone": "9321786252",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:46 pm"
+  },
+  {
+    "id": "TAG-126",
+    "name": "Vishal",
+    "phone": "9229201332",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:10 pm"
+  },
+  {
+    "id": "TAG-127",
+    "name": "Aditya",
+    "phone": "8356870844",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:09 am"
+  },
+  {
+    "id": "TAG-128",
+    "name": "Aryan",
+    "phone": "9619229694",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:40 am"
+  },
+  {
+    "id": "TAG-129",
+    "name": "Himanshu",
+    "phone": "8383872147",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:03 pm"
+  },
+  {
+    "id": "TAG-130",
+    "name": "Sakshi",
+    "phone": "9881059000",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:16 pm"
+  },
+  {
+    "id": "TAG-131",
+    "name": "Himanshu",
+    "phone": "8291530384",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:14 am"
+  },
+  {
+    "id": "TAG-132",
+    "name": "Karan",
+    "phone": "8976080056",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:00 am"
+  },
+  {
+    "id": "TAG-133",
+    "name": "Sumanyu goyal",
+    "phone": "8770927578",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #3",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:17 pm"
+  },
+  {
+    "id": "TAG-134",
+    "name": "Vinayak",
+    "phone": "9167403625",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:27 pm"
+  },
+  {
+    "id": "TAG-135",
+    "name": "Anshul joshi ",
+    "phone": "9819001878",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:33 am"
+  },
+  {
+    "id": "TAG-136",
+    "name": "Mitesh",
+    "phone": "7506086617",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:16 pm"
+  },
+  {
+    "id": "TAG-137",
+    "name": "Sukhada",
+    "phone": "7045025707",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 4:47 pm"
+  },
+  {
+    "id": "TAG-138",
+    "name": "Neeraj",
+    "phone": "7508988860",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:41 am"
+  },
+  {
+    "id": "TAG-139",
+    "name": "Mukunda",
+    "phone": "9326006632",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:43 am"
+  },
+  {
+    "id": "TAG-140",
+    "name": "Aishwarya ",
+    "phone": "123456789",
+    "category": "TagCon Tournament",
+    "event": "TagCon Arena",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #3",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 7:15 pm"
+  },
+  {
+    "id": "TAG-141",
+    "name": "Ruchira",
+    "phone": "9930927327",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:38 pm"
+  },
+  {
+    "id": "TAG-142",
+    "name": "Shaurya ",
+    "phone": "8291530384",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:40 pm"
+  },
+  {
+    "id": "TAG-143",
+    "name": "Khushi",
+    "phone": "9145195915",
+    "category": "TagCon Tournament",
+    "event": "TagCon Arena",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:12 pm"
+  },
+  {
+    "id": "TAG-144",
+    "name": "Munira",
+    "phone": "9867430771",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:46 pm"
+  },
+  {
+    "id": "TAG-145",
+    "name": "Namita",
+    "phone": "9967161918",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:34 pm"
+  },
+  {
+    "id": "TAG-146",
+    "name": "Aditya ",
+    "phone": "9820623495",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:03 pm"
+  },
+  {
+    "id": "TAG-147",
+    "name": "Karen",
+    "phone": "9820889340",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:57 am"
+  },
+  {
+    "id": "TAG-148",
+    "name": "Tanishq",
+    "phone": "8104356742",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:06 am"
+  },
+  {
+    "id": "TAG-149",
+    "name": "Deepti",
+    "phone": "9702054064",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:10 pm"
+  },
+  {
+    "id": "TAG-150",
+    "name": "Aaratrika",
+    "phone": "8446635067",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:15 am"
+  },
+  {
+    "id": "TAG-151",
+    "name": "Manjyot",
+    "phone": "9821387665",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:29 pm"
+  },
+  {
+    "id": "TAG-152",
+    "name": "Advay",
+    "phone": "9152539747",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:06 pm"
+  },
+  {
+    "id": "TAG-153",
+    "name": "Sanchit",
+    "phone": "996228690",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:41 pm"
+  },
+  {
+    "id": "TAG-154",
+    "name": "Vanshika",
+    "phone": "7350273502",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:11 pm"
+  },
+  {
+    "id": "TAG-155",
+    "name": "Abe alexander",
+    "phone": "8976018388",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:11 am"
+  },
+  {
+    "id": "TAG-156",
+    "name": "Jimit doshi",
+    "phone": "9664891716",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Seat Booked",
+    "seat": "Seat #3",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:16 pm"
+  },
+  {
+    "id": "TAG-157",
+    "name": "Harshad",
+    "phone": "9967273621",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:02 pm"
+  },
+  {
+    "id": "TAG-158",
+    "name": "Viral oza",
+    "phone": "9322246231",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:33 am"
+  },
+  {
+    "id": "TAG-159",
+    "name": "Aanchal ",
+    "phone": "9967470832",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:57 pm"
+  },
+  {
+    "id": "TAG-160",
+    "name": "Sanjita",
+    "phone": "9004677902",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:48 pm"
+  },
+  {
+    "id": "TAG-161",
+    "name": "Mahima",
+    "phone": "9538935863",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 6:18 pm"
+  },
+  {
+    "id": "TAG-162",
+    "name": "Ankit ",
+    "phone": "8828994210",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:32 pm"
+  },
+  {
+    "id": "TAG-163",
+    "name": "Natasha",
+    "phone": "9987975925",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:46 am"
+  },
+  {
+    "id": "TAG-164",
+    "name": "Prachi ",
+    "phone": "9907720055",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Seat Booked",
+    "seat": "Seat #1",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:09 pm"
+  },
+  {
+    "id": "TAG-165",
+    "name": "Shubhankar",
+    "phone": "8208842029",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:39 pm"
+  },
+  {
+    "id": "TAG-166",
+    "name": "Roshni",
+    "phone": "9544019555",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:18 am"
+  },
+  {
+    "id": "TAG-167",
+    "name": "Sayali ",
+    "phone": "8007772976",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:32 pm"
+  },
+  {
+    "id": "TAG-168",
+    "name": "Chinmayee",
+    "phone": "8369319217",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:28 am"
+  },
+  {
+    "id": "TAG-169",
+    "name": "Rohan",
+    "phone": "9873050005",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:18 pm"
+  },
+  {
+    "id": "TAG-170",
+    "name": "Labdhi",
+    "phone": "8976004308",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:15 am"
+  },
+  {
+    "id": "TAG-171",
+    "name": "Shrinidhi",
+    "phone": "9892608312",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Seat Booked",
+    "seat": "Seat #4",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:12 am"
+  },
+  {
+    "id": "TAG-172",
+    "name": "Riya",
+    "phone": "8849848076",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 4:11 pm"
+  },
+  {
+    "id": "TAG-173",
+    "name": "Nidhi malik ",
+    "phone": "9619295732",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:38 am"
+  },
+  {
+    "id": "TAG-174",
+    "name": "Nishit",
+    "phone": "7977266873",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:20 pm"
+  },
+  {
+    "id": "TAG-175",
+    "name": "Jai",
+    "phone": "9007982222",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:11 pm"
+  },
+  {
+    "id": "TAG-176",
+    "name": "Anisha",
+    "phone": "7506415256",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:22 pm"
+  },
+  {
+    "id": "TAG-177",
+    "name": "Zenobia",
+    "phone": "9833434509",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:48 am"
+  },
+  {
+    "id": "TAG-178",
+    "name": "Arijeet",
+    "phone": "9560122007",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:21 pm"
+  },
+  {
+    "id": "TAG-179",
+    "name": "Kajal sharma",
+    "phone": "7738310666",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:22 pm"
+  },
+  {
+    "id": "TAG-180",
+    "name": "Anish",
+    "phone": "8080265841",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:36 am"
+  },
+  {
+    "id": "TAG-181",
+    "name": "Aaditya ",
+    "phone": "9970283400",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:53 pm"
+  },
+  {
+    "id": "TAG-182",
+    "name": "Janvi",
+    "phone": "7021838144",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:59 pm"
+  },
+  {
+    "id": "TAG-183",
+    "name": "Simran ",
+    "phone": "9930100605",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:20 am"
+  },
+  {
+    "id": "TAG-184",
+    "name": "Sid",
+    "phone": "9820639937",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:56 am"
+  },
+  {
+    "id": "TAG-185",
+    "name": "Nikhil",
+    "phone": "9833212974",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:25 am"
+  },
+  {
+    "id": "TAG-186",
+    "name": "Manasvi",
+    "phone": "9619233219",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 2:24 pm"
+  },
+  {
+    "id": "TAG-187",
+    "name": "Shyam",
+    "phone": "9566045271",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:44 am"
+  },
+  {
+    "id": "TAG-188",
+    "name": "Aparna",
+    "phone": "9740767371",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 1:43 pm"
+  },
+  {
+    "id": "TAG-189",
+    "name": "Disha",
+    "phone": "7977028289",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:45 am"
+  },
+  {
+    "id": "TAG-190",
+    "name": "Venkat",
+    "phone": "9821144114",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 3:45 pm"
+  },
+  {
+    "id": "TAG-191",
+    "name": "Harsh",
+    "phone": "9588402164",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "RAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 9:51 am"
+  },
+  {
+    "id": "TAG-192",
+    "name": "Naomi",
+    "phone": "9082950936",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "WIND",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 4:13 pm"
+  },
+  {
+    "id": "TAG-193",
+    "name": "Shubham",
+    "phone": "9920180832",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 12:25 pm"
+  },
+  {
+    "id": "TAG-194",
+    "name": "Girija",
+    "phone": "9322748511",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "LAVA",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 11:32 am"
+  },
+  {
+    "id": "TAG-195",
+    "name": "Chirag bolar",
+    "phone": "8928466864",
+    "category": "TagCon Tournament",
+    "event": "Tournament-1",
+    "tribe": "MOUNTAIN",
+    "status": "Tribe Revealed",
+    "seat": "Not Seated",
+    "hasBought": "No",
+    "email": "N/A",
+    "date": "7 Jun 2026, 10:39 am"
+  },
+  {
+    "id": "BCH-1",
+    "name": "Kunaal",
+    "phone": "9819781883",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "RAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #4",
+    "hasBought": "Yes",
+    "email": "nehasvis01@gmail.com",
+    "date": "21 Feb 2026, 3:51 pm"
+  },
+  {
+    "id": "BCH-2",
+    "name": "Manish",
+    "phone": "7977009227",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "LAVA",
+    "status": "Registered Slot",
+    "seat": "Slot #1",
+    "hasBought": "Yes",
+    "email": "manishkanojia10@gmail.com",
+    "date": "21 Feb 2026, 1:28 pm"
+  },
+  {
+    "id": "BCH-3",
+    "name": "Twisha",
+    "phone": "+918329360642",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "MOUNTAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #2",
+    "hasBought": "Yes",
+    "email": "twisha1106@gmail.com",
+    "date": "21 Feb 2026, 3:41 pm"
+  },
+  {
+    "id": "BCH-4",
+    "name": "Kishan",
+    "phone": "8767226113",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "LAVA",
+    "status": "Registered Slot",
+    "seat": "Slot #4",
+    "hasBought": "Yes",
+    "email": "gopal.mundhra@ymail.com",
+    "date": "21 Feb 2026, 3:52 pm"
+  },
+  {
+    "id": "BCH-5",
+    "name": "Tanika Yetre",
+    "phone": "+919673065295",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "RAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #2",
+    "hasBought": "Yes",
+    "email": "tanika.yetre18@gmail.com",
+    "date": "21 Feb 2026, 3:41 pm"
+  },
+  {
+    "id": "BCH-6",
+    "name": "Steven Quadros",
+    "phone": "7769852013",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "MOUNTAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #1",
+    "hasBought": "Yes",
+    "email": "stevenrexquadros@gmail.com",
+    "date": "21 Feb 2026, 3:17 pm"
+  },
+  {
+    "id": "BCH-7",
+    "name": "Nikhil Shriyan",
+    "phone": "9967397051",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "LAVA",
+    "status": "Registered Slot",
+    "seat": "Slot #2",
+    "hasBought": "Yes",
+    "email": "nikhil.shriyan02@gmail.com",
+    "date": "21 Feb 2026, 3:31 pm"
+  },
+  {
+    "id": "BCH-8",
+    "name": "Keyuri",
+    "phone": "9773491045",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "LAVA",
+    "status": "Registered Slot",
+    "seat": "Slot #3",
+    "hasBought": "Yes",
+    "email": "phoenixkeyuri1993@gmail.com",
+    "date": "21 Feb 2026, 3:47 pm"
+  },
+  {
+    "id": "BCH-9",
+    "name": "Vedanth Gupta",
+    "phone": "9121891360",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "MOUNTAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #3",
+    "hasBought": "Yes",
+    "email": "flamebalze07@gmail.com",
+    "date": "21 Feb 2026, 3:52 pm"
+  },
+  {
+    "id": "BCH-10",
+    "name": "Meet",
+    "phone": "8758461990",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "WIND",
+    "status": "Registered Slot",
+    "seat": "Slot #1",
+    "hasBought": "Yes",
+    "email": "meetmistry1510@gmail.com",
+    "date": "21 Feb 2026, 2:57 pm"
+  },
+  {
+    "id": "BCH-11",
+    "name": "Raghav Menon",
+    "phone": "7738437390",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "RAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #1",
+    "hasBought": "Yes",
+    "email": "raghavhmenon@gmail.com",
+    "date": "21 Feb 2026, 1:41 pm"
+  },
+  {
+    "id": "BCH-12",
+    "name": "Neha",
+    "phone": "8130309863",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "RAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #3",
+    "hasBought": "Yes",
+    "email": "nehamonga01@gmail.com",
+    "date": "21 Feb 2026, 3:47 pm"
+  },
+  {
+    "id": "BCH-13",
+    "name": "Vitrag",
+    "phone": "7021156573",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "WIND",
+    "status": "Registered Slot",
+    "seat": "Slot #3",
+    "hasBought": "Yes",
+    "email": "vitragsinghi@gmail.com",
+    "date": "21 Feb 2026, 3:37 pm"
+  },
+  {
+    "id": "BCH-14",
+    "name": "Saarth",
+    "phone": "9920920347",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "WIND",
+    "status": "Registered Slot",
+    "seat": "Slot #2",
+    "hasBought": "Yes",
+    "email": "saarthpadmakar@gmail.com",
+    "date": "21 Feb 2026, 3:12 pm"
+  },
+  {
+    "id": "BCH-15",
+    "name": "Gauri",
+    "phone": "9967397051",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "WIND",
+    "status": "Registered Slot",
+    "seat": "Slot #4",
+    "hasBought": "Yes",
+    "email": "gauri.j2@gmail.com",
+    "date": "21 Feb 2026, 3:42 pm"
+  },
+  {
+    "id": "BCH-16",
+    "name": "Arrya",
+    "phone": "8898846361",
+    "category": "Beach Battle",
+    "event": "Coastal Duels (32 Slots)",
+    "tribe": "MOUNTAIN",
+    "status": "Registered Slot",
+    "seat": "Slot #4",
+    "hasBought": "Yes",
+    "email": "kaschitshah@gmail.com",
+    "date": "21 Feb 2026, 4:22 pm"
+  },
+  {
+    "id": "PRE-1",
+    "name": "Manajit Pal",
+    "phone": "9776304537",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (4 Guests)",
+    "tribe": "N/A",
+    "status": "PENDING",
+    "seat": "4 Guests",
+    "hasBought": "Inquiry",
+    "email": "manajitpal95@gmail.com",
+    "date": "4 Feb 2026, 7:55 pm"
+  },
+  {
+    "id": "PRE-2",
+    "name": "Arjun Panwar",
+    "phone": "9833745635",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (4 Guests)",
+    "tribe": "N/A",
+    "status": "PENDING",
+    "seat": "4 Guests",
+    "hasBought": "Inquiry",
+    "email": "arjunrpanwar@gmail.com",
+    "date": "6 Feb 2026, 1:11 pm"
+  },
+  {
+    "id": "PRE-3",
+    "name": "Sanjana",
+    "phone": "7738946756",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (4 Guests)",
+    "tribe": "N/A",
+    "status": "PENDING",
+    "seat": "4 Guests",
+    "hasBought": "Inquiry",
+    "email": "sanjanamitbander@gmail.com",
+    "date": "3 Feb 2026, 6:09 pm"
+  },
+  {
+    "id": "PRE-4",
+    "name": "Akhil",
+    "phone": "7259634589",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (4 Guests)",
+    "tribe": "N/A",
+    "status": "CONFIRMED",
+    "seat": "4 Guests",
+    "hasBought": "Inquiry",
+    "email": "akhil@gmail.com",
+    "date": "30 Jan 2026, 11:31 pm"
+  },
+  {
+    "id": "PRE-5",
+    "name": "Vachan Kudmule",
+    "phone": "02248971532",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (8 Guests)",
+    "tribe": "N/A",
+    "status": "PENDING",
+    "seat": "8 Guests",
+    "hasBought": "Inquiry",
+    "email": "vachan@kdc.in",
+    "date": "2 Mar 2026, 6:28 am"
+  },
+  {
+    "id": "PRE-6",
+    "name": "Deepak",
+    "phone": "9884269015",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (8 Guests)",
+    "tribe": "N/A",
+    "status": "CONFIRMED",
+    "seat": "8 Guests",
+    "hasBought": "Inquiry",
+    "email": "deepbluemicrob@gmail.com",
+    "date": "23 Jun 2026, 8:22 am"
+  },
+  {
+    "id": "PRE-7",
+    "name": "Abishariga",
+    "phone": "9600057220",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (8 Guests)",
+    "tribe": "N/A",
+    "status": "CONFIRMED",
+    "seat": "8 Guests",
+    "hasBought": "Inquiry",
+    "email": "kewlgalabi@gmail.com",
+    "date": "24 Jun 2026, 4:15 am"
+  },
+  {
+    "id": "PRE-8",
+    "name": "Akhil",
+    "phone": "7564319841",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (4 Guests)",
+    "tribe": "N/A",
+    "status": "PENDING",
+    "seat": "4 Guests",
+    "hasBought": "Inquiry",
+    "email": "che19s.mohan@pg.ictmumbai.edu.in",
+    "date": "7 Jun 2026, 12:55 am"
+  },
+  {
+    "id": "PRE-9",
+    "name": "Mansi Katgire",
+    "phone": "9619678086",
+    "category": "Pre-Bookings",
+    "event": "Party VIP (8 Guests)",
+    "tribe": "N/A",
+    "status": "CONFIRMED",
+    "seat": "8 Guests",
+    "hasBought": "Inquiry",
+    "email": "katgiremansi@gmail.com",
+    "date": "8 Jun 2026, 4:48 pm"
+  },
+  {
+    "id": "SCR-1",
+    "name": "Aditya",
+    "phone": "9680548312",
+    "category": "Arena Live Games",
+    "event": "D7r0viGDfbi9UQ2L5sdS",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1705s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 12:37 pm"
+  },
+  {
+    "id": "SCR-2",
+    "name": "Manish",
+    "phone": "7977009227",
+    "category": "Arena Live Games",
+    "event": "JoNynfNS95ZAeiFlfY2T",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1322s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 1:14 pm"
+  },
+  {
+    "id": "SCR-3",
+    "name": "Akshay",
+    "phone": "9322231433",
+    "category": "Arena Live Games",
+    "event": "KsMnSt1ebgV4qIxPNzrK",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "389s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 11:39 am"
+  },
+  {
+    "id": "SCR-4",
+    "name": "Dharma Teja",
+    "phone": "9846932562",
+    "category": "Arena Live Games",
+    "event": "lKkqIuscQil3GrYlba0V",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "159285s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "3 Feb 2026, 12:39 pm"
+  },
+  {
+    "id": "SCR-5",
+    "name": "Ihit",
+    "phone": "9425365077",
+    "category": "Arena Live Games",
+    "event": "OyX1P2Gm0GsbIq6DXyDg",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "742s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 1:14 pm"
+  },
+  {
+    "id": "SCR-6",
+    "name": "Tejas",
+    "phone": "9834942557",
+    "category": "Arena Live Games",
+    "event": "nihTHc5VQW5fSframpVE",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "711s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 3:48 pm"
+  },
+  {
+    "id": "SCR-7",
+    "name": "Lekhana",
+    "phone": "9121400738",
+    "category": "Arena Live Games",
+    "event": "1wTPRtsNq3x9MCHHtbbV",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1123s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 3:17 pm"
+  },
+  {
+    "id": "SCR-8",
+    "name": "Tina",
+    "phone": "9730309062",
+    "category": "Arena Live Games",
+    "event": "Ot6cATBvDoWo4KuJdT1s",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "632s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 6:48 pm"
+  },
+  {
+    "id": "SCR-9",
+    "name": "Myrra",
+    "phone": "8779491347",
+    "category": "Arena Live Games",
+    "event": "QlxnWWTRmUxH4Y1WfERR",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1584s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 3:54 pm"
+  },
+  {
+    "id": "SCR-10",
+    "name": "Jervis",
+    "phone": "9764680226",
+    "category": "Arena Live Games",
+    "event": "sq6rDiZOfRIeSzG9sXuL",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "690s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 1:45 pm"
+  },
+  {
+    "id": "SCR-11",
+    "name": "Chetali gandhi",
+    "phone": "9167081602",
+    "category": "Arena Live Games",
+    "event": "fnW8NgQqyf3O3oiqRBov",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "561s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 1:38 pm"
+  },
+  {
+    "id": "SCR-12",
+    "name": "Ashish",
+    "phone": "9664539774",
+    "category": "Arena Live Games",
+    "event": "MYUqCZk38WeOnAxrUu09",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1449s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 12:55 pm"
+  },
+  {
+    "id": "SCR-13",
+    "name": "Anjali Soni",
+    "phone": "7898269740",
+    "category": "Arena Live Games",
+    "event": "w0zOJAjSNu2rU3AC0rPd",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1700s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 12:27 pm"
+  },
+  {
+    "id": "SCR-14",
+    "name": "Kian",
+    "phone": "7304158633",
+    "category": "Arena Live Games",
+    "event": "5fYgRUCciY8MFw99sOVa",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "627s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 2:11 pm"
+  },
+  {
+    "id": "SCR-15",
+    "name": "payal",
+    "phone": "7021172440",
+    "category": "Arena Live Games",
+    "event": "0RXokgHVupXiHDlNjjAT",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "190s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 6:03 pm"
+  },
+  {
+    "id": "SCR-16",
+    "name": "ANIRUDH Biyani",
+    "phone": "8871161121",
+    "category": "Arena Live Games",
+    "event": "UuLofO6Oh0vHHC60EDtH",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "828s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 2:13 pm"
+  },
+  {
+    "id": "SCR-17",
+    "name": "Akshay",
+    "phone": "1234567890",
+    "category": "Arena Live Games",
+    "event": "VBN2PXetZ4rwT1N8GeiG",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "564s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 7:08 pm"
+  },
+  {
+    "id": "SCR-18",
+    "name": "Shaurya",
+    "phone": "7259634589",
+    "category": "Arena Live Games",
+    "event": "6EVYK6i8jjEwiwADfCcx",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "809s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 1:41 am"
+  },
+  {
+    "id": "SCR-19",
+    "name": "Harshita",
+    "phone": "79770785423",
+    "category": "Arena Live Games",
+    "event": "4jnkR2byRlQirZAnlq39",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1199s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 12:55 pm"
+  },
+  {
+    "id": "SCR-20",
+    "name": "Mehak",
+    "phone": "7747835857",
+    "category": "Arena Live Games",
+    "event": "5qnH4XRY2HCmzOunvdC7",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1067s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 1:07 pm"
+  },
+  {
+    "id": "SCR-21",
+    "name": "Dhanashree",
+    "phone": "9930260931",
+    "category": "Arena Live Games",
+    "event": "mpGCOzzR0nDrN3xffQI5",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "862s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 11:42 am"
+  },
+  {
+    "id": "SCR-22",
+    "name": "Aafeed",
+    "phone": "8999548416",
+    "category": "Arena Live Games",
+    "event": "qUIBwbOs4uT5H5G7fsdu",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1281s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 1:44 pm"
+  },
+  {
+    "id": "SCR-23",
+    "name": "Russell",
+    "phone": "9619251102",
+    "category": "Arena Live Games",
+    "event": "lO7KsMagnHDpvajRedeT",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "166806s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "3 Feb 2026, 12:39 pm"
+  },
+  {
+    "id": "SCR-24",
+    "name": "Shrinidhi",
+    "phone": "9892608312",
+    "category": "Arena Live Games",
+    "event": "sIESZWgBaW8Kq9xpSKEK",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1355s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 4:20 pm"
+  },
+  {
+    "id": "SCR-25",
+    "name": "Sriparameshwaran",
+    "phone": "7798478596",
+    "category": "Arena Live Games",
+    "event": "eqU30zm61YFrxycZ2Chn",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1024s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 2:45 pm"
+  },
+  {
+    "id": "SCR-26",
+    "name": "Srishti",
+    "phone": "7892691809",
+    "category": "Arena Live Games",
+    "event": "evugL2e04NGHUKSDCPj9",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "1524s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 3:40 pm"
+  },
+  {
+    "id": "SCR-27",
+    "name": "Shankarvva",
+    "phone": "8356870844",
+    "category": "Arena Live Games",
+    "event": "GYBb5Nh9BXvkbjv3MGl2",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "796s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "31 Jan 2026, 3:46 pm"
+  },
+  {
+    "id": "SCR-28",
+    "name": "Priyanka",
+    "phone": "6360937283",
+    "category": "Arena Live Games",
+    "event": "6qSYxoO8xMU8aZgStG7m",
+    "tribe": "N/A",
+    "status": "Match Played",
+    "seat": "347s",
+    "hasBought": "N/A",
+    "email": "N/A",
+    "date": "1 Feb 2026, 3:29 pm"
+  }
+];
+
+    let filteredData = [...RAW_DATA];
+    let currentPage = 1;
+    let pageSize = 15;
+    let selectedCategory = 'ALL';
+    let sortColumn = 'id';
+    let sortAsc = true;
+
+    // Toast helper
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function copyToClipboard(text, label = 'Phone number') {
+      if (!text || text === 'N/A') return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`📋 Copied ${label}: ${text}`);
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(`📋 Copied: ${text}`);
+      });
+    }
+
+    // Set Category Filter
+    function setCategoryFilter(cat, elem) {
+      selectedCategory = cat;
+      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      if (elem) elem.classList.add('active');
+      applyFilters();
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const tribe = document.getElementById('tribeFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const paid = document.getElementById('paidFilter').value;
+
+      filteredData = RAW_DATA.filter(item => {
+        // Category
+        if (selectedCategory !== 'ALL' && item.category !== selectedCategory) return false;
+
+        // Tribe
+        if (tribe !== 'ALL') {
+          if (tribe === 'UNASSIGNED') {
+            if (item.tribe !== 'UNASSIGNED' && item.tribe !== 'N/A') return false;
+          } else if (item.tribe !== tribe) {
+            return false;
+          }
+        }
+
+        // Status
+        if (status !== 'ALL') {
+          const s = (item.status || '').toLowerCase();
+          if (status === 'BOOKED' && !s.includes('booked') && !s.includes('seated') && !s.includes('winner') && !s.includes('zampion')) return false;
+          if (status === 'CONFIRMED' && !s.includes('confirmed')) return false;
+          if (status === 'REVEALED' && !s.includes('revealed')) return false;
+          if (status === 'WAITING' && !s.includes('waiting')) return false;
+        }
+
+        // Paid
+        if (paid !== 'ALL') {
+          if (paid === 'YES' && item.hasBought !== 'Yes') return false;
+          if (paid === 'NO' && item.hasBought !== 'No') return false;
+        }
+
+        // Search text
+        if (q) {
+          const matchName = (item.name || '').toLowerCase().includes(q);
+          const matchPhone = (item.phone || '').toLowerCase().includes(q);
+          const matchSeat = (item.seat || '').toLowerCase().includes(q);
+          const matchEvent = (item.event || '').toLowerCase().includes(q);
+          const matchEmail = (item.email || '').toLowerCase().includes(q);
+          const matchTribe = (item.tribe || '').toLowerCase().includes(q);
+          if (!matchName && !matchPhone && !matchSeat && !matchEvent && !matchEmail && !matchTribe) return false;
+        }
+
+        return true;
+      });
+
+      // Sort
+      sortData();
+      currentPage = 1;
+      renderTable();
+      updateTribeBar();
+    }
+
+    function onSearchChange() {
+      applyFilters();
+    }
+
+    function onPageSizeChange() {
+      const val = document.getElementById('pageSize').value;
+      pageSize = val === 'ALL' ? filteredData.length : parseInt(val, 10);
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Sort Handler
+    function onSort(col) {
+      if (sortColumn === col) {
+        sortAsc = !sortAsc;
+      } else {
+        sortColumn = col;
+        sortAsc = true;
+      }
+      sortData();
+      renderTable();
+    }
+
+    function sortData() {
+      filteredData.sort((a, b) => {
+        let vA = a[sortColumn] || '';
+        let vB = b[sortColumn] || '';
+
+        // If numeric ID
+        if (sortColumn === 'id') {
+          const numA = parseInt(vA.replace(/\D/g, '') || 0, 10);
+          const numB = parseInt(vB.replace(/\D/g, '') || 0, 10);
+          return sortAsc ? numA - numB : numB - numA;
+        }
+
+        vA = String(vA).toLowerCase();
+        vB = String(vB).toLowerCase();
+        if (vA < vB) return sortAsc ? -1 : 1;
+        if (vA > vB) return sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Render Table
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      const total = filteredData.length;
+      const effectivePageSize = pageSize === 'ALL' ? total : pageSize;
+      const totalPages = Math.max(1, Math.ceil(total / effectivePageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIdx = (currentPage - 1) * effectivePageSize;
+      const endIdx = Math.min(startIdx + effectivePageSize, total);
+      const pageItems = filteredData.slice(startIdx, endIdx);
+
+      // Render Rows
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No matching participants found.</td></tr>`;
+      } else {
+        pageItems.forEach(item => {
+          const tr = document.createElement('tr');
+          const tribeClass = 'tribe-' + (item.tribe || 'UNASSIGNED');
+          
+          let statusClass = 'status-waiting';
+          const s = (item.status || '').toLowerCase();
+          if (s.includes('booked') || s.includes('seated') || s.includes('zampion') || s.includes('winner')) statusClass = 'status-booked';
+          else if (s.includes('confirmed')) statusClass = 'status-confirmed';
+
+          tr.innerHTML = `
+            <td style="color:var(--text-muted); font-family:'JetBrains Mono',monospace; font-size:0.75rem;">${item.id}</td>
+            <td class="cell-name">${escapeHtml(item.name)}</td>
+            <td>
+              <span class="cell-phone">
+                ${item.phone !== 'N/A' ? item.phone : '<span style="color:#6B7280;">N/A</span>'}
+                ${item.phone !== 'N/A' ? `<button class="copy-btn" title="Copy Phone" onclick="copyToClipboard('${item.phone}', 'Phone')">📋</button><a href="https://wa.me/${item.phone.replace(/\D/g,'')}" target="_blank" class="copy-btn" title="Open WhatsApp" style="text-decoration:none;">💬</a>` : ''}
+              </span>
+            </td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${item.category}</td>
+            <td style="font-size:0.82rem; font-weight:600; color:var(--gold-light);">${escapeHtml(item.event)}</td>
+            <td><span class="badge-tribe ${tribeClass}">${item.tribe}</span></td>
+            <td style="font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:${item.seat !== 'Not Seated' ? 'var(--wind-color)' : 'var(--text-muted)'};">${item.seat}</td>
+            <td><span class="badge-status ${statusClass}">${item.status}</span></td>
+            <td>
+              <span style="font-weight:700; font-size:0.8rem; color:${item.hasBought === 'Yes' ? 'var(--wind-color)' : item.hasBought === 'No' ? 'var(--lava-color)' : 'var(--text-muted)'};">
+                ${item.hasBought === 'Yes' ? 'Paid ✓' : item.hasBought === 'No' ? 'Unpaid ✕' : item.hasBought}
+              </span>
+            </td>
+            <td style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${item.date}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Update counters
+      document.getElementById('resultsCount').innerHTML = `Showing <strong>${total === 0 ? 0 : startIdx + 1}</strong> to <strong>${endIdx}</strong> of <strong>${total}</strong> participants (Total: ${RAW_DATA.length})`;
+      document.getElementById('paginationSummary').innerText = `Page ${currentPage} of ${totalPages}`;
+
+      // Update pagination buttons
+      renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+      const container = document.getElementById('pageControls');
+      container.innerHTML = '';
+
+      if (totalPages <= 1) return;
+
+      // Prev Button
+      const prev = document.createElement('button');
+      prev.className = 'page-btn';
+      prev.innerHTML = '←';
+      prev.disabled = currentPage === 1;
+      prev.onclick = () => { if (currentPage > 1) { currentPage--; renderTable(); } };
+      container.appendChild(prev);
+
+      // Page numbers (smart window)
+      let pages = [];
+      if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+      } else {
+        if (currentPage <= 4) {
+          pages = [1, 2, 3, 4, 5, '...', totalPages];
+        } else if (currentPage >= totalPages - 3) {
+          pages = [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+        } else {
+          pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+        }
+      }
+
+      pages.forEach(p => {
+        if (p === '...') {
+          const dots = document.createElement('span');
+          dots.style.padding = '0 6px';
+          dots.style.color = 'var(--text-muted)';
+          dots.innerText = '...';
+          container.appendChild(dots);
+        } else {
+          const btn = document.createElement('button');
+          btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+          btn.innerText = p;
+          btn.onclick = () => { currentPage = p; renderTable(); };
+          container.appendChild(btn);
+        }
+      });
+
+      // Next Button
+      const next = document.createElement('button');
+      next.className = 'page-btn';
+      next.innerHTML = '→';
+      next.disabled = currentPage === totalPages;
+      next.onclick = () => { if (currentPage < totalPages) { currentPage++; renderTable(); } };
+      container.appendChild(next);
+    }
+
+    // Elemental Tribe Distribution Bar
+    function updateTribeBar() {
+      const counts = { LAVA: 0, RAIN: 0, MOUNTAIN: 0, WIND: 0, OTHER: 0 };
+      filteredData.forEach(d => {
+        if (counts[d.tribe] !== undefined) counts[d.tribe]++;
+        else counts.OTHER++;
+      });
+
+      const total = filteredData.length || 1;
+      const pLava = ((counts.LAVA / total) * 100).toFixed(1);
+      const pRain = ((counts.RAIN / total) * 100).toFixed(1);
+      const pMountain = ((counts.MOUNTAIN / total) * 100).toFixed(1);
+      const pWind = ((counts.WIND / total) * 100).toFixed(1);
+      const pOther = ((counts.OTHER / total) * 100).toFixed(1);
+
+      document.getElementById('tribe-bar').innerHTML = `
+        <div class="bar-segment" style="width: ${pLava}%; background: var(--lava-color);" title="Lava: ${counts.LAVA} (${pLava}%)"></div>
+        <div class="bar-segment" style="width: ${pRain}%; background: var(--rain-color);" title="Rain: ${counts.RAIN} (${pRain}%)"></div>
+        <div class="bar-segment" style="width: ${pMountain}%; background: var(--mountain-color);" title="Mountain: ${counts.MOUNTAIN} (${pMountain}%)"></div>
+        <div class="bar-segment" style="width: ${pWind}%; background: var(--wind-color);" title="Wind: ${counts.WIND} (${pWind}%)"></div>
+        <div class="bar-segment" style="width: ${pOther}%; background: #374151;" title="Other / Unassigned: ${counts.OTHER} (${pOther}%)"></div>
+      `;
+
+      document.getElementById('tribe-legend').innerHTML = `
+        <span class="legend-item"><span class="legend-dot" style="background:var(--lava-color)"></span> 🔥 Lava: ${counts.LAVA} (${pLava}%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--rain-color)"></span> 💧 Rain: ${counts.RAIN} (${pRain}%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--mountain-color)"></span> 🏔️ Mountain: ${counts.MOUNTAIN} (${pMountain}%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--wind-color)"></span> 🌪️ Wind: ${counts.WIND} (${pWind}%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B5563"></span> Others: ${counts.OTHER}</span>
+      `;
+    }
+
+    // Copy All Filtered Phone Numbers
+    function copyAllFilteredPhones() {
+      const phones = [];
+      const seen = new Set();
+      filteredData.forEach(d => {
+        if (d.phone && d.phone !== 'N/A' && !seen.has(d.phone)) {
+          seen.add(d.phone);
+          phones.push(d.phone);
+        }
+      });
+
+      if (phones.length === 0) {
+        showToast('⚠️ No phone numbers found in current filter!');
+        return;
+      }
+
+      copyToClipboard(phones.join(', '), `${phones.length} Phone Numbers`);
+    }
+
+    // Export Filtered View to CSV
+    function exportFilteredCSV() {
+      const headers = ['ID', 'Name', 'Phone', 'Category', 'Event', 'Tribe', 'Seat', 'Status', 'Paid', 'Email', 'Date'];
+      const rows = filteredData.map(d => [
+        d.id,
+        `"${(d.name || '').replace(/"/g, '""')}"`,
+        `"${d.phone}"`,
+        `"${d.category}"`,
+        `"${(d.event || '').replace(/"/g, '""')}"`,
+        d.tribe,
+        `"${d.seat}"`,
+        `"${d.status}"`,
+        d.hasBought,
+        `"${d.email}"`,
+        `"${d.date}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `Zambara_Export_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`📥 Exported ${filteredData.length} rows to CSV!`);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Initial load
+    applyFilters();
+  </script>
+</body>
+</html>

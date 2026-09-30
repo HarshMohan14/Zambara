@@ -44,3 +44,4 @@ core
 # Large assets
 *.psd
 public/TESTIMONIAL_*.mp4
+~$*
