@@ -550,7 +550,16 @@ export default function AdminTagconPage() {
             Manage registrations queue, configure tournaments, and book arena slots.
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-3">
+          <a 
+            href="/api/admin/export-excel" 
+            download="Zambara_Master_Contacts_Directory.xlsx"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 text-center text-sm shadow-md"
+            style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+          >
+            <span>📊</span>
+            <span>Download Excel Directory</span>
+          </a>
           <Link href="/tagcon" target="_blank" className="bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-[#d1a058]/50 text-[#d1a058] font-bold px-6 py-3 rounded uppercase tracking-wider transition-colors inline-block text-center text-sm" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
             Registration Form
           </Link>

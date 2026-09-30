@@ -770,11 +770,20 @@ export default function AdminZambaaraPage() {
             Double-verification queue manager, active brackets, and live standings config panel.
           </p>
         </div>
-        <div className="flex gap-4">
-          <Link href="/tournaments/zambaara/register" target="_blank" className="bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-[#d1a058]/50 text-[#d1a058] font-bold px-5 py-2.5 rounded uppercase tracking-wider transition-colors text-xs" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+        <div className="flex flex-wrap gap-3">
+          <a 
+            href="/api/admin/export-excel" 
+            download="Zambara_Master_Contacts_Directory.xlsx"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded uppercase tracking-wider transition-colors text-xs flex items-center gap-1.5 shadow-md"
+            style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+          >
+            <span>📊</span>
+            <span>Download Excel Directory</span>
+          </a>
+          <Link href="/tournaments/zambaara/register" target="_blank" className="bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-[#d1a058]/50 text-[#d1a058] font-bold px-4 py-2.5 rounded uppercase tracking-wider transition-colors text-xs" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
             Registration Page
           </Link>
-          <Link href="/tournaments/zambaara/reveal" target="_blank" className="bg-[#d1a058] hover:bg-[#c09048] text-black font-bold px-5 py-2.5 rounded uppercase tracking-wider transition-colors text-xs" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
+          <Link href="/tournaments/zambaara/reveal" target="_blank" className="bg-[#d1a058] hover:bg-[#c09048] text-black font-bold px-4 py-2.5 rounded uppercase tracking-wider transition-colors text-xs" style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}>
             Reveal Kiosk
           </Link>
         </div>
