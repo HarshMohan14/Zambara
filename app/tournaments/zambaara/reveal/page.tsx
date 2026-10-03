@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import gsap from 'gsap'
 import ThumbScanner from '@/components/tagcon/ThumbScanner'
 
@@ -99,14 +100,10 @@ class MysticSynth {
   }
 
   stop() {
-    if (!this.ctx) return;
+    if (!this.ctx || !this.gainNode) return;
     try {
       const now = this.ctx.currentTime;
-      if (this.gainNode) {
-        this.gainNode.gain.cancelScheduledValues(now);
-        this.gainNode.gain.setValueAtTime(this.gainNode.gain.value, now);
-        this.gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      }
+      this.gainNode.gain.linearRampToValueAtTime(0.001, now + 0.2);
       setTimeout(() => {
         try {
           this.osc1?.stop();
@@ -114,11 +111,12 @@ class MysticSynth {
           this.lfo?.stop();
           this.ctx?.close();
         } catch(e) {}
-      }, 150);
+      }, 250);
     } catch(e) {}
   }
 }
 
+// Sound for revealing burst
 const playRevealBurstSound = (tribe: Tribe) => {
   if (typeof window === 'undefined') return;
   try {
@@ -126,23 +124,8 @@ const playRevealBurstSound = (tribe: Tribe) => {
     if (!AudioContext) return;
     const ctx = new AudioContext();
     const now = ctx.currentTime;
-    
-    const boomOsc = ctx.createOscillator();
-    const boomGain = ctx.createGain();
-    
-    boomOsc.type = 'sine';
-    boomOsc.frequency.setValueAtTime(55, now);
-    boomOsc.frequency.exponentialRampToValueAtTime(20, now + 1.2);
-    
-    boomGain.gain.setValueAtTime(0.35, now);
-    boomGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-    
-    boomOsc.connect(boomGain);
-    boomGain.connect(ctx.destination);
-    boomOsc.start();
-    boomOsc.stop(now + 1.2);
 
-    const bufferSize = ctx.sampleRate * 1.5;
+    const bufferSize = ctx.sampleRate * 2.0;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -249,70 +232,41 @@ const playRevealBurstSound = (tribe: Tribe) => {
         osc.frequency.setValueAtTime(freq, now);
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(200, now);
-        filter.Q.setValueAtTime(4, now);
+        filter.frequency.setValueAtTime(450, now);
 
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.exponentialRampToValueAtTime(0.12, now + 0.1);
+        gain.gain.setValueAtTime(0.12, now + idx * 0.04);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
 
         osc.connect(filter);
         filter.connect(gain);
         gain.connect(ctx.destination);
-        osc.start();
+        osc.start(now + idx * 0.04);
         osc.stop(now + 2.6);
       });
     } 
     else if (tribe === 'wind') {
-      const windFilter = ctx.createBiquadFilter();
-      windFilter.type = 'bandpass';
-      windFilter.Q.setValueAtTime(15, now);
-      windFilter.frequency.setValueAtTime(800, now);
-      windFilter.frequency.exponentialRampToValueAtTime(2200, now + 1.2);
-
-      const windNoiseGain = ctx.createGain();
-      windNoiseGain.gain.setValueAtTime(0.12, now);
-      windNoiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
-
-      const windNoise = ctx.createBufferSource();
-      windNoise.buffer = buffer;
-      windNoise.connect(windFilter);
-      windFilter.connect(windNoiseGain);
-      windNoiseGain.connect(ctx.destination);
-      windNoise.start();
-      windNoise.stop(now + 1.8);
-
-      const windFreqs = [659.25, 739.99, 830.61, 987.77, 1109.73];
-      windFreqs.forEach((freq, idx) => {
-        const delay = idx * 0.05;
+      const gusts = [440, 554.37, 659.25, 880, 1108.73];
+      gusts.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + delay);
         
-        const tremolo = ctx.createOscillator();
-        const tremoloGain = ctx.createGain();
-        tremolo.frequency.setValueAtTime(8, now);
-        tremoloGain.gain.setValueAtTime(0.02, now);
-        tremolo.connect(tremoloGain);
-        tremoloGain.connect(gain.gain);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * 0.8, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.4, now + 1.5);
 
-        gain.gain.setValueAtTime(0.001, now + delay);
-        gain.gain.exponentialRampToValueAtTime(0.05, now + delay + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 1.6);
+        gain.gain.setValueAtTime(0.05, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
 
         osc.connect(gain);
         gain.connect(ctx.destination);
-        tremolo.start();
-        osc.start(now + delay);
-        tremolo.stop(now + delay + 1.8);
-        osc.stop(now + delay + 1.8);
+        osc.start(now + idx * 0.06);
+        osc.stop(now + 1.9);
       });
     }
 
     setTimeout(() => ctx.close(), 3000);
   } catch (e) {
-    console.error("Web Audio burst sound failed", e);
+    console.error("Audio burst failed", e);
   }
 };
 
@@ -425,6 +379,12 @@ const getTribeDetails = (tribeName: Tribe | null) => {
 }
 
 export default function RevealPage() {
+  // Kiosk step: 'input' (enter seeker name & phone) -> 'scan' (thumb scanner) -> 'revealed'
+  const [kioskStep, setKioskStep] = useState<'input' | 'scan' | 'revealed'>('input')
+  const [inputName, setInputName] = useState('')
+  const [inputMobile, setInputMobile] = useState('')
+  const [validationError, setValidationError] = useState('')
+
   const [scanState, setScanState] = useState<'idle' | 'scanning' | 'done' | 'error'>('idle')
   const [tribe, setTribe] = useState<Tribe | null>(null)
   const [userData, setUserData] = useState<{name: string, number: string} | null>(null)
@@ -435,6 +395,7 @@ export default function RevealPage() {
   const details = getTribeDetails(tribe)
   
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const inputCardRef = useRef<HTMLDivElement>(null)
   const scannerContainerRef = useRef<HTMLDivElement>(null)
   const revealContainerRef = useRef<HTMLDivElement>(null)
   const bgOverlayRef = useRef<HTMLDivElement>(null)
@@ -461,12 +422,11 @@ export default function RevealPage() {
     })
 
     const timer = setTimeout(() => {
-      const targets = [titleRef.current, scannerContainerRef.current].filter(Boolean)
-      if (targets.length > 0) {
+      if (inputCardRef.current) {
         gsap.fromTo(
-          targets,
-          { opacity: 0, scale: 0.92 },
-          { opacity: 1, scale: 1, duration: 1.5, stagger: 0.2, ease: 'power2.out', overwrite: 'auto' }
+          inputCardRef.current,
+          { opacity: 0, scale: 0.92, y: 20 },
+          { opacity: 1, scale: 1, y: 0, duration: 1.2, ease: 'power2.out', overwrite: 'auto' }
         )
       }
     }, 100)
@@ -496,6 +456,74 @@ export default function RevealPage() {
     }
   }, [mounted])
 
+  // Shared Animation: Proceed from Input Card to Thumb Scanner
+  const handleProceedToScan = (e: React.FormEvent) => {
+    e.preventDefault()
+    setValidationError('')
+
+    const trimmedName = inputName.trim()
+    const trimmedMobile = inputMobile.trim().replace(/\D/g, '')
+
+    if (!trimmedName) {
+      setValidationError('Please enter your seeker name.')
+      return
+    }
+
+    if (trimmedMobile.length < 7) {
+      setValidationError('Please enter a valid phone number (at least 7 digits).')
+      return
+    }
+
+    setUserData({ name: trimmedName, number: trimmedMobile })
+
+    // Execute morphing shared element transition
+    if (inputCardRef.current && scannerContainerRef.current) {
+      gsap.to(inputCardRef.current, {
+        opacity: 0,
+        scale: 0.85,
+        y: -25,
+        duration: 0.45,
+        ease: 'power2.in',
+        onComplete: () => {
+          setKioskStep('scan')
+          setScanState('idle')
+          gsap.fromTo(
+            scannerContainerRef.current,
+            { opacity: 0, scale: 0.82, y: 30 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(1.4)' }
+          )
+        }
+      })
+    } else {
+      setKioskStep('scan')
+      setScanState('idle')
+    }
+  }
+
+  // Smooth back transition: Return to Input Step
+  const handleBackToInput = () => {
+    if (scannerContainerRef.current && inputCardRef.current) {
+      gsap.to(scannerContainerRef.current, {
+        opacity: 0,
+        scale: 0.85,
+        y: 20,
+        duration: 0.4,
+        ease: 'power2.in',
+        onComplete: () => {
+          setKioskStep('input')
+          gsap.fromTo(
+            inputCardRef.current,
+            { opacity: 0, scale: 0.88, y: -20 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+          )
+        }
+      })
+    } else {
+      setKioskStep('input')
+    }
+  }
+
+  // Unblur and reveal card once scan completes
   useEffect(() => {
     if (scanState !== 'done' || !imageLoaded) return
 
@@ -550,62 +578,38 @@ export default function RevealPage() {
         }, 0)
       }
 
-      if (scanner) {
-        tl.to(scanner, {
-          opacity: 0,
-          scale: 0.9,
-          duration: 0.5,
-          ease: 'power2.out',
-          onComplete: () => {
-            scanner.style.display = 'none'
-          }
-        }, 0)
-      }
+      tl.to(plaque, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: 'back.out(1.5)'
+      }, 0.2)
 
       tl.to(front, {
         opacity: 1,
-        duration: 0.5,
-        ease: 'power1.out'
-      }, 0.1)
+        filter: 'blur(0px) drop-shadow(0 15px 35px rgba(0,0,0,0.95))',
+        duration: 1.4,
+        ease: 'power2.out'
+      }, 0.4)
 
-      const filterVal = { blur: 25, glow: 0 }
-      tl.to(filterVal, {
-        blur: 0,
-        glow: 8,
-        duration: 4.2,
-        ease: 'power1.inOut',
-        onUpdate: () => {
-          if (front) {
-            front.style.filter = `blur(${filterVal.blur}px) drop-shadow(0 0 ${filterVal.glow}px ${details.color || '#d1a058'}bb)`
-          }
-        }
-      }, 0.1)
-
-      tl.to(plaque, {
+      tl.to(wrapper, {
         scale: 1,
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'back.out(1.5)'
-      }, 1.2)
+        duration: 1.2,
+        ease: 'power2.out'
+      }, 0.4)
 
       tl.to(description, {
         opacity: 1,
         y: 0,
         duration: 0.8,
         ease: 'power2.out'
-      }, 1.2)
+      }, 0.8)
     }
-  }, [scanState, imageLoaded, details.color])
+  }, [scanState, imageLoaded])
 
   const handleScanStart = () => {
     setScanState('scanning')
-    gsap.to(titleRef.current, {
-      opacity: 0.3,
-      scale: 0.96,
-      duration: 0.8
-    })
-
     lastVibrateRef.current = Date.now()
 
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -615,9 +619,15 @@ export default function RevealPage() {
     activeSynthRef.current = new MysticSynth()
     activeSynthRef.current.start()
 
+    // Call /api/zambaara/reveal with the entered seeker name and phone number
     if (!prefetchedDataRef.current && !fetchPromiseRef.current) {
       const fetchPromise = fetch('/api/zambaara/reveal', {
-        method: 'POST'
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userData?.name || inputName,
+          mobile: userData?.number || inputMobile
+        })
       })
         .then(res => res.json())
         .then(data => {
@@ -658,11 +668,6 @@ export default function RevealPage() {
 
   const handleScanCancel = () => {
     setScanState('idle')
-    gsap.to(titleRef.current, {
-      opacity: 1,
-      scale: 1,
-      duration: 0.8
-    })
 
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(0)
@@ -689,12 +694,19 @@ export default function RevealPage() {
       if (!data && fetchPromiseRef.current) {
         data = await fetchPromiseRef.current
       } else if (!data) {
-        const res = await fetch('/api/zambaara/reveal', { method: 'POST' })
+        const res = await fetch('/api/zambaara/reveal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: userData?.name || inputName,
+            mobile: userData?.number || inputMobile
+          })
+        })
         data = await res.json()
       }
 
       if (!data || !data.success) {
-        throw new Error(data?.error || 'No pending seekers waiting in the queue.')
+        throw new Error(data?.error || 'Unable to summon tribe. Please retry.')
       }
 
       setTribe(data.tribe)
@@ -702,6 +714,7 @@ export default function RevealPage() {
       
       playRevealingSound()
       setScanState('done')
+      setKioskStep('revealed')
 
       setTimeout(() => {
         playRevealBurstSound(data.tribe)
@@ -720,42 +733,33 @@ export default function RevealPage() {
       setScanState('error')
       prefetchedDataRef.current = null
       fetchPromiseRef.current = null
-      gsap.to(titleRef.current, { opacity: 1, scale: 1, duration: 0.8 })
     }
   }
 
+  // Reset Kiosk for next seeker
   const resetToIdle = () => {
     if (cardFrontRef.current) gsap.killTweensOf(cardFrontRef.current)
     if (cardWrapperRef.current) gsap.killTweensOf(cardWrapperRef.current)
     if (plaqueRef.current) gsap.killTweensOf(plaqueRef.current)
     if (descriptionRef.current) gsap.killTweensOf(descriptionRef.current)
-    if (scannerContainerRef.current) {
-      gsap.killTweensOf(scannerContainerRef.current)
-      scannerContainerRef.current.style.display = 'flex'
-    }
-    if (bgOverlayRef.current) {
-      gsap.killTweensOf(bgOverlayRef.current)
-      gsap.to(bgOverlayRef.current, {
-        backgroundColor: 'rgba(0, 0, 0, 0.60)',
-        duration: 0.6,
-        ease: 'power2.out'
-      })
-    }
 
     setScanState('idle')
     setTribe(null)
     setUserData(null)
+    setInputName('')
+    setInputMobile('')
+    setValidationError('')
     setImageLoaded(false)
+    setKioskStep('input')
     prefetchedDataRef.current = null
     fetchPromiseRef.current = null
     gsap.to(backgroundRef.current, { opacity: 0, duration: 0.8 })
     
     setTimeout(() => {
-      const targets = [titleRef.current, scannerContainerRef.current].filter(Boolean)
-      if (targets.length > 0) {
-        gsap.fromTo(targets, 
-          { opacity: 0, scale: 0.92 },
-          { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out', overwrite: 'auto' }
+      if (inputCardRef.current) {
+        gsap.fromTo(inputCardRef.current,
+          { opacity: 0, scale: 0.92, y: 20 },
+          { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'power2.out' }
         )
       }
     }, 50)
@@ -773,12 +777,15 @@ export default function RevealPage() {
           50% { transform: translateY(-10px) rotateY(4deg); }
           100% { transform: translateY(0px) rotateY(0deg); }
         }
+        .levitate-slow {
+          animation: levitate 4.5s ease-in-out infinite;
+        }
       `}} />
 
       <div 
         className="min-h-[100dvh] flex flex-col items-center justify-center relative overflow-hidden bg-cover bg-center"
         style={{ 
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)), url('/zambaara_bg.jpg')",
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('/zambaara_bg.jpg')",
           fontFamily: "'Montserrat', sans-serif" 
         }}
       >
@@ -793,7 +800,7 @@ export default function RevealPage() {
 
         {/* Floating Neon Fireflies */}
         <div ref={firefliesRef} className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
-          {mounted && Array.from({ length: 20 }).map((_, index) => {
+          {mounted && Array.from({ length: 22 }).map((_, index) => {
             const left = `${Math.random() * 100}%`
             const top = `${Math.random() * 100}%`
             const size = 3 + Math.random() * 6
@@ -822,75 +829,170 @@ export default function RevealPage() {
           })}
         </div>
 
-        <div className={`relative z-20 flex flex-col items-center justify-center w-full ${scanState === 'done' ? 'max-w-2xl' : 'max-w-md'} h-[100dvh] sm:h-auto mx-auto p-4 sm:py-8`}>
-          
-          {/* Header text container */}
-          <div className="h-28 flex flex-col items-center justify-center w-full mb-8">
-            {scanState === 'idle' && (
-              <h1 ref={titleRef} className="text-3xl md:text-5xl text-center font-black tracking-[0.2em] text-[#d1a058] uppercase" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 2px 15px rgba(0,0,0,0.9)' }}>
-                Tribe Summoning
-              </h1>
-            )}
-            {scanState === 'scanning' && (
-              <h1 ref={titleRef} className="text-2xl md:text-4xl text-center font-black tracking-[0.3em] text-[#22d3ee] uppercase" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 0 25px rgba(34,211,238,0.6)' }}>
-                Summoning...
-              </h1>
-            )}
-            {scanState === 'error' && (
-              <div className="text-center">
-                <h1 className="text-lg md:text-xl font-bold tracking-[0.15em] text-red-500 mb-4 uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
-                  {errorMessage}
-                </h1>
-                <button 
-                  onClick={() => setScanState('idle')}
-                  className="bg-black/80 border border-red-500 text-red-500 px-6 py-2.5 tracking-widest text-xs hover:bg-red-500/10 transition-colors uppercase font-bold rounded-lg"
-                >
-                  Back
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Top Floating Navigation */}
+        <div className="absolute top-6 left-6 z-30">
+          <Link 
+            href="/tournaments/zambaara" 
+            className="text-white/60 hover:text-[#d1a058] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors bg-black/40 px-3.5 py-2 rounded-full border border-white/10 backdrop-blur"
+          >
+            <span>←</span>
+            <span>Tournament Arena</span>
+          </Link>
+        </div>
 
-          {/* Scanner */}
+        <div className={`relative z-20 flex flex-col items-center justify-center w-full ${kioskStep === 'revealed' ? 'max-w-2xl' : 'max-w-md'} h-[100dvh] sm:h-auto mx-auto p-4 sm:py-8`}>
+          
+          {/* STEP 1: Seeker Identity Input Form Card */}
+          {kioskStep === 'input' && (
+            <div 
+              ref={inputCardRef}
+              className="w-full bg-[#0d0f14]/90 border border-[#d1a058]/40 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-md relative"
+              style={{
+                boxShadow: '0 0 25px rgba(209,160,88,0.15), 0 20px 50px rgba(0,0,0,0.85)'
+              }}
+            >
+              <div className="text-center mb-6">
+                <span className="inline-block px-3 py-1 bg-[#d1a058]/10 border border-[#d1a058]/30 text-[#d1a058] rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
+                  Elemental Tournament Kiosk
+                </span>
+                <h1 className="text-2xl sm:text-3xl font-black uppercase text-[#d1a058] tracking-widest" style={{ fontFamily: "'Cinzel', serif" }}>
+                  Seeker Awakening
+                </h1>
+                <p className="text-white/60 text-xs sm:text-sm mt-1.5 font-sans">
+                  Enter your details to summon the relic and reveal your tribe.
+                </p>
+              </div>
+
+              <form onSubmit={handleProceedToScan} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                    Seeker Name
+                  </label>
+                  <input
+                    type="text"
+                    value={inputName}
+                    onChange={(e) => setInputName(e.target.value)}
+                    placeholder="Enter your name"
+                    autoFocus
+                    className="w-full bg-black/70 border border-[#d1a058]/30 rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#d1a058] focus:ring-1 focus:ring-[#d1a058] transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                    Phone / Mobile Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={inputMobile}
+                    onChange={(e) => setInputMobile(e.target.value)}
+                    placeholder="10-digit mobile number"
+                    className="w-full bg-black/70 border border-[#d1a058]/30 rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#d1a058] focus:ring-1 focus:ring-[#d1a058] font-mono transition-all"
+                  />
+                </div>
+
+                {validationError && (
+                  <p className="text-red-400 text-xs font-semibold bg-red-500/10 border border-red-500/20 px-3 py-2 rounded">
+                    ⚠️ {validationError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 mt-2 bg-gradient-to-r from-[#e7b875] via-[#d1a058] to-[#b3833d] hover:from-[#f5c889] hover:to-[#c6934a] text-black font-black uppercase tracking-widest text-xs rounded-lg shadow-[0_4px_20px_rgba(209,160,88,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  style={{ fontFamily: "'Cinzel', serif" }}
+                >
+                  Awaken Totem & Scan Thumb →
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* STEP 2: Thumb Scanner (Shared animation morph) */}
           <div 
             ref={scannerContainerRef} 
-            className={`flex flex-col items-center transition-all duration-700 ${
-              scanState === 'done' 
-                ? 'opacity-0 scale-90 pointer-events-none absolute' 
-                : 'opacity-100 scale-100 relative'
+            className={`flex flex-col items-center w-full transition-all duration-700 ${
+              kioskStep === 'scan' ? 'block' : 'hidden'
             }`}
           >
+            {/* Header text container */}
+            <div className="flex flex-col items-center justify-center w-full mb-6 text-center">
+              {scanState === 'idle' && (
+                <>
+                  <span className="text-[#d1a058] text-xs font-bold uppercase tracking-widest mb-1">
+                    Seeker: {userData?.name} ({userData?.number})
+                  </span>
+                  <h1 ref={titleRef} className="text-2xl md:text-4xl text-center font-black tracking-[0.2em] text-[#d1a058] uppercase" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 2px 15px rgba(0,0,0,0.9)' }}>
+                    Touch & Hold Totem
+                  </h1>
+                  <p className="text-white/50 text-xs mt-1">
+                    Hold your thumb firmly to initiate elemental scan
+                  </p>
+                </>
+              )}
+              {scanState === 'scanning' && (
+                <h1 ref={titleRef} className="text-2xl md:text-4xl text-center font-black tracking-[0.3em] text-[#22d3ee] uppercase" style={{ fontFamily: "'Cinzel', serif", textShadow: '0 0 25px rgba(34,211,238,0.6)' }}>
+                  Summoning Tribe...
+                </h1>
+              )}
+              {scanState === 'error' && (
+                <div className="text-center">
+                  <h1 className="text-lg md:text-xl font-bold tracking-[0.15em] text-red-500 mb-4 uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
+                    {errorMessage}
+                  </h1>
+                  <button 
+                    onClick={() => setScanState('idle')}
+                    className="bg-black/80 border border-red-500 text-red-500 px-6 py-2.5 tracking-widest text-xs hover:bg-red-500/10 transition-colors uppercase font-bold rounded-lg"
+                  >
+                    Retry Scan
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Scanner Component */}
             <ThumbScanner 
               onScanStart={handleScanStart} 
               onScanComplete={handleScanComplete} 
               onScanCancel={handleScanCancel} 
               onScanProgress={handleScanProgress}
             />
+
             <div 
-              className="mt-10 px-6 py-2.5 bg-black/80 rounded-full flex flex-col items-center gap-1.5 pointer-events-none select-none"
+              className="mt-8 px-6 py-2 bg-black/80 rounded-full flex flex-col items-center gap-1 pointer-events-none select-none"
               style={{
                 border: '1.5px solid rgba(209, 160, 88, 0.45)',
                 boxShadow: '0 0 15px rgba(209, 160, 88, 0.25), inset 0 0 5px rgba(209, 160, 88, 0.15)'
               }}
             >
-              <span className="text-[#d1a058] text-[13px] font-black tracking-[0.3em] uppercase drop-shadow-[0_0_8px_rgba(209,160,88,0.7)] animate-pulse">
-                SCAN THUMB
+              <span className="text-[#d1a058] text-[12px] font-black tracking-[0.3em] uppercase drop-shadow-[0_0_8px_rgba(209,160,88,0.7)] animate-pulse">
+                HOLD THUMB DOWN
               </span>
-              <span className="text-white/50 text-[10px] tracking-[0.2em] uppercase font-bold">
-                TO SUMMON TRIBE
+              <span className="text-white/50 text-[9px] tracking-[0.2em] uppercase font-bold">
+                100% TO REVEAL
               </span>
             </div>
+
+            {/* Edit Seeker Details Back Link */}
+            {scanState !== 'scanning' && (
+              <button
+                onClick={handleBackToInput}
+                className="mt-5 text-white/40 hover:text-[#d1a058] text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                ✏️ Edit Name or Phone
+              </button>
+            )}
           </div>
 
-          {/* Card Reveal */}
+          {/* STEP 3: Elemental Tribe Card Reveal */}
           <div 
             ref={revealContainerRef} 
             className={`flex flex-col justify-center items-center w-full pt-4 transition-all duration-1000 ${
-              scanState === 'done' 
+              kioskStep === 'revealed' && scanState === 'done' 
                 ? 'opacity-100 scale-100 pointer-events-auto relative' 
                 : 'opacity-0 scale-95 pointer-events-none absolute'
             }`}
-            style={{ minHeight: scanState === 'done' ? '85vh' : '0px' }}
+            style={{ minHeight: kioskStep === 'revealed' ? '85vh' : '0px' }}
           >
             {/* Name Plaque */}
             <div 
@@ -947,16 +1049,25 @@ export default function RevealPage() {
               />
             </div>
 
-            {/* Reset Kiosk Button */}
-            <button 
-              onClick={resetToIdle}
-              className="group relative px-10 py-3.5 overflow-hidden rounded-full border border-white/20 bg-black/85 hover:border-white/50 transition-colors shadow-2xl z-20"
-            >
-              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-              <span className="relative font-bold tracking-[0.25em] uppercase text-[11px] transition-colors" style={{ color: details.color }}>
-                Next seeker
-              </span>
-            </button>
+            {/* Navigation buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 z-20">
+              <button 
+                onClick={resetToIdle}
+                className="group relative px-8 py-3.5 overflow-hidden rounded-full border border-white/20 bg-black/85 hover:border-white/50 transition-colors shadow-2xl cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                <span className="relative font-bold tracking-[0.25em] uppercase text-[11px] transition-colors" style={{ color: details.color }}>
+                  Next Seeker Registration →
+                </span>
+              </button>
+
+              <Link
+                href="/tournaments/zambaara"
+                className="px-6 py-3.5 rounded-full border border-[#d1a058]/40 bg-[#d1a058]/10 text-[#d1a058] hover:bg-[#d1a058]/20 transition-all font-bold tracking-[0.2em] uppercase text-[10px] text-center"
+              >
+                View Tournament Arena
+              </Link>
+            </div>
           </div>
         </div>
       </div>

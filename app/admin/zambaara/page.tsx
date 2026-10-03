@@ -486,8 +486,8 @@ export default function AdminZambaaraPage() {
       toast.error('Please fill all fields.')
       return
     }
-    if (newTourneySize % 16 !== 0 || newTourneySize <= 0) {
-      toast.error('Tournament size must be a multiple of 16.')
+    if (newTourneySize <= 0) {
+      toast.error('Please enter a valid number of applicants (at least 1).')
       return
     }
     setTourneyLoading(true)
@@ -526,8 +526,8 @@ export default function AdminZambaaraPage() {
       toast.error('Please fill all fields.')
       return
     }
-    if (editTourneySize % 16 !== 0 || editTourneySize <= 0) {
-      toast.error('Tournament size must be a multiple of 16.')
+    if (editTourneySize <= 0) {
+      toast.error('Please enter a valid number of applicants (at least 1).')
       return
     }
 
@@ -540,7 +540,7 @@ export default function AdminZambaaraPage() {
       }
     })
     const maxBookedInAnyTribe = Math.max(tribeCounts.lava, tribeCounts.rain, tribeCounts.mountain, tribeCounts.wind)
-    const newTribeCapacity = editTourneySize / 4
+    const newTribeCapacity = Math.max(1, Math.ceil(editTourneySize / 4))
 
     if (maxBookedInAnyTribe > newTribeCapacity) {
       toast.error(`Cannot shrink size to ${editTourneySize}. A tribe has ${maxBookedInAnyTribe} bookings. Please release seats first.`)
@@ -726,7 +726,7 @@ export default function AdminZambaaraPage() {
 
   // Fetch active tournament details
   const activeTourney = tournaments.find(t => t.id === selectedTournamentId)
-  const capacity = activeTourney ? activeTourney.size / 4 : 4
+  const capacity = activeTourney ? Math.max(1, Math.ceil(activeTourney.size / 4)) : 4
 
   // Filter players list for the booking selector
   const assignablePlayers = users.filter(user => {
@@ -1038,16 +1038,22 @@ export default function AdminZambaaraPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-white/70 mb-1">Size (Multiple of 16)</label>
+                <label className="block text-xs font-semibold uppercase text-white/70 mb-1">
+                  Number of Applicants (Custom Capacity)
+                </label>
                 <input
                   type="number"
                   value={newTourneySize}
                   onChange={(e) => setNewTourneySize(Number(e.target.value))}
-                  min={16}
-                  step={16}
+                  min={1}
+                  step={1}
+                  placeholder="e.g. 16, 20, 24, 32..."
                   className="w-full bg-black/60 border border-white/20 rounded px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058]"
                   required
                 />
+                <p className="text-[11px] text-white/40 mt-1">
+                  Elemental seats are distributed evenly across the 4 tribes ({Math.max(1, Math.ceil(newTourneySize / 4))} seats per tribe).
+                </p>
               </div>
 
               <div>
@@ -1362,16 +1368,21 @@ export default function AdminZambaaraPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-white/70 mb-1">Size (Multiple of 16)</label>
+                <label className="block text-xs font-semibold uppercase text-white/70 mb-1">
+                  Number of Applicants (Custom Capacity)
+                </label>
                 <input
                   type="number"
                   value={editTourneySize}
                   onChange={(e) => setEditTourneySize(Number(e.target.value))}
-                  min={16}
-                  step={16}
+                  min={1}
+                  step={1}
                   className="w-full bg-black/60 border border-white/20 rounded px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#d1a058]"
                   required
                 />
+                <p className="text-[11px] text-white/40 mt-1">
+                  Tribe capacity: {Math.max(1, Math.ceil(editTourneySize / 4))} seats per tribe.
+                </p>
               </div>
 
               <div>

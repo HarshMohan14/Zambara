@@ -292,7 +292,7 @@ export default function ZambaaraTournamentPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {TRIBES.map((tr) => {
                     const tribeRoster = bookings.filter(b => b.tribe === tr.id)
-                    const capacity = activeTourney.size / 4
+                    const capacity = Math.max(1, Math.ceil(activeTourney.size / 4))
                     
                     return (
                       <div key={tr.id} className="bg-black/55 border border-white/5 rounded-2xl p-6 shadow-lg">
