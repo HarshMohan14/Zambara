@@ -14,6 +14,9 @@ export interface RevealPlayer {
 
 export interface TribeRevealMobileProps {
   eventName?: string
+  tournaments?: Array<{ id: string; name: string }>
+  selectedTournamentId?: string
+  onSelectTournament?: (id: string) => void
   players: RevealPlayer[]
   loading?: boolean
   error?: string | null
@@ -96,6 +99,9 @@ const maskPhone = (m: string) => {
 
 export default function TribeRevealMobile({
   eventName = 'ZAMBAARA TOURNAMENT',
+  tournaments,
+  selectedTournamentId,
+  onSelectTournament,
   players,
   loading = false,
   error = null,
@@ -261,6 +267,13 @@ export default function TribeRevealMobile({
         const p = Math.min(1, (ts - holdStartRef.current) / 1600)
         setProgress(p)
         if (onRevealSound) onRevealSound.update(p * 100)
+
+        // Subtle milestone haptics during charging
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          if (p >= 0.33 && p < 0.36 && Math.random() < 0.15) navigator.vibrate(10)
+          if (p >= 0.66 && p < 0.69 && Math.random() < 0.15) navigator.vibrate(15)
+        }
+
         if (p >= 1) {
           if (typeof navigator !== 'undefined' && navigator.vibrate) {
             navigator.vibrate(40)
@@ -429,6 +442,7 @@ export default function TribeRevealMobile({
 
         const f = isC ? 180 * (1 - flip) : 180
         return {
+          isC,
           src: c.src,
           alt: `${c.n} tribe card`,
           x: x.toFixed(1),
@@ -468,6 +482,27 @@ export default function TribeRevealMobile({
   const waveU = cl((time - 4.15) / 1.0)
   const waveSize = 160 + 520 * waveU
   const waveOpacity = isRev && time > 4.15 && !isAlreadyRevealed ? (0.9 * (1 - waveU)).toFixed(3) : '0'
+
+  // Gamified Subtle Effects:
+  // 1. Hold Button micro-jitter / rumble while charging
+  const holdJitterX = phase === 'holding' ? (Math.sin(progress * 65) * progress * 2.2).toFixed(1) : '0'
+  const holdJitterY = phase === 'holding' ? (Math.cos(progress * 80) * progress * 2.2).toFixed(1) : '0'
+
+  // 2. Subtle camera kick on reveal burst at t = 4.18s - 4.40s
+  const screenShake =
+    isRev && !isAlreadyRevealed && time >= 4.18 && time <= 4.40
+      ? (Math.sin((time - 4.18) * 55) * (1 - (time - 4.18) / 0.22) * 2.8).toFixed(1)
+      : '0'
+
+  // 3. Subtle floating elemental sparkle stars
+  const sparkleStars = useMemo(() => [
+    { x: -75, y: -45, delay: 0.08, sz: 12 },
+    { x: 80, y: -50, delay: 0.22, sz: 14 },
+    { x: -95, y: 35, delay: 0.38, sz: 11 },
+    { x: 90, y: 40, delay: 0.15, sz: 13 },
+    { x: -40, y: -90, delay: 0.32, sz: 12 },
+    { x: 50, y: -85, delay: 0.28, sz: 10 }
+  ], [])
 
   const flashOpacity =
     isRev && !isAlreadyRevealed
@@ -667,22 +702,48 @@ export default function TribeRevealMobile({
                 ← ARENA
               </button>
             )}
-            <span
-              style={{
-                maxWidth: '44vw',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                padding: '6px 12px',
-                borderRadius: '999px',
-                border: '1px solid rgba(201,160,99,.4)',
-                fontSize: '10px',
-                letterSpacing: '.16em',
-                color: '#C9A063'
-              }}
-            >
-              {eventName}
-            </span>
+            {tournaments && tournaments.length > 1 ? (
+              <select
+                value={selectedTournamentId}
+                onChange={e => onSelectTournament?.(e.target.value)}
+                aria-label="Select custom tournament"
+                style={{
+                  maxWidth: '46vw',
+                  padding: '5px 10px',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(201,160,99,.5)',
+                  background: 'rgba(10,8,6,.88)',
+                  color: '#C9A063',
+                  fontSize: '10px',
+                  letterSpacing: '.14em',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                {tournaments.map(t => (
+                  <option key={t.id} value={t.id} style={{ background: '#0B0907', color: '#E8C989' }}>
+                    {t.name.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span
+                style={{
+                  maxWidth: '44vw',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  padding: '6px 12px',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(201,160,99,.4)',
+                  fontSize: '10px',
+                  letterSpacing: '.16em',
+                  color: '#C9A063'
+                }}
+              >
+                {eventName}
+              </span>
+            )}
           </div>
         </header>
 
@@ -899,8 +960,37 @@ export default function TribeRevealMobile({
                 </div>
               )}
 
-              {/* No results card */}
-              {!loading && !error && filteredRows.length === 0 && (
+              {/* No players registered in this custom tournament yet */}
+              {!loading && !error && players.length === 0 && (
+                <div
+                  style={{
+                    marginTop: '26px',
+                    padding: '28px 20px',
+                    borderRadius: '16px',
+                    border: '1px dashed rgba(201,160,99,.4)',
+                    textAlign: 'center',
+                    background: 'rgba(10,8,6,.75)'
+                  }}
+                >
+                  <div style={{ fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: '20px', color: '#E8C989' }}>
+                    No Players Registered
+                  </div>
+                  <p style={{ margin: '10px 0 0', fontSize: '14px', lineHeight: 1.55, color: '#A89A86' }}>
+                    There are no players registered in <strong style={{ color: '#F3D594' }}>{eventName}</strong> yet.
+                  </p>
+                  <p style={{ margin: '8px 0 0', fontSize: '13px', color: '#8F8372' }}>
+                    Register players in the Admin Panel to reveal their tribes.
+                  </p>
+                  {onBackToArena && (
+                    <button type="button" className="cta" style={{ marginTop: '16px' }} onClick={onBackToArena}>
+                      ← TOURNAMENT ARENA
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* No results search query card */}
+              {!loading && !error && players.length > 0 && filteredRows.length === 0 && (
                 <div
                   style={{
                     marginTop: '26px',
@@ -918,7 +1008,7 @@ export default function TribeRevealMobile({
                     Nothing matches “{q}”. Check the spelling or search by the last 4 digits of your mobile number.
                   </p>
                   <p style={{ margin: '10px 0 0', fontSize: '13px', color: '#8F8372' }}>
-                    Not registered yet? Ask at the registration desk.
+                    Only players registered in {eventName} are available to reveal.
                   </p>
                   <button type="button" className="cta" style={{ marginTop: '16px' }} onClick={() => handleQuery('')}>
                     CLEAR SEARCH
@@ -942,7 +1032,7 @@ export default function TribeRevealMobile({
               ‹ SEARCH
             </button>
 
-            {/* 390 x 844 Design Canvas */}
+            {/* 390 x 844 Design Canvas with subtle screen impact shake */}
             <div
               style={{
                 position: 'absolute',
@@ -950,7 +1040,7 @@ export default function TribeRevealMobile({
                 top: '50%',
                 width: '390px',
                 height: '844px',
-                transform: `translate(-50%, -50%) scale(${scaleCanvas})`,
+                transform: `translate(calc(-50% + ${screenShake}px), -50%) scale(${scaleCanvas})`,
                 transformOrigin: 'center center'
               }}
             >
@@ -1016,7 +1106,7 @@ export default function TribeRevealMobile({
                     </div>
                   </div>
 
-                  {/* 1.6s Hold Sigil Button */}
+                  {/* 1.6s Hold Sigil Button with subtle micro-rumble */}
                   <button
                     type="button"
                     className="hold"
@@ -1033,7 +1123,27 @@ export default function TribeRevealMobile({
                     }}
                     onKeyUp={cancelHold}
                     onContextMenu={e => e.preventDefault()}
+                    style={{
+                      transform: `translate(${holdJitterX}px, ${holdJitterY}px)`
+                    }}
                   >
+                    {/* Channeling Pulse Aura */}
+                    {phase === 'holding' && (
+                      <div
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          inset: '-16px',
+                          borderRadius: '50%',
+                          border: '1.5px solid rgba(232, 201, 137, 0.55)',
+                          boxShadow: '0 0 25px rgba(232, 190, 110, 0.45)',
+                          transform: `scale(${1 + 0.12 * Math.sin(progress * Math.PI * 5)})`,
+                          opacity: 0.6 + 0.4 * Math.sin(progress * Math.PI * 5),
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    )}
+
                     <div
                       aria-hidden="true"
                       style={{
@@ -1054,9 +1164,32 @@ export default function TribeRevealMobile({
                         filter: `drop-shadow(0 0 ${(10 + 30 * progress).toFixed(0)}px rgba(232,190,110,.9))`
                       }}
                     />
+
+                    {/* Gamified Channeling Percentage Display */}
+                    {phase === 'holding' && (
+                      <div
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          bottom: '18px',
+                          left: 0,
+                          right: 0,
+                          textAlign: 'center',
+                          fontFamily: "'Cinzel', serif",
+                          fontWeight: 700,
+                          fontSize: '13px',
+                          letterSpacing: '.16em',
+                          color: '#F3D594',
+                          textShadow: '0 0 10px rgba(232,190,110,0.95)',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        {Math.floor(progress * 100)}%
+                      </div>
+                    )}
                   </button>
 
-                  {/* Pulse Pill */}
+                  {/* Pulse Pill with dynamic percentage */}
                   <div
                     className="pill"
                     style={{
@@ -1073,7 +1206,7 @@ export default function TribeRevealMobile({
                     }}
                   >
                     <div style={{ fontWeight: 600, fontSize: '13px', letterSpacing: '.3em', color: '#E8C989' }}>
-                      {phase === 'holding' ? 'CHANNELLING…' : 'HOLD TO REVEAL'}
+                      {phase === 'holding' ? `CHANNELLING ${Math.floor(progress * 100)}%` : 'HOLD TO REVEAL'}
                     </div>
                     <div style={{ marginTop: '3px', fontSize: '10px', letterSpacing: '.26em', color: '#A89A86' }}>
                       YOUR TRIBE
@@ -1122,14 +1255,35 @@ export default function TribeRevealMobile({
                   }}
                 >
                   <div className="flip" style={{ transform: `rotateY(${c.f}deg)` }}>
-                    <img
-                      className="fr"
-                      src={c.src}
-                      alt={c.alt}
-                      style={{
-                        filter: `drop-shadow(0 30px 40px rgba(0,0,0,.7)) drop-shadow(0 0 ${c.g}px ${c.gc})`
-                      }}
-                    />
+                    <div className="fr" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+                      <img
+                        src={c.src}
+                        alt={c.alt}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '14px',
+                          filter: `drop-shadow(0 30px 40px rgba(0,0,0,.7)) drop-shadow(0 0 ${c.g}px ${c.gc})`
+                        }}
+                      />
+                      {/* Subtle Holographic Foil Gleam Sweep across front of revealed card */}
+                      {c.isC && time >= 3.9 && (
+                        <div
+                          aria-hidden="true"
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            borderRadius: '14px',
+                            pointerEvents: 'none',
+                            background: 'linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.48) 50%, rgba(243,213,148,0.35) 55%, transparent 70%)',
+                            backgroundSize: '220% 220%',
+                            backgroundPosition: `${L(180, -60, ss(3.9, 4.8))}% 0%`,
+                            opacity: Number((ss(3.9, 4.2) * (1 - ss(4.8, 5.3))).toFixed(3)),
+                            mixBlendMode: 'color-dodge'
+                          }}
+                        />
+                      )}
+                    </div>
                     <img className="bk" src="/tribe-reveal/cards/back.webp" alt="" />
                   </div>
                   {/* Gold Name Plaque Under Card */}
@@ -1162,6 +1316,65 @@ export default function TribeRevealMobile({
                   </div>
                 </div>
               ))}
+
+              {/* Gamified "✦ TRIBE UNLOCKED ✦" Badge */}
+              {isRev && time > 4.25 && (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: '68px',
+                    transform: `translateX(-50%) scale(${(0.75 + 0.25 * ss(4.25, 4.65)).toFixed(3)})`,
+                    opacity: Number(ss(4.25, 4.55).toFixed(3)),
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '6px 18px',
+                    borderRadius: '999px',
+                    border: `1px solid ${activeTribe.c}`,
+                    background: 'rgba(10,8,6,0.92)',
+                    boxShadow: `0 0 24px ${activeTribe.c}, inset 0 0 10px rgba(0,0,0,0.6)`,
+                    zIndex: 50,
+                    pointerEvents: 'none'
+                  }}
+                >
+                  <span style={{ color: activeTribe.fg, fontSize: '10px' }}>✦</span>
+                  <span style={{ fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: '11px', letterSpacing: '.24em', color: '#F3D594' }}>
+                    TRIBE UNLOCKED
+                  </span>
+                  <span style={{ color: activeTribe.fg, fontSize: '10px' }}>✦</span>
+                </div>
+              )}
+
+              {/* Subtle Floating Sparkle Stars */}
+              {isRev && time > 4.18 && !isAlreadyRevealed && sparkleStars.map((sp, idx) => {
+                const tRel = time - 4.18 - sp.delay
+                if (tRel < 0 || tRel > 1.8) return null
+                const u = tRel / 1.8
+                const driftY = -55 * u
+                const op = u < 0.2 ? u / 0.2 : (1 - u)
+                return (
+                  <div
+                    key={`spark-${idx}`}
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      left: `calc(195px + ${sp.x}px)`,
+                      top: `calc(250px + ${sp.y}px + ${driftY}px)`,
+                      fontSize: `${sp.sz}px`,
+                      color: activeTribe.fg,
+                      opacity: op,
+                      textShadow: `0 0 8px ${activeTribe.c}`,
+                      transform: `rotate(${u * 90}deg) scale(${1 - u * 0.3})`,
+                      pointerEvents: 'none',
+                      zIndex: 45
+                    }}
+                  >
+                    ✦
+                  </div>
+                )
+              })}
 
               {/* Particle Burst Dots */}
               {burst.map((b, idx) => (

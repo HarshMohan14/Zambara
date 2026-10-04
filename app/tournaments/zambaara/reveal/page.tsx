@@ -211,6 +211,23 @@ const playRevealBurstSound = (tribe: Tribe) => {
       })
     }
 
+    // Subtle gamified triumphant chime chord (C5 - E5 - G5 - C6)
+    const victoryChord = [523.25, 659.25, 783.99, 1046.50]
+    victoryChord.forEach((freq, idx) => {
+      const delay = idx * 0.05
+      const chimeOsc = ctx.createOscillator()
+      const chimeGain = ctx.createGain()
+      chimeOsc.type = 'sine'
+      chimeOsc.frequency.setValueAtTime(freq, now + delay)
+      chimeGain.gain.setValueAtTime(0.001, now + delay)
+      chimeGain.gain.exponentialRampToValueAtTime(0.06, now + delay + 0.02)
+      chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 1.2)
+      chimeOsc.connect(chimeGain)
+      chimeGain.connect(ctx.destination)
+      chimeOsc.start(now + delay)
+      chimeOsc.stop(now + delay + 1.25)
+    })
+
     setTimeout(() => {
       try {
         ctx.close()
@@ -226,7 +243,6 @@ export default function ZambaaraRevealPage() {
   const [tournaments, setTournaments] = useState<CustomTournament[]>([])
   const [selectedTournamentId, setSelectedTournamentId] = useState<string>('')
   const [customPlayers, setCustomPlayers] = useState<CustomPlayer[]>([])
-  const [generalUsers, setGeneralUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -243,19 +259,23 @@ export default function ZambaaraRevealPage() {
         setTournaments(docs)
         if (docs.length > 0) {
           setSelectedTournamentId(prev => (prev && docs.some(d => d.id === prev) ? prev : docs[0].id))
+        } else {
+          setLoading(false)
         }
       },
       err => {
         console.error('Error fetching custom tournaments:', err)
         setLoadError('Failed to connect to tournament records.')
+        setLoading(false)
       }
     )
     return () => unsubscribe()
   }, [])
 
-  // 2. Listen to custom tournament players for the active tournament
+  // 2. Listen STRICTLY to custom tournament players for the active custom tournament
   useEffect(() => {
     if (!selectedTournamentId) return
+    setLoading(true)
     const q = query(collection(db, CUSTOM_PLAYERS_COLLECTION), where('tournamentId', '==', selectedTournamentId))
     const unsubscribe = onSnapshot(
       q,
@@ -272,55 +292,16 @@ export default function ZambaaraRevealPage() {
     return () => unsubscribe()
   }, [selectedTournamentId])
 
-  // 3. Also listen to zambaara_users so general registrations are accessible as well
-  useEffect(() => {
-    const q = query(collection(db, 'zambaara_users'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(
-      q,
-      snap => {
-        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        setGeneralUsers(docs)
-        setLoading(false)
-      },
-      () => setLoading(false)
-    )
-    return () => unsubscribe()
-  }, [])
-
-  // Combine players into a unified RevealPlayer list
-  const combinedPlayers = useMemo<RevealPlayer[]>(() => {
-    const list: RevealPlayer[] = []
-    const seenMobiles = new Set<string>()
-
-    // Priority 1: Custom tournament players
-    customPlayers.forEach(cp => {
-      const cleanMobile = String(cp.mobile || '').replace(/\D/g, '')
-      if (cleanMobile) seenMobiles.add(cleanMobile)
-      list.push({
-        id: cp.id,
-        name: cp.name,
-        mobile: cp.mobile,
-        tribe: (cp.tribe as Tribe) || null,
-        revealedAt: cp.revealedAt || null
-      })
-    })
-
-    // Priority 2: General users not already in custom tournament
-    generalUsers.forEach(gu => {
-      const mob = String(gu.mobile || gu.number || '').replace(/\D/g, '')
-      if (!seenMobiles.has(mob) && gu.name) {
-        list.push({
-          id: gu.id,
-          name: gu.name,
-          mobile: gu.mobile || gu.number || '',
-          tribe: (gu.tribe as Tribe) || null,
-          revealedAt: gu.revealedAt || null
-        })
-      }
-    })
-
-    return list
-  }, [customPlayers, generalUsers])
+  // ONLY players registered in the selected custom tournament are included
+  const tournamentPlayers = useMemo<RevealPlayer[]>(() => {
+    return customPlayers.map(cp => ({
+      id: cp.id,
+      name: cp.name,
+      mobile: cp.mobile,
+      tribe: (cp.tribe as Tribe) || null,
+      revealedAt: cp.revealedAt || null
+    }))
+  }, [customPlayers])
 
   // Sound hooks for the 1.6s channelling hold & reveal burst
   const soundHooks = useMemo(() => {
@@ -344,18 +325,12 @@ export default function ZambaaraRevealPage() {
     }
   }, [])
 
-  // Reveal API invocation
+  // Reveal API invocation for custom tournament player
   const handleReveal = useCallback(async (player: RevealPlayer): Promise<{ tribe: Tribe }> => {
-    // Check if player is from custom tournament
-    const isCustom = customPlayers.some(cp => cp.id === player.id)
-    const payload = isCustom
-      ? { customPlayerId: player.id }
-      : { name: player.name, mobile: player.mobile }
-
     const res = await fetch('/api/zambaara/reveal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ customPlayerId: player.id })
     })
 
     const data = await res.json()
@@ -365,7 +340,7 @@ export default function ZambaaraRevealPage() {
 
     const assignedTribe = data.tribe as Tribe
     return { tribe: assignedTribe }
-  }, [customPlayers])
+  }, [])
 
   const activeTourney = tournaments.find(t => t.id === selectedTournamentId)
   const eventTitle = activeTourney ? activeTourney.name.toUpperCase() : 'ZAMBAARA TOURNAMENT'
@@ -373,7 +348,7 @@ export default function ZambaaraRevealPage() {
   return (
     <>
       <Head>
-        <title>Zambaara Tribe Reveal — Mobile Kiosk</title>
+        <title>Zambaara Tribe Reveal — Custom Tournament Kiosk</title>
         <link
           href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Saira:wght@300;400;500;600&display=swap"
           rel="stylesheet"
@@ -382,13 +357,16 @@ export default function ZambaaraRevealPage() {
 
       <TribeRevealMobile
         eventName={eventTitle}
-        players={combinedPlayers}
+        tournaments={tournaments.map(t => ({ id: t.id, name: t.name }))}
+        selectedTournamentId={selectedTournamentId}
+        onSelectTournament={setSelectedTournamentId}
+        players={tournamentPlayers}
         loading={loading}
         error={loadError}
         onRetry={() => {
           setLoading(true)
           setLoadError(null)
-          setTimeout(() => setLoading(false), 900)
+          setTimeout(() => setLoading(false), 800)
         }}
         query={searchQuery}
         onQueryChange={setSearchQuery}
