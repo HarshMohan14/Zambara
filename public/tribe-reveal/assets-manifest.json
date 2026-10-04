@@ -1,0 +1,98 @@
+[
+  {
+    "file": "assets/icons/mountain.png",
+    "use": "Mountain icon",
+    "size": "160x160",
+    "kb": 15
+  },
+  {
+    "file": "assets/cards/reveal/reveal-rain.webp",
+    "use": "Rain reveal card",
+    "size": "633x840",
+    "kb": 62
+  },
+  {
+    "file": "assets/bracelets/bracelet-wind.webp",
+    "use": "Wind bracelet",
+    "size": "544x344",
+    "kb": 30
+  },
+  {
+    "file": "assets/backgrounds/universe-bg.jpg",
+    "use": "Black universe background",
+    "size": "3200x1800",
+    "kb": 199
+  },
+  {
+    "file": "assets/cards/back.webp",
+    "use": "Card back (the 4 face-down cards that orbit)",
+    "size": "480x702",
+    "kb": 34
+  },
+  {
+    "file": "assets/icons/lava.png",
+    "use": "Lava icon (ring + revealed-player sigil)",
+    "size": "160x160",
+    "kb": 19
+  },
+  {
+    "file": "assets/bracelets/bracelet-lava.webp",
+    "use": "Lava bracelet (result screen)",
+    "size": "544x344",
+    "kb": 28
+  },
+  {
+    "file": "assets/cards/reveal/reveal-lava.webp",
+    "use": "Lava reveal card (front of the chosen card)",
+    "size": "635x840",
+    "kb": 70
+  },
+  {
+    "file": "assets/icons/rain.png",
+    "use": "Rain icon",
+    "size": "160x160",
+    "kb": 17
+  },
+  {
+    "file": "assets/bracelets/bracelet-rain.webp",
+    "use": "Rain bracelet",
+    "size": "544x344",
+    "kb": 28
+  },
+  {
+    "file": "assets/backgrounds/smoke.webp",
+    "use": "Smoke overlay (screen blend, 14%)",
+    "size": "1600x900",
+    "kb": 84
+  },
+  {
+    "file": "assets/cards/reveal/reveal-mountain.webp",
+    "use": "Mountain reveal card",
+    "size": "633x840",
+    "kb": 72
+  },
+  {
+    "file": "assets/bracelets/bracelet-mountain.webp",
+    "use": "Mountain bracelet",
+    "size": "544x344",
+    "kb": 24
+  },
+  {
+    "file": "assets/icons/wind.png",
+    "use": "Wind icon",
+    "size": "160x160",
+    "kb": 22
+  },
+  {
+    "file": "assets/cards/reveal/reveal-wind.webp",
+    "use": "Wind reveal card",
+    "size": "633x840",
+    "kb": 51
+  },
+  {
+    "file": "assets/brand/logo.png",
+    "use": "Zambaara logo mark (header + hold sigil)",
+    "size": "522x495",
+    "kb": 36
+  }
+]

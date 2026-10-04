@@ -146,21 +146,28 @@ export default function TournamentsPage() {
             </Link>
 
             {/* Zambaara card */}
-            <Link 
-              href="/tournaments/zambaara"
-              className="group rounded-2xl border-2 border-white/10 bg-black/45 p-8 transition-all duration-300 hover:border-[#ff4400] hover:bg-red-950/10 hover:shadow-[0_0_30px_rgba(255,68,0,0.2)] hover:scale-[1.03] flex flex-col justify-between min-h-[220px]"
-            >
+            <div className="group rounded-2xl border-2 border-white/10 bg-black/45 p-8 transition-all duration-300 hover:border-[#ff4400] hover:bg-red-950/10 hover:shadow-[0_0_30px_rgba(255,68,0,0.2)] hover:scale-[1.03] flex flex-col justify-between min-h-[220px]">
               <div>
                 <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">⚔</span>
                 <span className="text-[10px] tracking-[0.2em] font-black text-[#ff4400] uppercase block mb-1">ELEMENTAL ARENA</span>
                 <h3 className="text-2xl font-black uppercase text-white" style={{ fontFamily: "'TheWalkyrDemo', serif" }}>Zambaara Arena</h3>
-                <p className="text-sm text-white/50 mt-2">Double-verified tribe rosters, seating, and live brackets.</p>
+                <p className="text-sm text-white/50 mt-2">Custom table tournaments, tribe rosters, and live battles.</p>
               </div>
-              <div className="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ff4400] group-hover:translate-x-1 transition-transform">
-                <span>Enter Zambaara Arena</span>
-                <span>→</span>
+              <div className="mt-6 flex flex-col sm:flex-row gap-2">
+                <Link
+                  href="/tournaments/zambaara/live"
+                  className="flex-1 bg-gradient-to-r from-[#e7b875] to-[#b3833d] text-black font-black text-center py-2 px-3 rounded-lg text-xs uppercase tracking-wider hover:opacity-90 transition-opacity"
+                >
+                  🔴 Live Tables →
+                </Link>
+                <Link
+                  href="/tournaments/zambaara"
+                  className="flex-1 border border-white/20 hover:border-[#ff4400] text-center py-2 px-3 rounded-lg text-xs uppercase font-bold text-white/80 hover:text-white transition-colors"
+                >
+                  Arena Hub →
+                </Link>
               </div>
-            </Link>
+            </div>
           </div>
         </div>
       </div>

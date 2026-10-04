@@ -210,9 +210,23 @@ export default function ZambaaraTournamentPage() {
             >
               Zambaara Arena
             </h1>
-            <p className="text-white/60 max-w-lg mx-auto text-sm md:text-base font-sans">
+            <p className="text-white/60 max-w-lg mx-auto text-sm md:text-base font-sans mb-4">
               Witness the clash of elements. Check live seat bookings, tribe rosters, and the reigning Zampions.
             </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link
+                href="/tournaments/zambaara/live"
+                className="bg-gradient-to-r from-[#e7b875] via-[#d1a058] to-[#b3833d] hover:from-[#f5c889] hover:to-[#c6934a] text-black font-black px-6 py-2.5 rounded-full uppercase tracking-wider text-xs shadow-[0_0_20px_rgba(209,160,88,0.35)] transition-all hover:scale-105"
+              >
+                🔴 View Live Tournament Tables →
+              </Link>
+              <Link
+                href="/tournaments/zambaara/reveal"
+                className="bg-black/60 border border-[#d1a058]/50 hover:border-[#d1a058] text-[#d1a058] hover:text-white font-bold px-6 py-2.5 rounded-full uppercase tracking-wider text-xs transition-all"
+              >
+                Reveal Kiosk ↗
+              </Link>
+            </div>
           </div>
 
           {/* Selector Bar */}

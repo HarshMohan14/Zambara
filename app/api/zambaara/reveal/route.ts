@@ -1,8 +1,69 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/firebase'
-import { collection, getDocs, updateDoc, addDoc, query, where, Timestamp } from 'firebase/firestore'
+import { collection, getDocs, updateDoc, addDoc, query, where, Timestamp, doc, getDoc, runTransaction } from 'firebase/firestore'
+import { CUSTOM_PLAYERS_COLLECTION } from '@/lib/zambaara-custom'
 
 const TRIBES = ['lava', 'rain', 'mountain', 'wind']
+
+const pickBalancedTribe = (counts: Record<string, number>) => {
+  let minCount = Infinity
+  let minTribes: string[] = []
+  TRIBES.forEach(tribe => {
+    const count = counts[tribe] || 0
+    if (count < minCount) {
+      minCount = count
+      minTribes = [tribe]
+    } else if (count === minCount) {
+      minTribes.push(tribe)
+    }
+  })
+  return minTribes[Math.floor(Math.random() * minTribes.length)]
+}
+
+// CASE 0: Player locked-in from a custom tournament roster (searched on the kiosk)
+async function revealCustomPlayer(customPlayerId: string) {
+  const playerRef = doc(db, CUSTOM_PLAYERS_COLLECTION, customPlayerId)
+  const playerSnap = await getDoc(playerRef)
+  if (!playerSnap.exists()) {
+    return NextResponse.json({ error: 'Player not found in this tournament roster.' }, { status: 404 })
+  }
+  const player = playerSnap.data()
+
+  if (player.tribe) {
+    return NextResponse.json({
+      success: true,
+      tribe: player.tribe,
+      name: player.name,
+      number: player.mobile,
+      isExisting: true
+    })
+  }
+
+  // Balance tribes within this tournament only
+  const rosterSnap = await getDocs(query(collection(db, CUSTOM_PLAYERS_COLLECTION), where('tournamentId', '==', player.tournamentId)))
+  const counts: Record<string, number> = { lava: 0, rain: 0, mountain: 0, wind: 0 }
+  rosterSnap.forEach(d => {
+    const t = d.data().tribe
+    if (t && counts[t] !== undefined) counts[t]++
+  })
+  const candidate = pickBalancedTribe(counts)
+
+  // Transaction guarantees a tribe is assigned only once even on double scans
+  const finalTribe = await runTransaction(db, async (tx) => {
+    const fresh = await tx.get(playerRef)
+    const existing = fresh.data()?.tribe
+    if (existing) return existing as string
+    tx.update(playerRef, { tribe: candidate, revealedAt: new Date().toISOString() })
+    return candidate
+  })
+
+  return NextResponse.json({
+    success: true,
+    tribe: finalTribe,
+    name: player.name,
+    number: player.mobile
+  })
+}
 
 export async function POST(req: Request) {
   try {
@@ -13,7 +74,12 @@ export async function POST(req: Request) {
       body = {}
     }
 
-    const { name, mobile } = body
+    const { name, mobile, customPlayerId } = body
+
+    if (customPlayerId) {
+      return await revealCustomPlayer(String(customPlayerId))
+    }
+
     const zambaaraRef = collection(db, 'zambaara_users')
 
     // Count existing tribes in zambaara_users to ensure balanced distribution

@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tribe reveal — mobile (search)</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&amp;family=Saira:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#04050A}
+.tw{position:absolute;width:2px;height:2px;border-radius:50%;background:#FFF5DE;box-shadow:0 0 6px rgba(232,201,137,.9);animation:twk 3s ease-in-out infinite alternate}
+@keyframes twk{from{opacity:.15}to{opacity:1}}
+.spin{animation:spin 40s linear infinite}
+.spinr{animation:spin 26s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scr{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 40px}
+.sbar{position:sticky;top:0;z-index:5;padding:10px 0 12px;background:linear-gradient(#04050A 70%,rgba(4,5,10,0))}
+.field{position:relative;display:flex;align-items:center;height:56px;border-radius:999px;border:1px solid rgba(201,160,99,.55);background:rgba(10,8,6,.88);box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.4)}
+.field:focus-within{border-color:#E8C989;box-shadow:0 0 0 3px rgba(201,160,99,.25),0 10px 30px rgba(0,0,0,.5)}
+.mag{position:relative;flex:none;width:18px;height:18px;margin:0 12px 0 20px}
+.mag:before{content:'';position:absolute;left:0;top:0;width:11px;height:11px;border:2px solid #C9A063;border-radius:50%}
+.mag:after{content:'';position:absolute;left:12px;top:12px;width:7px;height:2px;background:#C9A063;transform:rotate(45deg);transform-origin:0 50%}
+.sin{flex:1;min-width:0;height:100%;border:0;background:transparent;color:#F3D594;font:500 17px Saira,sans-serif;letter-spacing:.04em;outline:none}
+.sin::placeholder{color:#8F8372}
+.clr{flex:none;width:44px;height:44px;margin-right:6px;border:0;border-radius:50%;background:rgba(201,160,99,.12);color:#E8C989;font-size:16px;cursor:pointer}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:1 0 auto;min-height:38px;padding:0 10px;border-radius:999px;border:1px solid rgba(201,160,99,.35);background:rgba(10,8,6,.6);color:#CFC4B3;font:500 12px Saira,sans-serif;letter-spacing:.1em;white-space:nowrap;cursor:pointer}
+.chip.on{background:#C9A063;border-color:#C9A063;color:#0B0907}
+.row{display:flex;align-items:center;gap:14px;width:100%;min-height:72px;padding:12px 14px;margin-top:10px;border-radius:14px;border:1px solid rgba(201,160,99,.22);background:linear-gradient(135deg,rgba(16,12,9,.92),rgba(10,8,6,.78));color:inherit;font:inherit;text-align:left;cursor:pointer;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:border-color .2s,transform .2s}
+.row:active{transform:scale(.985)}
+.row:focus-visible{outline:2px solid #E8C989;outline-offset:3px}
+.sig{flex:none;position:relative;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-weight:700;font-size:18px}
+.mk{background:none;color:#FFE7A8;text-shadow:0 0 10px rgba(232,190,110,.7)}
+.st{flex:none;padding:7px 12px;border-radius:999px;font:600 11px Saira,sans-serif;letter-spacing:.16em;white-space:nowrap}
+.skel{height:72px;margin-top:10px;border-radius:14px;background:linear-gradient(100deg,rgba(30,24,18,.7) 30%,rgba(60,48,34,.7) 50%,rgba(30,24,18,.7) 70%);background-size:300% 100%;animation:sk 1.4s linear infinite}
+@keyframes sk{to{background-position:-150% 0}}
+.hold{position:absolute;left:110px;top:285px;width:170px;height:170px;border-radius:50%;border:0;padding:0;cursor:pointer;background:radial-gradient(circle at 50% 40%,#1A140C,#07060A 70%);box-shadow:0 0 0 2px rgba(201,160,99,.5),0 0 60px rgba(232,190,110,.25),inset 0 0 40px rgba(0,0,0,.8);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;transition:transform .2s}
+.hold:active{transform:scale(.97)}
+.hold:focus-visible{outline:2px solid #E8C989;outline-offset:8px}
+.card{position:absolute;left:0;top:0;width:254px;height:336px;margin:-168px 0 0 -127px;perspective:1300px;will-change:transform}
+.flip{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.flip img{position:absolute;inset:0;width:100%;height:100%;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 30px 70px rgba(0,0,0,.7)}
+.flip .bk{transform:rotateY(180deg);left:12px;width:230px}
+.flip .fr{box-shadow:none;border-radius:0}
+.cta{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border:1.5px solid #C9A063;border-radius:6px;color:#E8C989;text-decoration:none;font:500 13px Saira,sans-serif;letter-spacing:.16em;background:rgba(20,15,10,.75);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ctaf{background:#C9A063;color:#0B0907}
+.back{position:absolute;left:12px;top:64px;z-index:6;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid rgba(201,160,99,.4);background:rgba(10,8,6,.7);color:#E8C989;font:500 12px Saira,sans-serif;letter-spacing:.18em;cursor:pointer}
+.pill{animation:pl 2.4s ease-in-out infinite}
+@keyframes pl{0%,100%{box-shadow:0 0 0 rgba(232,190,110,0)}50%{box-shadow:0 0 26px rgba(232,190,110,.45)}}
+.toast{animation:tin .35s cubic-bezier(.22,1,.36,1)}
+@keyframes tin{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+.dev{position:absolute;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));opacity:.7;z-index:30;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.dev button{min-height:34px;padding:0 12px;border-radius:999px;border:1px dashed rgba(143,131,114,.6);background:rgba(4,5,10,.85);color:#8F8372;font:500 10px Saira,sans-serif;letter-spacing:.14em;cursor:pointer}
+@media (hover:hover){.row:hover{border-color:rgba(232,201,137,.6)}.cta:hover{background:#C9A063;color:#0B0907}.chip:hover{border-color:#E8C989}}
+@media (prefers-reduced-motion:reduce){.spin,.spinr,.tw,.pill,.skel{animation:none}}
+</style>
+</helmet>
+<div ref="{{setRoot}}" style="position: relative; height: 100vh; min-height: 560px; overflow: hidden; background: #04050A; color: #EDE6DA; font-family: 'Saira', sans-serif">
+<div aria-hidden="true" style="position: absolute; inset: -4%; background-image: url(../assets/backgrounds/universe-bg.jpg); background-size: cover; background-position: center; transform: scale({{bgS}}); filter: brightness({{bgB}})"></div>
+<div aria-hidden="true" style="position: absolute; inset: 0; background-image: url(../assets/backgrounds/smoke.webp); background-size: cover; mix-blend-mode: screen; opacity: .14"></div>
+<sc-for list="{{stars}}" as="s" hint-placeholder-count="0"><i class="tw" aria-hidden="true" style="left: {{s.x}}%; top: {{s.y}}%; animation-delay: {{s.d}}s"></i></sc-for>
+<div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, {{tint}}, rgba(0,0,0,0) 58%); opacity: {{tintO}}"></div>
+<div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 40%, rgba(0,0,0,.78) 100%)"></div>
+<div aria-hidden="true" style="position: absolute; inset: 0; background: #FFF3D6; opacity: {{flash}}; pointer-events: none; z-index: 20"></div>
+
+<header style="position: absolute; left: 0; right: 0; top: 0; z-index: 8; height: 56px; padding: env(safe-area-inset-top) 16px 0; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(rgba(4,5,10,.95), rgba(4,5,10,0))">
+<div style="display: flex; align-items: center; gap: 10px"><img src="../assets/brand/logo.png" alt="" style="width: 28px"><span style="font-family: 'Cinzel', serif; font-weight: 700; font-size: 15px; letter-spacing: .22em; color: #E8C989">ZAMBAARA</span></div>
+<span style="max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(201,160,99,.4); font-size: 10px; letter-spacing: .16em; color: #C9A063">{{eventName}}</span>
+</header>
+
+<sc-if value="{{isSearch}}" hint-placeholder-val="{{true}}">
+<div class="scr" style="opacity: {{searchO}}">
+<div class="wrap" style="padding-top: 70px">
+<div style="text-align: center; padding: 8px 0 14px">
+<div style="font-size: 11px; letter-spacing: .38em; color: #C9A063">THE ELEMENTS ARE WAITING</div>
+<h1 style="margin: 10px 0 0; font-family: 'Cinzel', serif; font-weight: 700; font-size: 32px; line-height: 1.05; letter-spacing: .1em; color: #F3D594; text-shadow: 0 0 40px rgba(232,190,110,.35)">SUMMON<br>YOUR TRIBE</h1>
+<p style="margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: #A89A86">Find your name, then hold the sigil to reveal your tribe.</p>
+</div>
+<div class="sbar">
+<div class="field">
+<span class="mag" aria-hidden="true"></span>
+<label for="psearch" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search registered players</label>
+<input id="psearch" class="sin" type="search" enterKeyHint="search" autoComplete="off" autoCapitalize="words" spellCheck="false" placeholder="Search name or last 4 digits" value="{{q}}" onInput="{{onQ}}">
+<sc-if value="{{hasQ}}" hint-placeholder-val="{{false}}"><button type="button" class="clr" aria-label="Clear search" onClick="{{clearQ}}">✕</button></sc-if>
+</div>
+<div class="chips" role="tablist" aria-label="Filter players" style="margin-top: 12px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="3"><button type="button" role="tab" class="{{f.cls}}" aria-selected="{{f.on}}" onClick="{{f.pick}}">{{f.lab}} · {{f.n}}</button></sc-for>
+</div>
+</div>
+<div aria-live="polite" style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .18em; color: #8F8372; padding: 2px 4px 0"><span>{{countLab}}</span><span>{{revLab}}</span></div>
+
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}"><div aria-label="Loading players"><div class="skel"></div><div class="skel" style="opacity: .8"></div><div class="skel" style="opacity: .6"></div><div class="skel" style="opacity: .4"></div></div></sc-if>
+
+<sc-if value="{{showList}}" hint-placeholder-val="{{true}}">
+<div role="list">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<button type="button" role="listitem" class="row" onClick="{{r.pick}}" aria-label="{{r.lab}}" style="border-color: {{r.bd}}">
+<span class="sig" aria-hidden="true" style="background: {{r.sbg}}; box-shadow: 0 0 0 1.5px {{r.sring}}, 0 0 18px {{r.sglow}}; color: {{r.sfg}}">
+<sc-if value="{{r.rev}}" hint-placeholder-val="{{false}}"><img src="{{r.icon}}" alt="" style="width: 30px; height: 30px"></sc-if>
+<sc-if value="{{r.notRev}}" hint-placeholder-val="{{true}}">{{r.ini}}</sc-if>
+</span>
+<span style="flex: 1; min-width: 0">
+<span style="display: block; font-size: 17px; font-weight: 500; color: #EDE6DA; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.pre}}<mark class="mk">{{r.mid}}</mark>{{r.post}}</span>
+<span style="display: block; margin-top: 3px; font-size: 12px; letter-spacing: .12em; color: #8F8372">{{r.phone}}</span>
+</span>
+<span class="st" style="background: {{r.cbg}}; color: {{r.cfg}}; border: 1px solid {{r.cbd}}">{{r.chip}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+<div style="margin-top: 26px; padding: 26px 20px; border-radius: 16px; border: 1px dashed rgba(201,160,99,.35); text-align: center; background: rgba(10,8,6,.6)">
+<div style="font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; color: #E8C989">No Zampion found</div>
+<p style="margin: 8px 0 0; font-size: 14px; line-height: 1.55; color: #A89A86">Nothing matches “{{q}}”. Check the spelling or search by the last 4 digits of your mobile number.</p>
+<p style="margin: 10px 0 0; font-size: 13px; color: #8F8372">Not registered yet? Ask at the registration desk.</p>
+<button type="button" class="cta" style="margin-top: 16px" onClick="{{clearQ}}">CLEAR SEARCH</button>
+</div>
+</sc-if>
+
+<sc-if value="{{loadErr}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="margin-top: 26px; padding: 22px 20px; border-radius: 16px; border: 1px solid rgba(224,90,70,.5); text-align: center; background: rgba(60,14,10,.5)">
+<div style="font-family: 'Cinzel', serif; font-weight: 700; font-size: 18px; color: #F2B8AE">The elements are restless</div>
+<p style="margin: 8px 0 0; font-size: 14px; color: #E4C4BC">We couldn’t load the player list. Check the connection and try again.</p>
+<button type="button" class="cta" style="margin-top: 14px" onClick="{{retry}}">TRY AGAIN</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isStage}}" hint-placeholder-val="{{false}}">
+<sc-if value="{{showBack}}" hint-placeholder-val="{{true}}"><button type="button" class="back" onClick="{{toSearch}}" aria-label="Back to search">‹  SEARCH</button></sc-if>
+<div style="position: absolute; left: 50%; top: 50%; width: 390px; height: 844px; transform: translate(-50%, -50%) scale({{sc}})">
+<div aria-hidden="true" style="position: absolute; left: 195px; top: 370px; width: 300px; height: 300px; margin: -150px 0 0 -150px; opacity: {{ringO}}; transform: scale({{ringS}})">
+<div class="spin" style="position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(201,160,99,.4)"><i style="position: absolute; left: 50%; top: -5px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: #E8C989; box-shadow: 0 0 14px #E8C989"></i><i style="position: absolute; left: 50%; bottom: -4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #E8C989"></i></div>
+<div class="spinr" style="position: absolute; inset: 34px; border-radius: 50%; border: 1px dashed rgba(201,160,99,.35)"></div>
+<img src="../assets/icons/lava.png" alt="" style="position: absolute; left: 130px; top: -20px; width: 40px; opacity: .9"><img src="../assets/icons/rain.png" alt="" style="position: absolute; left: 280px; top: 130px; width: 40px; opacity: .9"><img src="../assets/icons/wind.png" alt="" style="position: absolute; left: 130px; top: 280px; width: 40px; opacity: .9"><img src="../assets/icons/mountain.png" alt="" style="position: absolute; left: -20px; top: 130px; width: 40px; opacity: .9">
+</div>
+
+<sc-if value="{{isConfirm}}" hint-placeholder-val="{{true}}">
+<div style="position: absolute; left: 20px; right: 20px; top: 100px; text-align: center; opacity: {{plateO}}; transform: translateY({{plateY}}px)">
+<div style="font-size: 11px; letter-spacing: .36em; color: #C9A063">IS THIS YOU?</div>
+<div style="margin: 10px auto 0; display: inline-block; max-width: 330px; padding: 10px 22px; border-radius: 10px; background: linear-gradient(90deg, rgba(169,122,52,.18), rgba(243,213,148,.22), rgba(169,122,52,.18)); border: 1px solid rgba(232,201,137,.55)">
+<div style="font-family: 'Cinzel', serif; font-weight: 700; font-size: 24px; letter-spacing: .08em; line-height: 1.15; color: #F3D594; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{selName}}</div>
+<div style="margin-top: 4px; font-size: 12px; letter-spacing: .16em; color: #A89A86">{{selPhone}}</div>
+</div>
+</div>
+<button type="button" class="hold" aria-label="Press and hold to reveal your tribe" onPointerDown="{{down}}" onPointerUp="{{up}}" onPointerLeave="{{up}}" onPointerCancel="{{up}}" onKeyDown="{{kdown}}" onKeyUp="{{up}}" onContextMenu="{{noCtx}}">
+<div aria-hidden="true" style="position: absolute; inset: -12px; border-radius: 50%; background: conic-gradient(#E8C989 {{pDeg}}deg, rgba(201,160,99,.12) 0deg); -webkit-mask-image: radial-gradient(circle, transparent 69%, #000 70%); mask-image: radial-gradient(circle, transparent 69%, #000 70%)"></div>
+<img src="../assets/brand/logo.png" alt="" style="width: 74px; transform: scale({{logoS}}); filter: drop-shadow(0 0 {{logoG}}px rgba(232,190,110,.9))">
+</button>
+<div class="pill" style="position: absolute; left: 50%; top: 556px; transform: translateX(-50%); padding: 11px 24px; border-radius: 999px; border: 1px solid rgba(201,160,99,.55); background: rgba(10,8,6,.85); text-align: center; white-space: nowrap">
+<div style="font-weight: 600; font-size: 13px; letter-spacing: .3em; color: #E8C989">{{holdLab}}</div>
+<div style="margin-top: 3px; font-size: 10px; letter-spacing: .26em; color: #A89A86">YOUR TRIBE</div>
+</div>
+<p style="position: absolute; left: 30px; right: 30px; top: 628px; margin: 0; text-align: center; font-size: 14px; line-height: 1.5; color: {{msgC}}">{{msg}}</p>
+<button type="button" onClick="{{toSearch}}" style="position: absolute; left: 50%; top: 676px; transform: translateX(-50%); min-height: 44px; padding: 0 16px; white-space: nowrap; border: 0; background: none; color: #A89A86; font: 500 13px Saira, sans-serif; letter-spacing: .14em; text-decoration: underline; text-underline-offset: 4px; cursor: pointer">NOT YOU? SEARCH AGAIN</button>
+</sc-if>
+
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="0">
+<div class="card" style="transform: translate3d({{c.x}}px, {{c.y}}px, 0) rotate({{c.r}}deg) scale({{c.s}}); opacity: {{c.o}}; z-index: {{c.z}}">
+<div class="flip" style="transform: rotateY({{c.f}}deg)">
+<img class="fr" src="{{c.src}}" alt="{{c.alt}}" style="filter: drop-shadow(0 30px 40px rgba(0,0,0,.7)) drop-shadow(0 0 {{c.g}}px {{c.gc}})">
+<img class="bk" src="../assets/cards/back.webp" alt="">
+</div>
+<div style="position: absolute; left: 6%; right: 6%; bottom: -26px; height: 50px; border-radius: 6px; background: linear-gradient(90deg, #A97A34, #F3D594 50%, #A97A34); box-shadow: 0 10px 24px rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 0 10px; font-family: 'Cinzel', serif; font-weight: 700; font-size: 22px; letter-spacing: .1em; color: #1A1208; white-space: nowrap; overflow: hidden; opacity: {{c.pl}}; transform: translateY({{c.py}}px)">{{plaque}}</div>
+</div>
+</sc-for>
+<sc-for list="{{burst}}" as="b" hint-placeholder-count="0"><i aria-hidden="true" style="position: absolute; left: 195px; top: 250px; width: {{b.s}}px; height: {{b.s}}px; margin: {{b.m}}px; border-radius: 50%; background: {{b.c}}; box-shadow: 0 0 12px {{b.c}}; transform: translate3d({{b.x}}px, {{b.y}}px, 0); opacity: {{b.o}}"></i></sc-for>
+<div aria-hidden="true" style="position: absolute; left: 195px; top: 250px; width: {{wave}}px; height: {{wave}}px; margin: {{waveM}}px 0 0 {{waveM}}px; border-radius: 50%; border: 2px solid {{accent}}; opacity: {{waveO}}"></div>
+
+<sc-if value="{{waiting}}" hint-placeholder-val="{{false}}"><div role="status" style="position: absolute; left: 0; right: 0; top: 560px; text-align: center; font-size: 12px; letter-spacing: .32em; color: #C9A063">CONSULTING THE ELEMENTS…</div></sc-if>
+
+<sc-if value="{{done}}" hint-placeholder-val="{{false}}">
+<div role="status" style="position: absolute; left: 18px; right: 18px; top: 408px; text-align: center">
+<div style="font-size: 11px; letter-spacing: .34em; color: {{fg}}; opacity: {{r1}}; transform: translateY({{r1y}}px)">{{doneEyebrow}}</div>
+<div style="margin-top: 8px; font-family: 'Cinzel', serif; font-weight: 900; font-size: 26px; line-height: 1.12; letter-spacing: .08em; color: #F3D594; text-shadow: 0 0 40px {{glow}}; opacity: {{r2}}; transform: translateY({{r2y}}px)">WELCOME,<br>{{selUp}}</div>
+<div style="margin-top: 10px; font-size: 12px; letter-spacing: .22em; color: {{fg}}; opacity: {{r3}}">{{traits}}</div>
+<p style="margin: 6px auto 0; max-width: 320px; font-size: 14px; line-height: 1.5; color: #D9CFC0; opacity: {{r3}}">{{line}}</p>
+<img src="{{bracelet}}" alt="{{tribe}} tribe bracelet" style="display: block; margin: 8px auto 0; width: 150px; height: auto; opacity: {{r4}}; transform: translateY({{r4y}}px) scale({{r4s}}); filter: drop-shadow(0 0 20px {{glow}})">
+<div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px; opacity: {{r5}}">
+<button type="button" class="cta ctaf" onClick="{{nextP}}" style="flex: 1; max-width: 200px">NEXT ZAMPION</button>
+<button type="button" class="cta" onClick="{{replay}}" style="flex: none">REPLAY</button>
+</div>
+<sc-if value="{{already}}" hint-placeholder-val="{{false}}"><div style="margin-top: 10px; font-size: 12px; letter-spacing: .1em; color: #8F8372; opacity: {{r5}}">{{revealedAt}}</div></sc-if>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{toastOn}}" hint-placeholder-val="{{false}}"><div class="toast" role="alert" style="position: absolute; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 25; width: min(340px, 90vw); padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(224,90,70,.5); background: rgba(40,10,8,.95); color: #F2B8AE; font-size: 14px; text-align: center">{{toast}}</div></sc-if>
+
+<div class="dev" aria-label="Prototype states (design only)">
+<sc-if value="{{devOpen}}" hint-placeholder-val="{{false}}">
+<button type="button" onClick="{{devLoading}}">LOADING LIST</button>
+<button type="button" onClick="{{devError}}">LIST ERROR</button>
+<button type="button" onClick="{{devEmpty}}">NO RESULTS</button>
+<button type="button" onClick="{{devSlow}}">SLOW REVEAL API</button>
+<button type="button" onClick="{{devFail}}">REVEAL FAILS</button>
+</sc-if>
+<button type="button" onClick="{{devToggle}}">{{devLab}}</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(...a) {
+    super(...a);
+    this.state = { view: 'search', q: '', filter: 0, sel: -1, phase: 'idle', p: 0, t: 0, sw: 390, sh: 844, loading: false, loadErr: false, toast: '', dev: false, slow: false, fail: false, resolved: true, tribe: 0, already: false };
+    let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    this.stars = [...Array(46)].map(() => ({ x: (rnd() * 100).toFixed(2), y: (rnd() * 100).toFixed(2), d: (rnd() * 3).toFixed(2) }));
+    this.TR = [
+      { n: 'LAVA', src: '../assets/cards/reveal/reveal-lava.webp', icon: '../assets/icons/lava.png', traits: 'FIERCE · RELENTLESS · UNSTOPPABLE', br: '../assets/bracelets/bracelet-lava.webp', c: 'rgba(224,65,47,.9)', fg: '#F59A6E', tint: 'rgba(170,40,20,.6)' },
+      { n: 'RAIN', src: '../assets/cards/reveal/reveal-rain.webp', icon: '../assets/icons/rain.png', traits: 'CALM · CLEVER · UNSHAKEN', br: '../assets/bracelets/bracelet-rain.webp', c: 'rgba(47,143,216,.9)', fg: '#8EC3EC', tint: 'rgba(20,80,170,.6)' },
+      { n: 'WIND', src: '../assets/cards/reveal/reveal-wind.webp', icon: '../assets/icons/wind.png', traits: 'FAST · FEARLESS · UNBOUND', br: '../assets/bracelets/bracelet-wind.webp', c: 'rgba(230,235,245,.85)', fg: '#EDEDED', tint: 'rgba(140,150,180,.5)' },
+      { n: 'MOUNTAIN', src: '../assets/cards/reveal/reveal-mountain.webp', icon: '../assets/icons/mountain.png', traits: 'STRONG · STEADY · UNBREAKABLE', br: '../assets/bracelets/bracelet-mountain.webp', c: 'rgba(190,180,170,.8)', fg: '#C9BFB4', tint: 'rgba(110,100,90,.55)' }
+    ];
+    this.TI = { lava: 0, rain: 1, wind: 2, mountain: 3 };
+    // SAMPLE DATA for the design prototype only. In production the list comes from the registered-players API.
+    this.P = [
+      ['Aarav Shah', '9820014821', null], ['Ananya Iyer', '9811203377', 'rain'], ['Dev Malhotra', '9930441205', null], ['Diya Kapoor', '9004457719', 'lava'],
+      ['Ishaan Rao', '9867012286', null], ['Kabir Sethi', '9819930054', 'mountain'], ['Meera Nair', '9920087731', null], ['Neel Desai', '9833100498', 'wind'],
+      ['Riya Banerjee', '9821456610', null], ['Rohan Kulkarni', '9769903342', 'lava'], ['Sara Thomas', '9892210075', null], ['Vihaan Joshi', '9004120983', 'rain'],
+      ['Zara Khan', '9967712240', null], ['Arjun Menon', '9930887126', null]
+    ].map((r, i) => ({ id: 'p' + i, name: r[0], mobile: r[1], tribe: r[2], revealedAt: r[2] ? 'Revealed today · ' + (10 + (i % 8)) + ':' + String(10 + i * 3).slice(-2) : '' }));
+    this.setRoot = (el) => { this.root = el; };
+    this.onQ = (e) => this.setState({ q: e.target.value });
+    this.clearQ = () => { this.setState({ q: '' }); const el = document.getElementById('psearch'); if (el) el.focus(); };
+    this.fp = [0, 1, 2].map((i) => () => this.setState({ filter: i }));
+    this.retry = () => { this.setState({ loadErr: false, loading: true }); setTimeout(() => this.setState({ loading: false }), 900); };
+    this.picks = this.P.map((pl, i) => () => this.select(i));
+    this.toSearch = () => this.setState({ view: 'search', phase: 'idle', p: 0, t: 0, sel: -1 });
+    this.nextP = () => this.setState({ view: 'search', phase: 'idle', p: 0, t: 0, sel: -1, q: '' });
+    this.replay = () => { this.t0 = performance.now(); this.extra = 0; this.setState({ phase: 'reveal', t: 0, wait: 0, resolved: true, already: false }); };
+    this.noCtx = (e) => { if (e && e.preventDefault) e.preventDefault(); };
+    this.down = (e) => { if (e && e.preventDefault) e.preventDefault(); this.startHold(); };
+    this.kdown = (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); if (!e.repeat) this.startHold(); } };
+    this.up = () => { if (this.state.phase === 'holding') this.setState({ phase: 'idle', p: 0 }); };
+    this.devToggle = () => this.setState({ dev: !this.state.dev });
+    this.devLoading = () => { this.setState({ view: 'search', loading: true, loadErr: false }); setTimeout(() => this.setState({ loading: false }), 2500); };
+    this.devError = () => this.setState({ view: 'search', loading: false, loadErr: true });
+    this.devEmpty = () => this.setState({ view: 'search', q: 'xyz', loadErr: false });
+    this.devSlow = () => this.setState({ slow: !this.state.slow });
+    this.devFail = () => this.setState({ fail: !this.state.fail });
+    this.onResize = () => this.measure();
+    this.tick = (ts) => {
+      this.raf = requestAnimationFrame(this.tick);
+      const st = this.state;
+      if (st.phase === 'holding') {
+        const p = Math.min(1, (ts - this.h0) / 1600);
+        if (p >= 1) this.beginReveal(ts); else this.setState({ p: p });
+      } else if (st.phase === 'reveal') {
+        let t = (ts - this.t0) / 1000;
+        // the chosen card is only picked once the reveal API has answered: keep the cards orbiting until then
+        if (!st.resolved && t > 2.9) { const over = t - 2.9; this.t0 += over * 1000; this.extra = (this.extra || 0) + over; t = 2.9; }
+        this.setState({ t: t, wait: this.extra || 0, phase: t > 6.2 ? 'done' : 'reveal' });
+      }
+    };
+  }
+  select(i) {
+    const pl = this.P[i];
+    if (pl.tribe) { this.setState({ view: 'stage', sel: i, phase: 'done', t: 6.2, tribe: this.TI[pl.tribe], already: true, resolved: true }); return; }
+    this.setState({ view: 'stage', sel: i, phase: 'idle', p: 0, t: 0, already: false });
+  }
+  startHold() {
+    if (this.state.phase !== 'idle') return;
+    this.h0 = performance.now();
+    this.setState({ phase: 'holding', p: 0 });
+  }
+  beginReveal(ts) {
+    const st = this.state, pl = this.P[st.sel];
+    // DEMO: production calls the existing reveal API here and uses the tribe it returns.
+    let h = 7; for (const ch of pl.name.toUpperCase()) h = (h * 31 + ch.charCodeAt(0)) % 100003;
+    const tribe = h % 4;
+    this.t0 = ts;
+    this.extra = 0;
+    this.setState({ phase: 'reveal', p: 1, t: 0, wait: 0, tribe: tribe, resolved: !st.slow && !st.fail });
+    if (st.fail) { setTimeout(() => { this.setState({ phase: 'idle', p: 0, t: 0, toast: 'The elements are restless — the reveal didn’t go through. Hold the sigil to try again.' }); setTimeout(() => this.setState({ toast: '' }), 3800); }, 2600); return; }
+    if (st.slow) setTimeout(() => { pl.tribe = ['lava', 'rain', 'wind', 'mountain'][tribe]; this.setState({ resolved: true }); }, 4500);
+    else pl.tribe = ['lava', 'rain', 'wind', 'mountain'][tribe];
+  }
+  measure() { if (this.root) { const r = this.root.getBoundingClientRect(); this.setState({ sw: r.width, sh: r.height }); } }
+  componentDidMount() { window.addEventListener('resize', this.onResize); this.measure(); this.raf = requestAnimationFrame(this.tick); }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); cancelAnimationFrame(this.raf); }
+  renderVals() {
+    const st = this.state, ph = st.phase;
+    const cl = (x) => Math.min(1, Math.max(0, x));
+    const t = ph === 'done' ? 6.2 : (ph === 'reveal' ? st.t : 0);
+    const ss = (a, b) => { const x = cl((t - a) / (b - a)); return x * x * (3 - 2 * x); };
+    const L = (a, b, k) => a + (b - a) * k;
+    const isStage = st.view === 'stage';
+    const rev = isStage && (ph === 'reveal' || ph === 'done');
+    const T = this.TR[st.tribe];
+    const pl = st.sel >= 0 ? this.P[st.sel] : null;
+    const mask = (m) => '•••••• ' + String(m).slice(-4);
+    // ---------- search ----------
+    const q = st.q.trim().toLowerCase();
+    const digits = q.replace(/\D/g, '');
+    const counts = [this.P.length, this.P.filter((x) => !x.tribe).length, this.P.filter((x) => x.tribe).length];
+    const rows = [];
+    this.P.forEach((x, i) => {
+      if (st.filter === 1 && x.tribe) return;
+      if (st.filter === 2 && !x.tribe) return;
+      let at = -1, len = 0;
+      if (q) {
+        at = x.name.toLowerCase().indexOf(q); len = q.length;
+        if (at < 0 && !(digits.length >= 3 && x.mobile.slice(-digits.length) === digits) && !(digits.length >= 3 && x.mobile.indexOf(digits) >= 0)) return;
+      }
+      const Tx = x.tribe ? this.TR[this.TI[x.tribe]] : null;
+      const ini = x.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+      rows.push({
+        pick: this.picks[i], lab: x.name + (Tx ? ', revealed: ' + Tx.n : ', ready to reveal'),
+        pre: at >= 0 ? x.name.slice(0, at) : x.name, mid: at >= 0 ? x.name.slice(at, at + len) : '', post: at >= 0 ? x.name.slice(at + len) : '',
+        phone: mask(x.mobile), ini: ini, rev: !!Tx, notRev: !Tx, icon: Tx ? Tx.icon : '',
+        sbg: Tx ? 'radial-gradient(circle, rgba(0,0,0,.2), rgba(0,0,0,.7))' : 'radial-gradient(circle at 50% 35%, #2A2013, #0B0907)', sring: Tx ? Tx.c : 'rgba(201,160,99,.7)', sglow: Tx ? Tx.c.replace(/[\d.]+\)$/, '.35)') : 'rgba(232,190,110,.15)', sfg: '#E8C989',
+        chip: Tx ? Tx.n : 'REVEAL', cbg: Tx ? 'rgba(0,0,0,.35)' : '#C9A063', cfg: Tx ? Tx.fg : '#0B0907', cbd: Tx ? Tx.c.replace(/[\d.]+\)$/, '.6)') : '#C9A063', bd: Tx ? 'rgba(201,160,99,.18)' : 'rgba(201,160,99,.32)'
+      });
+    });
+    const labs = ['ALL', 'TO REVEAL', 'REVEALED'];
+    // ---------- reveal (port of R01, mobile stage 390x844) ----------
+    const CX = 195, CY = 250;
+    const ang = (u) => { const a1 = Math.min(u, 2.4); return 140 * a1 * a1 + (u > 2.4 ? (672 * (u - 2.4) - 120 * (u - 2.4) * (u - 2.4)) : 0); };
+    const emerge = ss(0.2, 0.9), pick = ss(3.0, 3.7), flip = ss(3.7, 4.4), plq = ss(4.6, 5.1);
+    const cards = rev ? this.TR.map((c, i) => {
+      const isC = i === st.tribe;
+      const a = (ang(Math.min(t, 3.0)) + (st.wait || 0) * 528 + i * 90) * Math.PI / 180;
+      const rad = L(0, 140, emerge) * (1 + 0.1 * Math.sin(t * 6));
+      let x = CX + Math.cos(a) * rad, y = CY + 70 + Math.sin(a) * rad * 0.42;
+      let s = L(0.16, 0.4, emerge) * (0.85 + 0.15 * Math.sin(a));
+      let r = Math.cos(a) * 14, o = emerge, z = Math.round(10 + 10 * Math.sin(a));
+      if (isC) { x = L(x, CX, pick); y = L(y, CY, pick) - 50 * Math.sin(Math.PI * pick); s = L(s, 0.62, pick); r = L(r, 0, pick); z = pick > 0 ? 40 : z; }
+      else { const out = pick; x = L(x, CX + (x - CX) * 3.2, out); y = L(y, y + 120, out); o = o * (1 - out); s = s * (1 - 0.3 * out); }
+      const f = isC ? 180 * (1 - flip) : 180;
+      return { src: c.src, alt: c.n + ' tribe reveal card', x: x.toFixed(1), y: y.toFixed(1), s: s.toFixed(3), r: r.toFixed(2), o: o.toFixed(3), z: z, f: f.toFixed(1), g: isC ? (60 * flip).toFixed(0) : 0, gc: c.c, pl: isC ? plq.toFixed(3) : 0, py: (14 * (1 - plq)).toFixed(1) };
+    }) : [];
+    const burst = rev && t > 4.2 && !st.already ? [...Array(18)].map((_, k) => { const u = cl((t - 4.2) / 1.2); const a = k / 18 * Math.PI * 2; const d = 50 + 190 * (1 - Math.pow(1 - u, 3)); const sz = 4 + (k % 3) * 2; return { x: (Math.cos(a) * d).toFixed(1), y: (Math.sin(a) * d).toFixed(1), o: (1 - u).toFixed(3), c: T.c, s: sz, m: -sz / 2 }; }) : [];
+    const wu = cl((t - 4.15) / 1.0), wave = 160 + 520 * wu;
+    const nm = pl ? pl.name.toUpperCase() : '';
+    const conf = isStage && (ph === 'idle' || ph === 'holding');
+    return {
+      setRoot: this.setRoot, stars: this.stars, sc: Math.min(st.sw / 390, st.sh / 844).toFixed(4), eventName: 'ZAMBAARA TOURNAMENT',
+      bgS: (1.04 + 0.04 * ss(0, 3)).toFixed(4), bgB: isStage ? '0.85' : '0.7',
+      tint: T.tint, tintO: rev ? ss(3.6, 4.6).toFixed(3) : (ph === 'holding' ? (0.3 * st.p).toFixed(3) : '0'), accent: T.c,
+      flash: rev && !st.already ? (0.55 * Math.max(Math.sin(Math.PI * ss(0, 0.35)), Math.sin(Math.PI * ss(4.05, 4.45)))).toFixed(3) : '0',
+      isSearch: st.view === 'search', searchO: '1', q: st.q, onQ: this.onQ, hasQ: st.q.length > 0, clearQ: this.clearQ,
+      filters: labs.map((l, i) => ({ lab: l, n: counts[i], cls: 'chip' + (st.filter === i ? ' on' : ''), on: st.filter === i ? 'true' : 'false', pick: this.fp[i] })),
+      countLab: (q ? rows.length + ' MATCH' + (rows.length === 1 ? '' : 'ES') : counts[0] + ' REGISTERED'), revLab: counts[2] + ' REVEALED',
+      loading: st.loading, loadErr: st.loadErr && !st.loading, retry: this.retry,
+      showList: !st.loading && !st.loadErr && rows.length > 0, rows: rows, empty: !st.loading && !st.loadErr && rows.length === 0,
+      isStage: isStage, showBack: isStage && (conf || ph === 'done'), toSearch: this.toSearch,
+      ringO: rev ? (1 - ss(0.1, 0.8) * 0.75 - 0.25 * ss(4.4, 5.2)).toFixed(3) : '1', ringS: rev ? (1 + 0.25 * ss(0, 1) - 0.1 * ss(3, 4)).toFixed(3) : (1 + 0.04 * st.p).toFixed(3),
+      isConfirm: conf, plateO: '1', plateY: '0', selName: pl ? pl.name : '', selPhone: pl ? mask(pl.mobile) : '', selUp: nm,
+      pDeg: (360 * st.p).toFixed(1), logoS: (1 + 0.12 * st.p).toFixed(3), logoG: (10 + 30 * st.p).toFixed(0),
+      holdLab: ph === 'holding' ? 'CHANNELLING…' : 'HOLD TO REVEAL',
+      down: this.down, up: this.up, kdown: this.kdown, noCtx: this.noCtx,
+      msg: 'Press and hold the sigil for two breaths.', msgC: '#8F8372',
+      cards: cards, burst: burst, plaque: nm,
+      wave: wave.toFixed(0), waveM: (-wave / 2).toFixed(0), waveO: rev && t > 4.15 && !st.already ? (0.9 * (1 - wu)).toFixed(3) : '0',
+      waiting: ph === 'reveal' && !st.resolved && t >= 2.9,
+      done: rev && t > 4.8, already: st.already, revealedAt: pl ? pl.revealedAt : '', doneEyebrow: st.already ? 'YOUR TRIBE' : 'THE ELEMENTS HAVE SPOKEN',
+      tribe: T.n, fg: T.fg, glow: T.c, traits: T.traits, line: 'Your ' + T.n.charAt(0) + T.n.slice(1).toLowerCase() + ' bracelet waits for you in the arena.', bracelet: T.br,
+      r1: ss(4.8, 5.3).toFixed(3), r1y: (16 * (1 - ss(4.8, 5.3))).toFixed(1), r2: ss(4.95, 5.5).toFixed(3), r2y: (20 * (1 - ss(4.95, 5.5))).toFixed(1),
+      r3: ss(5.2, 5.7).toFixed(3), r4: ss(5.35, 6.0).toFixed(3), r4y: (40 * (1 - ss(5.35, 6.0))).toFixed(1), r4s: (0.8 + 0.2 * ss(5.35, 6.0)).toFixed(3), r5: ss(5.7, 6.2).toFixed(3),
+      nextP: this.nextP, replay: this.replay,
+      toastOn: !!st.toast, toast: st.toast,
+      devOpen: st.dev, devToggle: this.devToggle, devLab: st.dev ? 'CLOSE STATES' : 'PROTOTYPE STATES', devLoading: this.devLoading, devError: this.devError, devEmpty: this.devEmpty,
+      devSlow: this.devSlow, devFail: this.devFail
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<!doctype html>
+<!-- Zambaara reference viewer: a ~90-line runtime that renders the .dc.html prototype pages (the same files as the Claude Design canvas). Serve this folder over http (python3 -m http.server) and open /reference/. -->
+<html lang="en"><head><meta charset="utf-8">
+<title>Zambaara — tribe reveal reference</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+html,body{margin:0;background:#05060B}
+.menu{font-family:Saira,system-ui,sans-serif;color:#EDE6DA;max-width:720px;margin:0 auto;padding:48px 20px}
+.menu h1{font-family:Cinzel,serif;color:#E8C989;letter-spacing:.12em;font-size:30px;margin:0 0 6px}
+.menu p{color:#A89A86;line-height:1.6}
+.menu a{display:block;padding:16px 18px;margin:12px 0;border:1px solid rgba(201,160,99,.4);border-radius:10px;color:#E8C989;text-decoration:none}
+.menu a span{display:block;color:#A89A86;font-size:14px;margin-top:4px}
+.menu a:hover{background:rgba(201,160,99,.1)}
+.phone{display:flex;justify-content:center;align-items:center;min-height:100vh;background:#111}
+.phone>#app{width:390px;height:844px;overflow:hidden;border-radius:38px;box-shadow:0 0 0 10px #222,0 30px 80px rgba(0,0,0,.6)}
+@media (max-width:500px){.phone{display:block;background:none}.phone>#app{border-radius:0;box-shadow:none}}
+@font-face{font-family:'Cinzel';src:url(../assets/fonts/Cinzel.ttf);font-weight:100 900}
+@font-face{font-family:'Saira';src:url(../assets/fonts/Saira.ttf);font-weight:100 900}
+</style>
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+</head><body>
+<div id="app"></div>
+<script>
+(async function(){
+  const PAGES = [['tribe-reveal-mobile', 'Tribe Reveal — mobile (player search)', 'Search a registered player, hold the sigil, the elements reveal the tribe. Use PROTOTYPE STATES (bottom-right) to see loading, error, empty, slow-API and failed-reveal states.']];
+  const file = new URLSearchParams(location.search).get('p');
+  if (!file) { document.getElementById('app').outerHTML = '<div class="menu"><h1>ZAMBAARA</h1><p>Reference prototypes for the website redesign. Each page below is the exact prototype from the design canvas, running locally. Scroll to play the animations.</p>' + PAGES.map(p => '<a href="?p=' + p[0] + '">' + p[1] + '<span>' + p[2] + '</span></a>').join('') + '</div>'; return; }
+  if (file === 'tribe-reveal-mobile') document.body.classList.add('phone');
+  const txt = await (await fetch('pages/' + file + '.dc.html')).text();
+  const doc = new DOMParser().parseFromString(txt, 'text/html');
+  const xdc = doc.querySelector('x-dc');
+  const helmet = xdc.querySelector('helmet');
+  if (helmet) { [...helmet.children].forEach(n => { if (n.tagName === 'STYLE') { const s = document.createElement('style'); s.textContent = n.textContent; document.head.appendChild(s); } }); helmet.remove(); }
+  const src = doc.querySelector('script[data-dc-script]').textContent;
+  const E = React.createElement;
+  const lookup = (sc, p) => { p = p.trim(); if (p === 'true') return true; if (p === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(p)) return +p; let v = sc; for (const k of p.split('.')) { if (v == null) return undefined; v = v[k]; } return v; };
+  const whole = /^\s*\{\{([^}]+)\}\}\s*$/;
+  const interp = (s, sc) => s.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = lookup(sc, p); return v == null ? '' : String(v); });
+  const val = (s, sc) => { const m = s.match(whole); return m ? lookup(sc, m[1]) : interp(s, sc); };
+  const AMAP = { class: 'className', for: 'htmlFor', onclick: 'onClick', onmousemove: 'onMouseMove', onmouseleave: 'onMouseLeave', onmouseenter: 'onMouseEnter', onsubmit: 'onSubmit', oninput: 'onInput', onchange: 'onChange', onkeydown: 'onKeyDown', onpointerdown: 'onPointerDown', onpointerup: 'onPointerUp', onpointermove: 'onPointerMove', onpointercancel: 'onPointerCancel', onpointerleave: 'onPointerLeave', ontouchstart: 'onTouchStart', ontouchmove: 'onTouchMove', ontouchend: 'onTouchEnd', onscroll: 'onScroll', playsinline: 'playsInline', autoplay: 'autoPlay', tabindex: 'tabIndex', readonly: 'readOnly', maxlength: 'maxLength', viewbox: 'viewBox', srcset: 'srcSet', colspan: 'colSpan', autocomplete: 'autoComplete', enterkeyhint: 'enterKeyHint', inputmode: 'inputMode', onfocus: 'onFocus', onblur: 'onBlur', onkeyup: 'onKeyUp' };
+  const camel = (k) => k.startsWith('--') ? k : k.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  const styleObj = (s) => { const o = {}; s.split(';').forEach(d => { const i = d.indexOf(':'); if (i < 0) return; const k = d.slice(0, i).trim(); const v = d.slice(i + 1).trim(); if (k) o[camel(k)] = v; }); return o; };
+  let key = 0;
+  const conv = (node, sc) => {
+    if (node.nodeType === 3) { const t = node.textContent; return t.includes('{{') ? interp(t, sc) : t; }
+    if (node.nodeType !== 1) return null;
+    const tag = node.tagName.toLowerCase();
+    const kids = (s) => [...node.childNodes].map(n => conv(n, s));
+    if (tag === 'sc-for') { const list = val(node.getAttribute('list'), sc) || []; const as = node.getAttribute('as') || 'item'; return list.map((it, i) => E(React.Fragment, { key: i }, ...kids(Object.assign(Object.create(sc), { [as]: it, $index: i })))); }
+    if (tag === 'sc-if') { return val(node.getAttribute('value'), sc) ? E(React.Fragment, null, ...kids(sc)) : null; }
+    const props = {};
+    for (const a of node.attributes) {
+      let k = a.name; if (k.startsWith('hint-')) continue;
+      const v = val(a.value, sc);
+      if (k === 'style') { props.style = styleObj(String(v)); continue; }
+      k = AMAP[k] || k;
+      if (k === 'muted' || k === 'loop' || k === 'playsInline' || k === 'autoPlay' || k === 'disabled' || k === 'checked') { props[k] = v === true || v === '' || v === 'true'; continue; }
+      props[k] = v;
+    }
+    const ch = kids(sc);
+    const voids = ['img','input','br','hr','source','meta','link'];
+    return voids.includes(tag) ? E(tag, props) : E(tag, props, ...ch);
+  };
+  const roots = [...xdc.childNodes];
+  class DCLogic extends React.Component {
+    render() { const v = this.renderVals(); const sc = Object.assign({}, v); return E(React.Fragment, null, ...roots.map(n => conv(n, sc))); }
+  }
+  const Component = new Function('DCLogic', 'React', src + '\n;return Component;')(DCLogic, React);
+  window.__dc = null;
+  class Wrap extends Component { componentDidMount() { window.__dc = this; if (super.componentDidMount) super.componentDidMount(); } }
+  ReactDOM.createRoot(document.getElementById('app')).render(E(Wrap, {}));
+})().catch(e => { document.body.innerText = 'ERR ' + e.stack; console.error(e); });
+</script>
+</body></html>

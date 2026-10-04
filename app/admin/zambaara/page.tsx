@@ -16,6 +16,7 @@ import {
 import { convertTimestamps } from '@/lib/firestore'
 import Link from 'next/link'
 import { toast, Toaster } from 'sonner'
+import CustomTournamentAdmin from '@/components/zambaara/CustomTournamentAdmin'
 
 interface ZambaaraUser {
   id: string
@@ -321,7 +322,7 @@ export default function AdminZambaaraPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTribeFilter, setSelectedTribeFilter] = useState('all')
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'queue' | 'tournaments' | 'booking'>('queue')
+  const [activeTab, setActiveTab] = useState<'custom' | 'queue' | 'tournaments' | 'booking'>('custom')
 
   // Tournaments state
   const [tournaments, setTournaments] = useState<Tournament[]>([])
@@ -792,6 +793,14 @@ export default function AdminZambaaraPage() {
       {/* Tabs Selector */}
       <div className="flex border-b border-[#d1a058]/20 mb-6 overflow-x-auto whitespace-nowrap scrollbar-none">
         <button 
+          id="admin-tab-custom"
+          onClick={() => setActiveTab('custom')}
+          className={`px-6 py-3 font-bold text-sm uppercase tracking-wider transition-all border-b-2 ${activeTab === 'custom' ? 'border-[#d1a058] text-[#d1a058]' : 'border-transparent text-white/60 hover:text-white'}`}
+          style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
+        >
+          ⚔ Custom Tournament
+        </button>
+        <button 
           onClick={() => setActiveTab('queue')}
           className={`px-6 py-3 font-bold text-sm uppercase tracking-wider transition-all border-b-2 ${activeTab === 'queue' ? 'border-[#d1a058] text-[#d1a058]' : 'border-transparent text-white/60 hover:text-white'}`}
           style={{ fontFamily: "'BlinkerSemiBold', sans-serif" }}
@@ -813,6 +822,9 @@ export default function AdminZambaaraPage() {
           Seat Allocations
         </button>
       </div>
+
+      {/* Tab Contents: Custom table-based tournament */}
+      {activeTab === 'custom' && <CustomTournamentAdmin />}
 
       {/* Tab Contents: Queue Manager */}
       {activeTab === 'queue' && (
