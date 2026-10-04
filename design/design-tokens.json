@@ -1,0 +1,68 @@
+{
+  "$description": "Zambaara design tokens. Values are taken directly from the approved prototypes.",
+  "color": {
+    "bg": { "base": "#05060B", "deep": "#03040A", "panel": "#0B0806", "panelWarm": "#0A0806" },
+    "gold": { "500": "#C9A063", "300": "#E8C989", "200": "#F3D594", "50": "#FFF5DE", "deep": "#B98A3E" },
+    "text": { "primary": "#EDE6DA", "body": "#D9CFC0", "secondary": "#CFC4B3", "muted": "#A89A86", "subtle": "#8F8372", "faint": "#6E6457", "onGold": "#0B0907" },
+    "line": { "gold40": "rgba(201,160,99,.40)", "gold25": "rgba(201,160,99,.25)", "gold20": "rgba(201,160,99,.20)", "goldStrong": "rgba(232,201,137,.80)" },
+    "surface": { "glass": "rgba(10,8,6,.70)", "card": "linear-gradient(135deg, rgba(14,10,8,.95), rgba(14,10,8,.72))", "nav": "rgba(5,6,11,.82)", "navMobile": "rgba(5,6,11,.95)", "scrim": "rgba(3,3,5,.94)" },
+    "tribe": {
+      "lava": { "base": "#D83A2A", "glow": "rgba(224,65,47,.85)", "text": "#F59A6E", "chip": "#F29A8E", "medal": "#C8301F" },
+      "rain": { "base": "#2F8FD8", "glow": "rgba(47,143,216,.85)", "text": "#8EC3EC", "medal": "#1F74B8" },
+      "wind": { "base": "#D8D8D8", "glow": "rgba(225,225,225,.70)", "text": "#EDEDED", "medal": "#E6E6E6" },
+      "mountain": { "base": "#8A8178", "glow": "rgba(170,160,150,.70)", "text": "#C9BFB4", "medal": "#141414" }
+    },
+    "power": {
+      "freeze": { "glow": "rgba(143,211,240,.80)", "text": "#B5E2F5" },
+      "lightning": { "glow": "rgba(240,120,42,.85)", "text": "#F5B26E" },
+      "reverse": { "glow": "rgba(190,120,240,.85)", "text": "#C9A6FA" },
+      "meteor": { "glow": "rgba(232,190,90,.85)", "text": "#F3D594" }
+    },
+    "host": { "accent": "#E07A5F", "tint": "rgba(150,22,18,.55)", "glow": "rgba(200,40,24,.45)" },
+    "status": { "success": "#CFE8CF", "successBorder": "rgba(158,211,158,.5)", "successBg": "rgba(20,30,20,.6)" }
+  },
+  "font": {
+    "display": "'Cinzel', serif",
+    "body": "'Saira', sans-serif",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Saira:wght@300;400;500;600&display=swap",
+    "localFiles": ["assets/fonts/Cinzel.ttf", "assets/fonts/Saira.ttf"]
+  },
+  "type": {
+    "heroWordmark": { "desktop": "700 112px/1.1 Cinzel; letter-spacing .22em", "mobile": "700 44px/1.1 Cinzel; letter-spacing .16em" },
+    "heroTagline": { "desktop": "700 20px Cinzel; letter-spacing animates 1.3em → .6em", "mobile": "700 12px Cinzel" },
+    "sectionTitle": { "desktop": "700 44–64px Cinzel; letter-spacing .06–.14em", "mobile": "700 22–32px Cinzel" },
+    "bigStatement": { "desktop": "900 84px/1.02 Cinzel (BEAT THE HOST)", "mobile": "900 42px" },
+    "eyebrow": "Cinzel 11–16px; letter-spacing .3em; color gold.500",
+    "body": "Saira 400 14–17px/1.5–1.7; color text.body",
+    "label": "Saira 500 11–13px; letter-spacing .14–.24em; uppercase",
+    "price": "700 40px Cinzel; color gold.200"
+  },
+  "radius": { "button": "6px", "pill": "999px", "card": "12px", "tile": "14px", "panel": "16–18px", "mat": "18px" },
+  "shadow": {
+    "card": "0 22px 46px rgba(0,0,0,.6)",
+    "panel": "0 30px 60px rgba(0,0,0,.5)",
+    "hero": "0 40px 100px rgba(0,0,0,.6)",
+    "goldGlow": "0 0 32px rgba(201,160,99,.45)",
+    "goldRing": "0 0 0 2px #E8C989, 0 0 42px 6px rgba(232,190,110,.75)"
+  },
+  "button": {
+    "primaryOutline": "min-height 52px; padding 0 34px; border 1.5px solid gold.500; radius 6px; color gold.300; bg rgba(20,15,10,.7); 16px Saira, letter-spacing .16em; hover (hover devices only): bg gold.500, color onGold, goldGlow",
+    "primaryFilled": "same as outline with bg gold.500 and color onGold; hover bg gold.300",
+    "ghostPill": "min-height 44px; radius 999px; border 1px gold.40; bg rgba(0,0,0,.35); 12px Saira, letter-spacing .18em"
+  },
+  "motion": {
+    "easeOutExpo": "cubic-bezier(.22,1,.36,1)",
+    "easeInOut": "cubic-bezier(.65,0,.35,1)",
+    "smoothstep": "t*t*(3-2*t) — used for every scroll-linked tween",
+    "scrollSmoothing": { "desktop": 0.11, "mobile": 0.2, "note": "per-frame lerp factor at 60fps, frame-rate corrected: k = 1-(1-f)^(dt/16.67)" },
+    "durations": { "hover": "250–350ms", "modalIn": "400ms fade + 800ms card flip-in", "toast": "3200ms" }
+  },
+  "layout": {
+    "desktopStage": { "width": 1600, "height": 900, "scale": "min(viewportW/1600, viewportH/900)" },
+    "mobileStage": { "width": 390, "height": 844, "scale": "min(viewportW/390, viewportH/844)", "note": "mat / host / bracelets reuse the 1600x900 stage scaled by viewportH/900" },
+    "breakpoint": { "mobile": "max-width: 860px" },
+    "gutter": { "desktop": "40px", "mobile": "16px" },
+    "maxContent": "1240px",
+    "touchTarget": "44px minimum"
+  }
+}

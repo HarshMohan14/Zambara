@@ -1,0 +1,565 @@
+{
+  "_note": "All copy from the approved prototypes. Items marked [PLACEHOLDER] need real data before launch.",
+  "brand": {
+    "name": "Zambaara",
+    "tagline": "Master the Elements, Win the Bracelets, Become the Zampion",
+    "short_tagline": "Master the Elements, Become the Zampion",
+    "descriptor": "The ultimate elemental card game",
+    "players": "2–8 players",
+    "player_title": "Zampion (plural: Zampions)"
+  },
+  "nav": {
+    "links": [
+      [
+        "THE DECK",
+        "#deck"
+      ],
+      [
+        "CARDS",
+        "#deck"
+      ],
+      [
+        "HOW TO PLAY",
+        "#howto"
+      ],
+      [
+        "BEAT THE HOST",
+        "#host"
+      ],
+      [
+        "GALLERY",
+        "#chronicles"
+      ]
+    ],
+    "cta": [
+      "PRE-BOOK",
+      "#next"
+    ]
+  },
+  "hero": {
+    "wordmark": "ZAMBAARA",
+    "tagline": "MASTER THE ELEMENTS",
+    "subline_desktop": "THE ULTIMATE ELEMENTAL CARD GAME · 2–8 PLAYERS",
+    "subline_mobile": "THE ULTIMATE ELEMENTAL CARD GAME",
+    "cta": "PRE-BOOK NOW",
+    "scroll_cue": "SCROLL TO ENTER THE ARENA",
+    "skip": "SKIP INTRO ›",
+    "replay": "↺ REPLAY",
+    "intro_narration": [
+      {
+        "from_s": 0.3,
+        "to_s": 1.15,
+        "text": "FROM STONE…"
+      },
+      {
+        "from_s": 1.4,
+        "to_s": 3.9,
+        "text": "…FIRE IS BORN"
+      },
+      {
+        "from_s": 4.15,
+        "to_s": 5.5,
+        "text": "RAIN TAMES THE FLAME"
+      },
+      {
+        "from_s": 5.75,
+        "to_s": 7.1,
+        "text": "WIND BINDS THEM AS ONE"
+      }
+    ],
+    "title_reveal_at_s": 8.3
+  },
+  "deck": {
+    "eyebrow": "02 · GAME CARDS",
+    "headlines": [
+      "SHUFFLE THE ELEMENTS",
+      "DRAW YOUR HAND",
+      "FOUR TRIBES · FOUR POWERS"
+    ],
+    "row_labels": [
+      "THE TRIBES",
+      "THE POWERS"
+    ],
+    "hint_desktop": "✦ TAP ANY CARD TO REVEAL ITS DETAILS ✦",
+    "hint_mobile": "✦ TAP A CARD FOR DETAILS ✦",
+    "hud_phases": [
+      "THE DECK",
+      "SHUFFLE",
+      "DRAW",
+      "REVEAL"
+    ],
+    "modal_labels": [
+      "CARD TYPE",
+      "GOES TO",
+      "RULES"
+    ],
+    "modal_rules_link": "Full rulebook & video guide ›"
+  },
+  "cards": [
+    {
+      "name": "Lava",
+      "kind": "Tribe Card",
+      "tagline": "Born of the molten core. Relentless, burning, unstoppable.",
+      "lore": "The Lava tribe strikes first and strikes hard — fire that remembers the heart of the world.",
+      "goes_to": "Attack Pile",
+      "card_type": "Tribe card · numbered · part of the elemental cycle Lava → Rain → Wind → Mountain",
+      "image": "assets/cards/lava.webp",
+      "icon": "assets/icons/lava.png"
+    },
+    {
+      "name": "Rain",
+      "kind": "Tribe Card",
+      "tagline": "Patient as the storm, endless as the sea.",
+      "lore": "The Rain tribe bends but never breaks — it waits, it gathers, and then it floods.",
+      "goes_to": "Attack Pile",
+      "card_type": "Tribe card · numbered · part of the elemental cycle Lava → Rain → Wind → Mountain",
+      "image": "assets/cards/rain.webp",
+      "icon": "assets/icons/rain.png"
+    },
+    {
+      "name": "Wind",
+      "kind": "Tribe Card",
+      "tagline": "Unseen, untamed, everywhere at once.",
+      "lore": "The Wind tribe moves where it pleases — swift, cunning and impossible to hold.",
+      "goes_to": "Attack Pile",
+      "card_type": "Tribe card · numbered · part of the elemental cycle Lava → Rain → Wind → Mountain",
+      "image": "assets/cards/wind.webp",
+      "icon": "assets/icons/wind.png"
+    },
+    {
+      "name": "Mountain",
+      "kind": "Tribe Card",
+      "tagline": "Ancient stone. Unmoving. Unbroken.",
+      "lore": "The Mountain tribe stands as the world’s first wall — slow to anger, impossible to topple.",
+      "goes_to": "Attack Pile",
+      "card_type": "Tribe card · numbered · part of the elemental cycle Lava → Rain → Wind → Mountain",
+      "image": "assets/cards/mountain.webp",
+      "icon": "assets/icons/mountain.png"
+    },
+    {
+      "name": "Freeze",
+      "kind": "Power Card",
+      "tagline": "Stillness falls across the table.",
+      "lore": "Freeze locks the battle in ice — a single breath where nothing moves but you.",
+      "goes_to": "Punish Pile",
+      "card_type": "Power card · punish",
+      "image": "assets/cards/freeze.webp",
+      "icon": "assets/icons/freeze.png"
+    },
+    {
+      "name": "Lightning",
+      "kind": "Power Card",
+      "tagline": "A strike from the heavens.",
+      "lore": "Lightning tears through the sky and turns the fight in an instant.",
+      "goes_to": "Punish Pile",
+      "card_type": "Power card · punish",
+      "image": "assets/cards/lightning.webp",
+      "icon": "assets/icons/lightning.png"
+    },
+    {
+      "name": "Reverse",
+      "kind": "Power Card",
+      "tagline": "What was, is undone.",
+      "lore": "Reverse spins the wheel backwards — fortune flips, and the hunter becomes the hunted.",
+      "goes_to": "Special play — see the rulebook",
+      "card_type": "Power card · special",
+      "image": "assets/cards/reverse.webp",
+      "icon": "assets/icons/reverse.png"
+    },
+    {
+      "name": "Meteor",
+      "kind": "Power Card",
+      "tagline": "Fire from beyond the stars.",
+      "lore": "Meteor falls without warning — the rarest, most devastating force in the arena.",
+      "goes_to": "Special play — see the rulebook",
+      "card_type": "Power card · special",
+      "image": "assets/cards/meteor.webp",
+      "icon": "assets/icons/meteor.png"
+    }
+  ],
+  "cards_todo": "[PLACEHOLDER] Confirm the rules text for Reverse and Meteor (which pile they go to). Tribe cards are numbered; confirm the number range per tribe.",
+  "how_to_play": {
+    "eyebrow": "04 · HOW TO PLAY",
+    "title": "ENTER THE ARENA",
+    "zones": [
+      "BRACELET CHAMBER",
+      "ATTACK PILE",
+      "DRAW DECK",
+      "PUNISH PILE",
+      "SAND CLOCK"
+    ],
+    "chosen_plaque": "LAVA CHOSEN",
+    "steps": [
+      {
+        "n": "—",
+        "title": "Take your seat",
+        "text": "The Zambaara mat has five zones. Scroll to play through a round with the Host."
+      },
+      {
+        "n": "I",
+        "title": "Choose your tribe",
+        "text": "Lava, Rain, Wind or Mountain. The four tribe bracelets wait in the Bracelet Chamber — claim yours."
+      },
+      {
+        "n": "II",
+        "title": "Draw from the deck",
+        "text": "The Draw Deck sits at the heart of the arena. Every hand begins here."
+      },
+      {
+        "n": "III",
+        "title": "Attack",
+        "text": "Play a tribe card onto the Attack Pile to strike your opponent."
+      },
+      {
+        "n": "IV",
+        "title": "Punish",
+        "text": "Only two powers belong on the Punish Pile — Freeze and Lightning. Play them to turn the fight against your rival."
+      },
+      {
+        "n": "V",
+        "title": "Beat the Sand Clock",
+        "text": "The sand clock turns and every battle is timed. The fastest Zampion claims the bracelet."
+      },
+      {
+        "n": "✦",
+        "title": "You’re ready",
+        "text": "Watch the full tutorial, gather your tribe and take the table.",
+        "ctas": [
+          "▶ WATCH THE TUTORIAL",
+          "PRE-BOOK"
+        ]
+      }
+    ]
+  },
+  "beat_the_host": {
+    "eyebrow": "05 · BEAT THE HOST",
+    "title": "BEAT THE HOST",
+    "text": "Sit across the table from the Zambaara Host at our live events. Read his tells, out-draw his deck — and walk away a Zampion.",
+    "ctas": [
+      "FIND AN EVENT",
+      "PRE-BOOK"
+    ]
+  },
+  "win_the_bracelets": {
+    "eyebrow": "THE REWARD",
+    "title": "WIN THE BRACELETS",
+    "text": "One for every tribe — red Lava, blue Rain, opal Wind and onyx Mountain. Collect your tribe, or claim all four.",
+    "chips": [
+      "LAVA",
+      "RAIN",
+      "WIND",
+      "MOUNTAIN"
+    ],
+    "rewards_title": "WIN AT BEAT THE HOST",
+    "rewards": [
+      "Earth Bracelet · 10% off",
+      "Ice Bracelet · 20% off",
+      "A free game",
+      "Buy 2 at ₹850"
+    ]
+  },
+  "gallery": {
+    "title": "GALLERY",
+    "eyebrow": "06 · WITNESS THE ELEMENTS IN ACTION",
+    "header_line": "MOMENTS FROM THE ARENA · TAP TO EXPAND",
+    "film_label": "THE FILM ▸",
+    "tiles": [
+      {
+        "image": "assets/gallery/friends-table.webp",
+        "caption": "TABLES OF LAUGHTER"
+      },
+      {
+        "image": "assets/gallery/box-waterfall.webp",
+        "caption": "THE BOX BY THE FALLS"
+      },
+      {
+        "image": "assets/gallery/hand.webp",
+        "caption": "A HAND WORTH PLAYING"
+      },
+      {
+        "image": "assets/gallery/tree.webp",
+        "caption": "IN THE WILD"
+      },
+      {
+        "image": "assets/gallery/face.webp",
+        "caption": "HIDE YOUR STRATEGY"
+      },
+      {
+        "image": "assets/gallery/cave-cards.webp",
+        "caption": "THE TRIBES COLLIDE"
+      }
+    ],
+    "film": "assets/video/gallery-film.mp4"
+  },
+  "voices": {
+    "eyebrow": "07 · VOICES OF THE ARENA",
+    "title": "HEAR FROM THE ZAMPIONS",
+    "cards": [
+      {
+        "image": "assets/gallery/player-pouch.webp",
+        "quote": "[PLACEHOLDER] Real player quote from the review video",
+        "name": "[PLACEHOLDER] PLAYER NAME · EVENT"
+      },
+      {
+        "image": "assets/gallery/player-reader.webp",
+        "quote": "[PLACEHOLDER]",
+        "name": "[PLACEHOLDER]"
+      },
+      {
+        "image": "assets/gallery/player-box.webp",
+        "quote": "[PLACEHOLDER]",
+        "name": "[PLACEHOLDER]"
+      }
+    ],
+    "rule": "Use only genuine quotes with the player's permission."
+  },
+  "product": {
+    "breadcrumb": [
+      "HOME",
+      "SHOP",
+      "ZAMBAARA BATTLE PACK"
+    ],
+    "badge": "PRE-BOOKING OPEN",
+    "eyebrow": "08 · THE BATTLE PACK",
+    "title": "Zambaara Battle Pack",
+    "subtitle": "Strategic gameplay for 2–8 players",
+    "categories": [
+      "CARD GAME",
+      "STRATEGY GAME",
+      "PARTY GAME"
+    ],
+    "price_inr": 799,
+    "price_note": "Pre-book price",
+    "price_5_8_inr": "[PLACEHOLDER] price for the 5–8 player edition",
+    "description": "The ultimate elemental card game. Master the four tribes — Lava, Rain, Wind and Mountain — wield the power cards Freeze, Lightning, Reverse and Meteor, and outplay the table to become the Zampion. Quick to learn, built for game nights, cafés and live tournaments.",
+    "editions": [
+      {
+        "id": "2-4",
+        "label": "2–4 PLAYERS",
+        "note": "Perfect for intimate gaming sessions. Experience the thrill of elemental mastery with a smaller group of players."
+      },
+      {
+        "id": "5-8",
+        "label": "5–8 PLAYERS",
+        "note": "Built for the bigger table: game nights, cafés and group battles for up to eight players."
+      }
+    ],
+    "buttons": [
+      "ADD TO CART",
+      "PRE-BOOK NOW"
+    ],
+    "toast": "Added to cart · {n} item(s) · {edition} edition",
+    "highlights": [
+      [
+        "2–8",
+        "PLAYERS"
+      ],
+      [
+        "4 + 4",
+        "TRIBES · POWERS"
+      ],
+      [
+        "Live",
+        "TOURNAMENTS"
+      ]
+    ],
+    "accordion": [
+      {
+        "title": "WHAT’S IN THE BOX",
+        "body": [
+          "Zambaara card deck — tribe cards and power cards",
+          "Burlap carry pouch",
+          "Tribe bracelets",
+          "Card box"
+        ],
+        "todo": "[PLACEHOLDER] confirm exact contents and card count"
+      },
+      {
+        "title": "HOW TO PLAY",
+        "body": "Choose your tribe, draw from the deck, attack and punish — and race the sand clock. Most groups are playing within minutes of opening the box. The full rulebook and video guide are linked below."
+      },
+      {
+        "title": "SHIPPING & RETURNS",
+        "body": "[PLACEHOLDER] Delivery timelines, shipping regions and the returns policy."
+      }
+    ],
+    "links": [
+      [
+        "Rulebook",
+        "https://www.zambaara.com/how-to-play"
+      ],
+      [
+        "Video tutorial",
+        "https://www.youtube.com/embed/nxtyDh9SD-Q"
+      ],
+      [
+        "Bulk & café orders",
+        "https://www.zambaara.com/#contact"
+      ]
+    ],
+    "images": [
+      "assets/product/battle-pack.jpg",
+      "assets/gallery/fan-table.webp",
+      "assets/bracelets/bracelets-stack-photo.webp",
+      "assets/gallery/cave-cards.webp",
+      "assets/gallery/box-waterfall.webp"
+    ]
+  },
+  "footer": {
+    "wordmark": "ZAMBAARA",
+    "blurb": "The ultimate elemental card game. Strategic gameplay for 2–8 players. Master the elements, win the bracelets, become the Zampion.",
+    "columns": {
+      "THE GAME": [
+        [
+          "The Cards",
+          "#deck"
+        ],
+        [
+          "How to Play",
+          "#howto"
+        ],
+        [
+          "Rulebook",
+          "https://www.zambaara.com/how-to-play"
+        ],
+        [
+          "Battle Pack",
+          "#next"
+        ]
+      ],
+      "THE ARENA": [
+        [
+          "Beat the Host",
+          "#host"
+        ],
+        [
+          "Tournaments",
+          "/tournaments"
+        ],
+        [
+          "Beach Battle",
+          "https://www.zambaara.com/beach-battle"
+        ],
+        [
+          "Event Rankings",
+          "/tournaments#rankings"
+        ]
+      ],
+      "COMMUNITY": [
+        [
+          "Gallery",
+          "#chronicles"
+        ],
+        [
+          "Zampion Voices",
+          "#voices"
+        ],
+        [
+          "Contact",
+          "https://www.zambaara.com/#contact"
+        ],
+        [
+          "Video Tutorial",
+          "https://www.youtube.com/embed/nxtyDh9SD-Q"
+        ]
+      ]
+    },
+    "copyright": "© 2026 ZAMBAARA · MASTER THE ELEMENTS, BECOME THE ZAMPION",
+    "back_to_top": "RETURN TO THE BEGINNING ↑",
+    "social": "[PLACEHOLDER] Confirmed: @zambaara on X/Twitter. Add Instagram / YouTube URLs."
+  },
+  "tournaments": {
+    "hero_eyebrow": "THE ARENAS OF ZAMBAARA",
+    "title": "ZAMBAARA TOURNAMENTS",
+    "intro": "Witness the clash of legends. Select a tournament arena below to review standings, rosters, and live stats.",
+    "cta": "ENTER THE ARENAS ↓",
+    "arenas": [
+      {
+        "name": "Beach Battle",
+        "eyebrow": "COASTAL DUELS",
+        "panel_title": "BEACH BATTLE · THE BRACKET",
+        "cta": "VIEW LIVE BRACKET",
+        "stats": [
+          "32 PLAYERS",
+          "ROUNDS",
+          "LOSS AND YOU’RE OUT",
+          "SUMMER",
+          "ON THE BEACH"
+        ],
+        "rounds": [
+          "ROUND OF 32",
+          "ROUND OF 16",
+          "QUARTERS",
+          "SEMIS",
+          "FINAL",
+          "ZAMPION"
+        ],
+        "note": "Seats fill as players register. Results update live during the event.",
+        "todo": "[PLACEHOLDER] player names for the 32 seats"
+      },
+      {
+        "name": "TagCon Arena",
+        "eyebrow": "KIOSK ARENA",
+        "panel_title": "TAGCON ARENA · BOOK YOUR SEAT",
+        "text": "Pick a tribe table and a seat. Tribe battles run through the event — the last tribe standing crowns the ultimate Zampions.",
+        "cta": "BOOK THIS SEAT"
+      },
+      {
+        "name": "Zambaara Arena",
+        "eyebrow": "ELEMENTAL ARENA",
+        "panel_title": "ZAMBAARA ARENA · TRIBE ROSTERS",
+        "cta": "JOIN A ROSTER",
+        "labels": [
+          "✓✓ VERIFIED",
+          "— Open seat"
+        ],
+        "note": "Every roster is verified twice before the brackets go live."
+      }
+    ],
+    "rankings": {
+      "eyebrow": "HALL OF CHAMPIONS",
+      "title": "EVENT RANKINGS",
+      "event": "MEEPLECON · DAY 2",
+      "rule": "Fastest time to defeat the host wins.",
+      "rows": [
+        [
+          "Priyanka",
+          "347s"
+        ],
+        [
+          "Chetali Gandhi",
+          "561s"
+        ],
+        [
+          "Kian",
+          "627s"
+        ],
+        [
+          "Jervis",
+          "690s"
+        ],
+        [
+          "Tejas",
+          "711s"
+        ]
+      ]
+    }
+  },
+  "tribe_reveal": {
+    "eyebrow": "THE ELEMENTS ARE WAITING",
+    "title": "SUMMON YOUR TRIBE",
+    "input_label": "ENTER YOUR NAME, ZAMPION",
+    "hold": "HOLD TO REVEAL",
+    "holding": "CHANNELLING…",
+    "result_eyebrow": "THE ELEMENTS HAVE SPOKEN",
+    "result_title": "WELCOME, {NAME}",
+    "result_line": "Your {Tribe} bracelet waits for you in the arena.",
+    "again": "REVEAL AGAIN",
+    "traits": {
+      "Lava": "Fierce · Relentless · Unstoppable",
+      "Rain": "Calm · Clever · Unshaken",
+      "Wind": "Fast · Fearless · Unbound",
+      "Mountain": "Strong · Steady · Unbreakable"
+    }
+  }
+}

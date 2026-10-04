@@ -1,0 +1,426 @@
+[
+  {
+    "file": "assets/brand/logo.png",
+    "description": "Zambaara logo mark (gold flame/peak)",
+    "used_in": "Footer brand block, favicon source",
+    "size": "522x495",
+    "kb": 36,
+    "prototype_blob_id": "e83d98ebe6f58aced87f875278a4a858"
+  },
+  {
+    "file": "assets/cards/lava.webp",
+    "description": "Lava tribe card front",
+    "used_in": "Hero, deck, mat, modal, host orbit",
+    "size": "480x702",
+    "kb": 47,
+    "prototype_blob_id": "f079b7de0d34ab017d885e78acc52f0c"
+  },
+  {
+    "file": "assets/cards/rain.webp",
+    "description": "Rain tribe card front",
+    "used_in": "Hero, deck, mat, modal, host orbit",
+    "size": "480x702",
+    "kb": 43,
+    "prototype_blob_id": "d733a5eb1cf7380c536254afee2edcc2"
+  },
+  {
+    "file": "assets/cards/wind.webp",
+    "description": "Wind tribe card front",
+    "used_in": "Hero, deck, modal, host orbit",
+    "size": "480x702",
+    "kb": 30,
+    "prototype_blob_id": "691fb2b30807afcad05f4c86ab2adfdb"
+  },
+  {
+    "file": "assets/cards/mountain.webp",
+    "description": "Mountain tribe card front",
+    "used_in": "Hero, deck, modal, host orbit",
+    "size": "480x702",
+    "kb": 34,
+    "prototype_blob_id": "d41275786f491fe572190d684f6b0773"
+  },
+  {
+    "file": "assets/cards/freeze.webp",
+    "description": "Freeze power card front",
+    "used_in": "Deck, mat (Punish Pile), modal",
+    "size": "480x702",
+    "kb": 89,
+    "prototype_blob_id": "ef0b6480c587878f3398b009e3c9d61d"
+  },
+  {
+    "file": "assets/cards/lightning.webp",
+    "description": "Lightning power card front",
+    "used_in": "Deck, mat (Punish Pile), modal",
+    "size": "480x702",
+    "kb": 53,
+    "prototype_blob_id": "ffcb3c1165633fe6f69a04abb7c8bfc0"
+  },
+  {
+    "file": "assets/cards/reverse.webp",
+    "description": "Reverse power card front",
+    "used_in": "Deck, modal",
+    "size": "480x702",
+    "kb": 52,
+    "prototype_blob_id": "9dac9c7d7d6625a1f06a8b562e9a7eb7"
+  },
+  {
+    "file": "assets/cards/meteor.webp",
+    "description": "Meteor power card front",
+    "used_in": "Deck, modal",
+    "size": "480x702",
+    "kb": 57,
+    "prototype_blob_id": "70bf67679cc3628d85bb202bbb5fed5c"
+  },
+  {
+    "file": "assets/cards/back.webp",
+    "description": "Card back (gold ZAMBAARA)",
+    "used_in": "Hero flip, deck, transit, deal-and-flip mosaic",
+    "size": "480x702",
+    "kb": 34,
+    "prototype_blob_id": "215219c33378f5c697ba1d47f6c3e476"
+  },
+  {
+    "file": "assets/cards/back-hd.webp",
+    "description": "Card back, high resolution",
+    "used_in": "Draw Deck stack on the mat",
+    "size": "720x1054",
+    "kb": 113,
+    "prototype_blob_id": "fdaf4532de73edc0fff3a2a6118b3be7"
+  },
+  {
+    "file": "assets/cards/reveal/reveal-lava.webp",
+    "description": "Tribe reveal card: Lava",
+    "used_in": "Tribe Reveal page",
+    "size": "635x840",
+    "kb": 70,
+    "prototype_blob_id": "32acaf35ab038f59fcb5ba064d1c61ad"
+  },
+  {
+    "file": "assets/cards/reveal/reveal-rain.webp",
+    "description": "Tribe reveal card: Rain",
+    "used_in": "Tribe Reveal page",
+    "size": "633x840",
+    "kb": 62,
+    "prototype_blob_id": "1329944f64b63ff47426b265080e1329"
+  },
+  {
+    "file": "assets/cards/reveal/reveal-wind.webp",
+    "description": "Tribe reveal card: Wind",
+    "used_in": "Tribe Reveal page",
+    "size": "633x840",
+    "kb": 51,
+    "prototype_blob_id": "e7b9e629b938bc930367430688f6861e"
+  },
+  {
+    "file": "assets/cards/reveal/reveal-mountain.webp",
+    "description": "Tribe reveal card: Mountain",
+    "used_in": "Tribe Reveal page",
+    "size": "633x840",
+    "kb": 72,
+    "prototype_blob_id": "bca0171f4ec62551a088c9e73240a105"
+  },
+  {
+    "file": "assets/icons/lava.png",
+    "description": "Lava element icon",
+    "used_in": "Card modal, footer, tournaments",
+    "size": "160x160",
+    "kb": 19,
+    "prototype_blob_id": "2a854478b32ca3f13514366407dfcdda"
+  },
+  {
+    "file": "assets/icons/rain.png",
+    "description": "Rain element icon",
+    "used_in": "Card modal, footer, tournaments",
+    "size": "160x160",
+    "kb": 17,
+    "prototype_blob_id": "6c702e8bf0446421dadb7bf9e183aea4"
+  },
+  {
+    "file": "assets/icons/wind.png",
+    "description": "Wind element icon",
+    "used_in": "Card modal, footer, tournaments",
+    "size": "160x160",
+    "kb": 22,
+    "prototype_blob_id": "ce7b6b3d43f274b0fd45b59d78f15a08"
+  },
+  {
+    "file": "assets/icons/mountain.png",
+    "description": "Mountain element icon",
+    "used_in": "Card modal, footer, tournaments",
+    "size": "160x160",
+    "kb": 15,
+    "prototype_blob_id": "0a4aa040be5dd0e1e0910e13d4ba852c"
+  },
+  {
+    "file": "assets/icons/freeze.png",
+    "description": "Freeze power icon",
+    "used_in": "Card modal",
+    "size": "160x160",
+    "kb": 23,
+    "prototype_blob_id": "3176f4c457d94672e5624d11c7f117c8"
+  },
+  {
+    "file": "assets/icons/lightning.png",
+    "description": "Lightning power icon",
+    "used_in": "Card modal",
+    "size": "160x160",
+    "kb": 18,
+    "prototype_blob_id": "3270e93cbf1f7a8b38a4de2ef7b5b190"
+  },
+  {
+    "file": "assets/icons/reverse.png",
+    "description": "Reverse power icon",
+    "used_in": "Card modal",
+    "size": "160x160",
+    "kb": 23,
+    "prototype_blob_id": "41f9d8046d15ef82f805d651af5ebfb9"
+  },
+  {
+    "file": "assets/icons/meteor.png",
+    "description": "Meteor power icon",
+    "used_in": "Card modal",
+    "size": "160x160",
+    "kb": 20,
+    "prototype_blob_id": "cd18bb2dd0c10f78a939345c7c3d8738"
+  },
+  {
+    "file": "assets/bracelets/bracelet-lava.webp",
+    "description": "Lava bracelet (generated, transparent)",
+    "used_in": "Bracelet Chamber on the mat, Tribe Reveal",
+    "size": "544x344",
+    "kb": 28,
+    "prototype_blob_id": "32533c74b72c32560f13edcc419f0ca5"
+  },
+  {
+    "file": "assets/bracelets/bracelet-rain.webp",
+    "description": "Rain bracelet (generated, transparent)",
+    "used_in": "Bracelet Chamber, Tribe Reveal",
+    "size": "544x344",
+    "kb": 28,
+    "prototype_blob_id": "9b587e1b53645e45217e3c42fd46828b"
+  },
+  {
+    "file": "assets/bracelets/bracelet-wind.webp",
+    "description": "Wind bracelet (generated, transparent)",
+    "used_in": "Bracelet Chamber, Tribe Reveal",
+    "size": "544x344",
+    "kb": 30,
+    "prototype_blob_id": "156138ea0ea69e5f437e96da5372ce66"
+  },
+  {
+    "file": "assets/bracelets/bracelet-mountain.webp",
+    "description": "Mountain bracelet (generated, transparent)",
+    "used_in": "Bracelet Chamber, Tribe Reveal",
+    "size": "544x344",
+    "kb": 24,
+    "prototype_blob_id": "c7a7ed8d21d55ed790c6feff0e4068c4"
+  },
+  {
+    "file": "assets/bracelets/bracelets-stack-photo.webp",
+    "description": "Real photo: four bracelets stacked",
+    "used_in": "Win the Bracelets ring, product gallery",
+    "size": "1400x1400",
+    "kb": 236,
+    "prototype_blob_id": "43d4d58831f6792f58ca412bbb7e4e57"
+  },
+  {
+    "file": "assets/backgrounds/universe-bg.jpg",
+    "description": "Black universe background (Prototype B + mobile)",
+    "used_in": "Fixed sky layer",
+    "size": "3200x1800",
+    "kb": 199,
+    "prototype_blob_id": "1ecd717cc53b843a355cd16c7f82b1a0"
+  },
+  {
+    "file": "assets/backgrounds/constellation-bg.jpg",
+    "description": "Constellation sky background (Prototype A)",
+    "used_in": "Fixed sky layer",
+    "size": "3200x1800",
+    "kb": 522,
+    "prototype_blob_id": "08d06b928d8576115694650b2e3ffd38"
+  },
+  {
+    "file": "assets/backgrounds/smoke.webp",
+    "description": "Smoke overlay (screen blend)",
+    "used_in": "Drifting fog over the sky",
+    "size": "1600x900",
+    "kb": 84,
+    "prototype_blob_id": "bab63b32940c73e0470e540fb610e546"
+  },
+  {
+    "file": "assets/backgrounds/mat-bg.jpg",
+    "description": "Play mat texture",
+    "used_in": "How to Play mat",
+    "size": "1600x800",
+    "kb": 98,
+    "prototype_blob_id": "a51dea1271eb591d3af8a4f0a7bf12ad"
+  },
+  {
+    "file": "assets/host/host-throw.webp",
+    "description": "The Host conjuring cards",
+    "used_in": "How to Play backdrop",
+    "size": "1024x1536",
+    "kb": 107,
+    "prototype_blob_id": "02107f6299c9f45cde9605b612039c16"
+  },
+  {
+    "file": "assets/host/host-portrait.webp",
+    "description": "The Host portrait (red top hat)",
+    "used_in": "Beat the Host",
+    "size": "1024x1536",
+    "kb": 134,
+    "prototype_blob_id": "75439b1583b6fab62ae2c62443069b17"
+  },
+  {
+    "file": "assets/gallery/friends-table.webp",
+    "description": "Players laughing at a stone table",
+    "used_in": "Gallery tile 1, deal-and-flip reveal image",
+    "size": "828x1100",
+    "kb": 168,
+    "prototype_blob_id": "a4e8a0744fa7730c545745ac90107518"
+  },
+  {
+    "file": "assets/gallery/box-waterfall.webp",
+    "description": "Wooden box by the falls",
+    "used_in": "Gallery, product gallery",
+    "size": "828x1100",
+    "kb": 131,
+    "prototype_blob_id": "8704b998e8921296e0a76ae0837cba37"
+  },
+  {
+    "file": "assets/gallery/hand.webp",
+    "description": "A hand of cards",
+    "used_in": "Gallery",
+    "size": "825x1100",
+    "kb": 48,
+    "prototype_blob_id": "f15c1d521c60b22a3df37c0b84d04ed5"
+  },
+  {
+    "file": "assets/gallery/tree.webp",
+    "description": "Zambaara in the wild (tree)",
+    "used_in": "Gallery",
+    "size": "828x1100",
+    "kb": 110,
+    "prototype_blob_id": "bccbed438cb78a60acb42e169760b007"
+  },
+  {
+    "file": "assets/gallery/face.webp",
+    "description": "Player hiding behind cards",
+    "used_in": "Gallery",
+    "size": "825x1100",
+    "kb": 86,
+    "prototype_blob_id": "bb7f31232f2c6ffe406f222642a14e43"
+  },
+  {
+    "file": "assets/gallery/cave-cards.webp",
+    "description": "Mountain, Rain and Lava cards in a cave",
+    "used_in": "Gallery, product gallery",
+    "size": "1600x573",
+    "kb": 83,
+    "prototype_blob_id": "97ef9a0885abe3ed3cba2d2decb9a897"
+  },
+  {
+    "file": "assets/gallery/fan-table.webp",
+    "description": "Full deck fanned on a table",
+    "used_in": "Gallery film poster, product gallery",
+    "size": "1600x1066",
+    "kb": 118,
+    "prototype_blob_id": "7d4818719df40ba9dec9467fa87b06cb"
+  },
+  {
+    "file": "assets/gallery/player-pouch.webp",
+    "description": "Player with pouch and bracelets",
+    "used_in": "Voices card 1",
+    "size": "618x1100",
+    "kb": 136,
+    "prototype_blob_id": "4cc7f27c736b438b293ca7242a62370d"
+  },
+  {
+    "file": "assets/gallery/player-reader.webp",
+    "description": "Player reading a Lava card",
+    "used_in": "Voices card 2",
+    "size": "618x1100",
+    "kb": 80,
+    "prototype_blob_id": "d64bee5a9a9b2e47595835a4e7f70fa6"
+  },
+  {
+    "file": "assets/gallery/player-box.webp",
+    "description": "Player holding the wooden box",
+    "used_in": "Voices card 3",
+    "size": "618x1100",
+    "kb": 143,
+    "prototype_blob_id": "4beafbbc12efaa55e65340610ebee609"
+  },
+  {
+    "file": "assets/product/battle-pack.jpg",
+    "description": "Battle Pack product photo (your reference photo)",
+    "used_in": "Product section main image",
+    "size": "972x996",
+    "kb": 237,
+    "prototype_blob_id": "e7439d51de886af5c60388d09b08b36d"
+  },
+  {
+    "file": "assets/sprites/hourglass-sprite.webp",
+    "description": "Sand clock sprite: 24 frames x 120x200",
+    "used_in": "Sand Clock zone on the mat",
+    "size": "5760x400",
+    "kb": 279,
+    "prototype_blob_id": "ce3396c890b3878107478968deb5d1e6"
+  },
+  {
+    "file": "assets/video/hero-a-intro.mp4",
+    "description": "Prototype A hero intro (plays once)",
+    "used_in": "Hero",
+    "size": "1920x1080, 10.0s",
+    "kb": 6219,
+    "prototype_blob_id": "358f810a3f13736567ce410d02bfdcdc"
+  },
+  {
+    "file": "assets/video/hero-a-loop.mp4",
+    "description": "Prototype A hero loop",
+    "used_in": "Hero",
+    "size": "1920x1080, 6.0s",
+    "kb": 835,
+    "prototype_blob_id": "baf6eaeab8bac4d26d4ab9365c541ed7"
+  },
+  {
+    "file": "assets/video/hero-a-poster.jpg",
+    "description": "Prototype A hero poster",
+    "used_in": "Hero",
+    "size": "1920x1080",
+    "kb": 301,
+    "prototype_blob_id": "1c63e30a969a1865890b5b7a5d3e73ce"
+  },
+  {
+    "file": "assets/video/hero-b-intro.mp4",
+    "description": "Prototype B / mobile hero intro (orb, plays once)",
+    "used_in": "Hero",
+    "size": "1920x1080, 10.0s",
+    "kb": 5603,
+    "prototype_blob_id": "a1e987741e8c1bffc3f98f12add3ba6b"
+  },
+  {
+    "file": "assets/video/hero-b-loop.mp4",
+    "description": "Prototype B / mobile hero loop",
+    "used_in": "Hero",
+    "size": "1920x1080, 12.0s",
+    "kb": 2283,
+    "prototype_blob_id": "5e911628440db44627a25a67c9c09cef"
+  },
+  {
+    "file": "assets/video/hero-b-poster.jpg",
+    "description": "Prototype B / mobile hero poster",
+    "used_in": "Hero",
+    "size": "1920x1080",
+    "kb": 199,
+    "prototype_blob_id": "fe20de65cf215d07a97ecdb3138cb73d"
+  },
+  {
+    "file": "assets/video/gallery-film.mp4",
+    "description": "Gallery film loop",
+    "used_in": "Gallery video tile",
+    "size": "1600x900, 20.6s",
+    "kb": 2752,
+    "prototype_blob_id": "c79bab4937763e57eae2d03c62bff5e7"
+  }
+]
