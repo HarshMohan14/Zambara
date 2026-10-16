@@ -260,9 +260,12 @@ const ELS=[
  stir(){this.gust=(rnd()<.5?-1:1)*2.4},
  amb:{n:46,mk(){return{x:rnd(),y:.3+rnd()*.7,v:.5+rnd(),r:.5+rnd()*1.1,a:.15+rnd()*.3,l:rnd()<.18}},draw(x,p){p.x+=S.wind*S.dt*.06*p.v+.002*S.dt;if(p.x>1.1)p.x=-.1;if(p.x<-.1)p.x=1.1;const X=p.x*S.w+bgOff(),Y=p.y*S.h+Math.sin(S.T+p.v*9)*6;if(p.l){x.strokeStyle=`rgba(230,205,165,${p.a*.4})`;x.lineWidth=.7;x.beginPath();x.moveTo(X,Y);x.lineTo(X-Math.sign(S.wind||1)*40*p.v,Y+2);x.stroke()}else{x.fillStyle=`rgba(236,214,178,${p.a})`;x.fillRect(X,Y,p.r,p.r)}}},
  note:'Desert sand travels by saltation, hopping in low arcs on the wind.'},
-{id:'mons',latin:'Mons',name:'Mountain',accent:'#b4c6e4',bg:'img/mons.jpg',shape:'cone',maxW:58,glow:0,subs:2,tone:.14,tint:'rgba(200,215,240,.035)',rim:1.22,
+{id:'mons',latin:'Mons',name:'Mountain',accent:'#b4c6e4',bg:'img/mons.jpg',shape:'cone',maxW:58,glow:0,subs:2,tone:.1,tint:'rgba(200,215,240,.035)',rim:1.22,
  mat:{moveP:1,slideP:.3,spread:0,windP:0},
- pal(){ramp([[1,'#6b6b70'],[40,'#7f7d7b']]);bandsP(41,24,['#3c3b3f','#5f6470','#7d5d42','#b18c63','#8b8681','#714737','#58634f','#a7a297']);ramp([[233,'#d6dfec'],[255,'#ffffff']])},
+ // one tonal family: graphite strata rising to silver, separated by faint seams, under a blue-white snow cap
+ pal(){ramp([[1,'#5c5f66'],[40,'#6d7078']]);
+  ['#25272c','#31343a','#3f4249','#4e5259','#5f636b','#71757d','#858990','#9b9fa5'].forEach((h,b)=>{const a=hex(h),seam=b%2?.93:1;for(let k=0;k<24;k++){const f=(.95+.1*k/23)*seam,i=41+b*24+k;pr[i]=a[0]*f;pg[i]=a[1]*f;pb[i]=a[2]*f}});
+  ramp([[233,'#c9d3e0'],[255,'#f2f5fa']])},
  init(){return 1+(rnd()*39|0)}, cross(j){const p=progress();c[j]=p>.9?233+(rnd()*22|0):41+Math.min(7,(p/.9*8)|0)*24+(rnd()*23|0)},
  every(){if(this.av>0){this.av-=S.dt;if(this.av<=0)this.mat.slideP=.3}if(progress()>.88&&rnd()<.12){const sy=surfaceY();S.fx.push({k:'glint',x:S.sx(CX+(rnd()-.5)*8),y:S.sy(sy+rnd()*3*gs()),life:.6,max:.6,r:1})}},
  stir(){this.mat.slideP=1;this.av=1.6;burst(18,['#d6dfec','#a7a297'])},
@@ -379,8 +382,8 @@ function drawFx(x){for(let k=S.fx.length-1;k>=0;k--){const p=S.fx[k];p.life-=S.d
  if(p.k==='spark'){x.globalCompositeOperation='lighter';x.fillStyle=rgba(p.col,a);x.beginPath();x.arc(p.x,p.y,p.r,0,TAU);x.fill();x.globalCompositeOperation='source-over'}
  else if(p.k==='wisp'){x.fillStyle=rgba(p.col,a*.6);x.beginPath();x.arc(p.x,p.y,p.r,0,TAU);x.fill()}
  else if(p.k==='glint'){const s=Math.sin(a*Math.PI);x.strokeStyle=`rgba(255,255,255,${s*.9})`;x.lineWidth=.7;x.beginPath();x.moveTo(p.x-2.5*s,p.y);x.lineTo(p.x+2.5*s,p.y);x.moveTo(p.x,p.y-2.5*s);x.lineTo(p.x,p.y+2.5*s);x.stroke()}
- else if(p.k==='drop'){const sp=Math.min(4,1+p.vy/120);x.fillStyle='rgba(190,228,255,.85)';x.beginPath();x.ellipse(p.x,p.y,p.r*.7,p.r*sp*.8,0,0,TAU);x.fill()}
- else if(p.k==='ring'){const t=1-a,rx=p.r0+t*p.grow;x.strokeStyle=rgba(p.col,a*.7);x.lineWidth=.7;x.beginPath();x.ellipse(p.x,p.y,rx,Math.max(.4,rx*.22),0,0,TAU);x.stroke()}
+ else if(p.k==='drop'){const sp=Math.min(4,1+Math.abs(p.vy)/120);x.fillStyle='rgba(190,228,255,.85)';x.beginPath();x.ellipse(p.x,p.y,Math.max(.2,p.r*.7),Math.max(.2,p.r*sp*.8),0,0,TAU);x.fill()}
+ else if(p.k==='ring'){const t=1-a,rx=Math.max(.4,p.r0+t*p.grow);x.strokeStyle=rgba(p.col,a*.7);x.lineWidth=.7;x.beginPath();x.ellipse(p.x,p.y,rx,Math.max(.4,rx*.22),0,0,TAU);x.stroke()}
  }}
 
 /* ============ input: gyroscope, touch, keys ============ */
@@ -592,7 +595,10 @@ function renderCodex(){$('stEss').textContent=Object.values(db.ess).reduce((a,b)
 
 /* ============ loop ============ */
 let last=performance.now(),simAcc=0,saveT=0;
-function loop(now){let raw=(now-last)/1000;last=now;
+/* the frame loop always schedules the next frame first, so one bad frame can never freeze the app */
+let errN=0;
+function loop(now){requestAnimationFrame(loop);try{tick(now)}catch(e){errN++;if(errN<5)console.error(e);S.fx.length=0;snapT=0;cv.width=cv.width;bgc.width=bgc.width}}
+function tick(now){let raw=(now-last)/1000;last=now;
  if(raw>.3&&S.running&&!finished&&flipT<0){fastForward(raw);raw=.016}
  const dt=Math.min(.05,Math.max(0,raw));S.dt=dt;S.T+=dt;
  if(!dragging&&Math.abs(dragAng)>.05)dragAng*=Math.pow(.015,dt);
@@ -610,7 +616,7 @@ function loop(now){let raw=(now-last)/1000;last=now;
  if(finished&&flipT<0&&Math.abs(S.grav.y)>.35&&cnt[sNow]>0)resumeFlip();
  if(S.running&&!finished&&flipT<0&&Math.abs(S.grav.y)>.2&&cnt[sNow]===0){finished=true;S.running=false;S.flashA=reduce?0:.12;award();chainWin=6;burst(30,[th.accent,'#ffffff']);try{navigator.vibrate&&navigator.vibrate([24,60,24])}catch(_){}syncCtrl();saveState()}
  saveT+=dt;if(saveT>1){saveT=0;saveState()}
- draw();updateUI();requestAnimationFrame(loop)}
+ draw();updateUI()}
 
 let st0=null;try{st0=JSON.parse(localStorage.getItem(STK)||'null')}catch(_){}
 if(st0&&okDur(st0.dur))dur=st0.dur;else if(okDur(db.dur))dur=db.dur;
