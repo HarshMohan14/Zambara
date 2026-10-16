@@ -44,6 +44,12 @@ button:focus-visible{outline:1px solid var(--accent);outline-offset:3px;border-r
 .tab::after{content:"";position:absolute;bottom:3px;left:50%;width:0;height:1px;background:var(--accent);transform:translateX(-50%);transition:width .5s}
 .tab[aria-pressed="true"]{color:var(--accent)}
 .tab[aria-pressed="true"]::after{width:16px}
+/* phone held upside down: the glass stays fixed to the phone; the time turns in place so it stays readable */
+.readout{transition:transform .7s cubic-bezier(.65,0,.35,1)}
+body.inv .readout{transform:rotate(180deg)}
+body.inv .toast{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);transform:translate(-50%,8px) rotate(180deg)}
+body.inv .toast.on{transform:translate(-50%,0) rotate(180deg)}
+body.inv .fexit{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%) rotate(180deg)}
 /* focus mode: only the hourglass remains */
 .app>*{transition:opacity .5s ease}
 body.focus .app>*{opacity:0;pointer-events:none}
@@ -183,8 +189,13 @@ function newSess(){return{run:0,disturbed:false,by:{}}}
 let sess=newSess(),chain=0,chainWin=0,pOv=-1;
 const rowL=new Int16Array(H),rowR=new Int16Array(H);
 const SIN=new Float32Array(1024);for(let k=0;k<1024;k++)SIN[k]=Math.sin(k/1024*TAU);
-const progress=()=>pOv>=0?pOv:Math.max(0,Math.min(1,1-cnt[0]/N0));
-function surfaceY(){for(let y=MID+1;y<=Y1;y++){const i=y*W;if(g[i+75]===1||g[i+74]===1||g[i+76]===1)return y}return Y1+1}
+/* the source chamber is whichever one is physically on top right now */
+let srcS=0,lastSrcS=0;
+function srcSide(){const gy=S.grav.y;if(gy>.2)srcS=0;else if(gy<-.2)srcS=1;return srcS}
+const gs=()=>S.grav.y>=0?1:-1;
+const progress=()=>pOv>=0?pOv:Math.max(0,Math.min(1,1-cnt[srcSide()]/N0));
+function surfaceY(){if(S.grav.y>=0){for(let y=MID+1;y<=Y1;y++){const i=y*W;if(g[i+75]===1||g[i+74]===1||g[i+76]===1)return y}return Y1+1}
+ for(let y=MID-2;y>=Y0;y--){const i=y*W;if(g[i+75]===1||g[i+74]===1||g[i+76]===1)return y+1}return Y0}
 
 /* ============ the four elements ============ */
 const FINISH=[['Graphite','#121316','#4a4d55','#c3c7cf'],['Bronze','#1f130a','#7a4f2c','#e6b585'],['Silver','#202328','#8e959f','#f3f5f8'],['Gold','#241806','#9a7230','#f5da94'],['Obsidian','#050506','#25262b','#d8b96a']];
@@ -195,9 +206,9 @@ const ELS=[
  mat:{moveP:.55,slideP:.5,spread:1,windP:0},
  pal(){ramp([[1,'#0c0706'],[25,'#1d0b07'],[60,'#46110a'],[110,'#8a1b0c'],[160,'#c5300f'],[210,'#ea5018'],[255,'#ff8442']])},
  init(){return 205+(rnd()*50|0)}, cross(j){c[j]=235+(rnd()*20|0)},
- age(i){if(st[i]>28&&c[i]>10){if(tn[i]>226){if(rnd()<.1)c[i]--}else c[i]-=c[i]>90?3:1}},
+ age(i){if(st[i]<3){if(c[i]<215)c[i]+=7}else if(st[i]>28&&c[i]>10){if(tn[i]>226){if(rnd()<.1)c[i]--}else c[i]-=c[i]>90?3:1}},
  shade(i,f,x,y){return c[i]>150?f*(1+.08*SIN[((S.T*2.6+x*.21+y*.17)*162.97|0)&1023]):f},
- every(){if(S.running&&!finished&&rnd()<.22){const sy=surfaceY();S.fx.push({k:'spark',x:S.sx(CX+(rnd()-.5)*30),y:S.sy(sy),vx:(rnd()-.5)*10,vy:-14-rnd()*22,ay:-4,life:1+rnd()*1.2,max:2.2,r:.5+rnd()*.9,col:rnd()<.6?'#ff6a2a':'#ffb070'})}},
+ every(){if(S.running&&!finished&&rnd()<.22){const sy=surfaceY();S.fx.push({k:'spark',x:S.sx(CX+(rnd()-.5)*30),y:S.sy(sy),vx:(rnd()-.5)*10,vy:(-14-rnd()*22)*gs(),ay:-4*gs(),life:1+rnd()*1.2,max:2.2,r:.5+rnd()*.9,col:rnd()<.6?'#ff6a2a':'#ffb070'})}},
  stir(){for(let i=0;i<N;i++)if(g[i]===1&&c[i]<200)c[i]=200+(rnd()*40|0);burst(26,['#ff6a2a','#ffb070'])},
  amb:{n:30,mk(){return{x:rnd(),y:.55+rnd()*.5,v:.015+rnd()*.03,r:.5+rnd()*1.3,ph:rnd()*TAU}},draw(x,p){p.y-=p.v*S.dt;p.x+=Math.sin(S.T*.6+p.ph)*.0004;if(p.y<.2){p.y=1.02;p.x=rnd()}const a=(.35+.45*Math.sin(S.T*3+p.ph))*Math.min(1,(p.y-.2)*3);x.fillStyle=`rgba(255,120,50,${Math.max(0,a)})`;x.beginPath();x.arc(p.x*S.w+bgOff(),p.y*S.h,p.r,0,TAU);x.fill()},add:true},
  note:'Molten basalt pours slow and heavy, then cools to a black crust veined with fire.'},
@@ -214,7 +225,7 @@ const ELS=[
  pal(){ramp([[1,'#a38865'],[90,'#c9b18e'],[170,'#e2d1b2'],[255,'#f3e9d8']])},
  init(){return 1+(rnd()*254|0)}, cross(){},
  every(){this.gust=(this.gust||0)*Math.pow(.3,S.dt);S.wind=Math.sin(S.T*.45)*.55+Math.sin(S.T*1.3+1)*.25+S.grav.x*1.3+this.gust;this.mat.windP=Math.min(.7,.1+Math.abs(S.wind)*.32);S.windSide=S.wind>0?-1:1;
-  if(rnd()<.3+Math.abs(S.wind)*.3){const sy=surfaceY();if(sy<=Y1){S.fx.push({k:'wisp',x:S.sx(CX+(rnd()-.5)*20),y:S.sy(sy)-1,vx:S.wind*40+(rnd()-.5)*8,vy:-3-rnd()*6,ay:4,life:.9+rnd()*.8,max:1.7,r:.6+rnd()*.5,col:'#efe2c8'})}}},
+  if(rnd()<.3+Math.abs(S.wind)*.3){const sy=surfaceY();if(sy<=Y1&&sy>Y0){S.fx.push({k:'wisp',x:S.sx(CX+(rnd()-.5)*20),y:S.sy(sy)-gs(),vx:S.wind*40+(rnd()-.5)*8,vy:(-3-rnd()*6)*gs(),ay:4*gs(),life:.9+rnd()*.8,max:1.7,r:.6+rnd()*.5,col:'#efe2c8'})}}},
  stir(){this.gust=(rnd()<.5?-1:1)*2.4},
  amb:{n:46,mk(){return{x:rnd(),y:.3+rnd()*.7,v:.5+rnd(),r:.5+rnd()*1.1,a:.15+rnd()*.3,l:rnd()<.18}},draw(x,p){p.x+=S.wind*S.dt*.06*p.v+.002*S.dt;if(p.x>1.1)p.x=-.1;if(p.x<-.1)p.x=1.1;const X=p.x*S.w+bgOff(),Y=p.y*S.h+Math.sin(S.T+p.v*9)*6;if(p.l){x.strokeStyle=`rgba(230,205,165,${p.a*.4})`;x.lineWidth=.7;x.beginPath();x.moveTo(X,Y);x.lineTo(X-Math.sign(S.wind||1)*40*p.v,Y+2);x.stroke()}else{x.fillStyle=`rgba(236,214,178,${p.a})`;x.fillRect(X,Y,p.r,p.r)}}},
  note:'Desert sand travels by saltation, hopping in low arcs on the wind.'},
@@ -222,7 +233,7 @@ const ELS=[
  mat:{moveP:1,slideP:.3,spread:0,windP:0},
  pal(){ramp([[1,'#6b6b70'],[40,'#7f7d7b']]);bandsP(41,24,['#3c3b3f','#5f6470','#7d5d42','#b18c63','#8b8681','#714737','#58634f','#a7a297']);ramp([[233,'#d6dfec'],[255,'#ffffff']])},
  init(){return 1+(rnd()*39|0)}, cross(j){const p=progress();c[j]=p>.9?233+(rnd()*22|0):41+Math.min(7,(p/.9*8)|0)*24+(rnd()*23|0)},
- every(){if(this.av>0){this.av-=S.dt;if(this.av<=0)this.mat.slideP=.3}if(progress()>.88&&rnd()<.12){const sy=surfaceY();S.fx.push({k:'glint',x:S.sx(CX+(rnd()-.5)*8),y:S.sy(sy+rnd()*3),life:.6,max:.6,r:1})}},
+ every(){if(this.av>0){this.av-=S.dt;if(this.av<=0)this.mat.slideP=.3}if(progress()>.88&&rnd()<.12){const sy=surfaceY();S.fx.push({k:'glint',x:S.sx(CX+(rnd()-.5)*8),y:S.sy(sy+rnd()*3*gs()),life:.6,max:.6,r:1})}},
  stir(){this.mat.slideP=1;this.av=1.6;burst(18,['#d6dfec','#a7a297'])},
  amb:{n:22,mk(){return{x:rnd(),y:rnd(),v:.012+rnd()*.02,r:.5+rnd()*1,ph:rnd()*TAU}},draw(x,p){p.y+=p.v*S.dt*(progress()>.85?2.5:1);p.x+=Math.sin(S.T*.5+p.ph)*.0003;if(p.y>1.02){p.y=-.02;p.x=rnd()}x.fillStyle=`rgba(225,234,248,${.25+.25*Math.sin(S.T+p.ph)})`;x.beginPath();x.arc(p.x*S.w+bgOff()*1.6,p.y*S.h,p.r,0,TAU);x.fill()},mist:true},
  note:'Each band of stone is a slice of your time. The snow cap is the final tenth.'}
@@ -296,6 +307,7 @@ function fill(p=0,keep=false){
  let b=0;S.ff=true;for(let y=Y1;y>MID&&b<botN;y--)for(const x of xOrder){if(b>=botN)break;const i=y*W+x;if(g[i]===0){g[i]=1;tn[i]=rnd()*255|0;pOv=(b+1)/N0;c[i]=th.init();th.cross(i);st[i]=60;b++}}
  pOv=-1;S.ff=false;
  cnt[0]=acc;cnt[1]=b;rate=N0/dur;tokens=0;lastSec=-1;S.fx.length=0;
+ if(srcSide()===1)rotate180(); // phone held upside down: the remaining sand goes in the chamber that is physically on top
  if(!keep){finished=false;sess=newSess();chainWin=0}
 }
 
@@ -304,8 +316,10 @@ const sideOf=y=>y<MID?0:1;
 function moveTo(i,j,y,ny){g[j]=1;c[j]=c[i];st[j]=0;tn[j]=tn[i];stamp[j]=frame;g[i]=0;c[i]=0;st[i]=0;if(y<MID!==ny<MID){const a=sideOf(y),b=sideOf(ny);cnt[a]--;cnt[b]++;th.cross(j)}}
 function mv(x,y,i,d){const nx=x+DX[d],ny=y+DY[d];if(nx<0||nx>=W||ny<0||ny>=H)return false;const j=ny*W+nx;if(g[j]!==0)return false;if((y<MID)!==(ny<MID)){if(!S.running||finished||tokens<1)return false;tokens-=1}moveTo(i,j,y,ny);return true}
 function step(base,frac){
- frame=(frame+1)&255;if(frame===0)frame=1;const ltr=(frame&1)===0;
- for(let y=Y1;y>=Y0;y--){const row=y*W,L=rowL[y],R=rowR[y],n=R-L+1;for(let k=0;k<n;k++){const x=ltr?L+k:R-k,i=row+x;if(g[i]!==1||stamp[i]===frame)continue;
+ frame=(frame+1)&255;if(frame===0)frame=1;
+ // scan against gravity so a falling column moves together, whichever way the phone points
+ const down=S.grav.y>=0,yA=down?Y1:Y0,yB=down?Y0-1:Y1+1,ys=down?-1:1,gx=S.grav.x,ltr=gx>.3?false:gx<-.3?true:(frame&1)===0;
+ for(let y=yA;y!==yB;y+=ys){const row=y*W,L=rowL[y],R=rowR[y],n=R-L+1;for(let k=0;k<n;k++){const x=ltr?L+k:R-k,i=row+x;if(g[i]!==1||stamp[i]===frame)continue;
   const m=mats[c[i]];
   if(m.moveP<1&&rnd()>m.moveP){if(st[i]<255)st[i]++;continue}
   const d=(base+(rnd()<frac?1:0))&7;
@@ -316,16 +330,19 @@ function step(base,frac){
   if(st[i]<255)st[i]++}}
 }
 function rotate180(){for(let i=0,j=N-1;i<j;i++,j--){let t=g[i];g[i]=g[j];g[j]=t;t=c[i];c[i]=c[j];c[j]=t;t=st[i];st[i]=st[j];st[j]=t;t=tn[i];tn[i]=tn[j];tn[j]=t}const t=cnt[0];cnt[0]=cnt[1];cnt[1]=t}
-function fastForward(sec){let k=Math.min(cnt[0],Math.round(rate*sec));if(k<=0)return;S.ff=true;const used=k/rate;sess.run+=used;sess.by[th.id]=(sess.by[th.id]||0)+used;
- let removed=0;for(let y=Y0;y<MID&&removed<k;y++)for(let x=0;x<W&&removed<k;x++){const i=y*W+x;if(g[i]===1){g[i]=0;c[i]=0;st[i]=0;removed++}}
- let added=0;for(let y=Y1;y>MID&&added<removed;y--)for(const x of xOrder){if(added>=removed)break;const i=y*W+x;if(g[i]===0&&isOpen(x,y)){g[i]=1;tn[i]=rnd()*255|0;c[i]=th.init();th.cross(i);st[i]=60;added++}}
- cnt[0]-=removed;cnt[1]+=added;S.ff=false}
+/* catch up after the app was in the background: move sand from the far end of the upper chamber to the far end of the lower one */
+function fastForward(sec){const s=srcSide(),d=1-s;let k=Math.min(cnt[s],Math.round(rate*sec));if(k<=0)return;S.ff=true;const used=k/rate;sess.run+=used;sess.by[th.id]=(sess.by[th.id]||0)+used;
+ let removed=0;const rem=(y)=>{for(let x=0;x<W&&removed<k;x++){const i=y*W+x;if(g[i]===1){g[i]=0;c[i]=0;st[i]=0;removed++}}};
+ if(s===0){for(let y=Y0;y<MID&&removed<k;y++)rem(y)}else{for(let y=Y1;y>=MID&&removed<k;y--)rem(y)}
+ let added=0;const add=(y)=>{for(const x of xOrder){if(added>=removed)break;const i=y*W+x;if(g[i]===0&&isOpen(x,y)){g[i]=1;tn[i]=rnd()*255|0;c[i]=th.init();th.cross(i);st[i]=60;added++}}};
+ if(d===1){for(let y=Y1;y>MID&&added<removed;y--)add(y)}else{for(let y=Y0;y<MID-1&&added<removed;y++)add(y)}
+ cnt[s]-=removed;cnt[d]+=added;S.ff=false}
 
 /* ============ effects ============ */
-function burst(n,cols){const sy=S.sy(surfaceY()),cx=S.sx(CX);for(let i=0;i<n;i++){const a=-Math.PI*rnd(),v=20+rnd()*50;S.fx.push({k:'spark',x:cx+(rnd()-.5)*S.cs*20,y:sy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,ay:40,life:.6+rnd()*.8,max:1.4,r:.5+rnd()*.9,col:cols[i%cols.length]})}}
-function dropFx(){const ny=S.sy(MID+1),sy=S.sy(surfaceY());if(sy-ny<6)return;S.fx.push({k:'drop',x:S.sx(CX)+S.grav.x*2,y:ny,vx:S.grav.x*30,vy:30,ay:420,ty:sy,life:3,max:3,r:.9+rnd()*1.1})}
+function burst(n,cols){const sy=S.sy(surfaceY()),cx=S.sx(CX),s=gs();for(let i=0;i<n;i++){const a=-Math.PI*rnd(),v=20+rnd()*50;S.fx.push({k:'spark',x:cx+(rnd()-.5)*S.cs*20,y:sy,vx:Math.cos(a)*v,vy:Math.sin(a)*v*s,ay:40*s,life:.6+rnd()*.8,max:1.4,r:.5+rnd()*.9,col:cols[i%cols.length]})}}
+function dropFx(){const s=gs(),ny=S.sy(s>0?MID+1:MID-1),sy=S.sy(surfaceY());if(Math.abs(sy-ny)<6)return;S.fx.push({k:'drop',x:S.sx(CX)+S.grav.x*2,y:ny,vx:S.grav.x*30,vy:30*s,ay:420*s,ty:sy,life:3,max:3,r:.9+rnd()*1.1})}
 function drawFx(x){for(let k=S.fx.length-1;k>=0;k--){const p=S.fx[k];p.life-=S.dt;p.vx+=(p.ax||0)*S.dt;p.vy+=(p.ay||0)*S.dt;p.x+=(p.vx||0)*S.dt;p.y+=(p.vy||0)*S.dt;
- if(p.ty!=null&&p.y>=p.ty){S.fx.push({k:'ring',x:p.x,y:p.ty,r0:.5,grow:S.cs*(5+rnd()*5),life:.7,max:.7,col:'#d7efff'});S.fx.splice(k,1);continue}
+ if(p.ty!=null&&(p.vy>=0?p.y>=p.ty:p.y<=p.ty)){S.fx.push({k:'ring',x:p.x,y:p.ty,r0:.5,grow:S.cs*(5+rnd()*5),life:.7,max:.7,col:'#d7efff'});S.fx.splice(k,1);continue}
  if(p.life<=0){S.fx.splice(k,1);continue}
  const a=Math.max(0,Math.min(1,p.life/p.max));
  if(p.k==='spark'){x.globalCompositeOperation='lighter';x.fillStyle=rgba(p.col,a);x.beginPath();x.arc(p.x,p.y,p.r,0,TAU);x.fill();x.globalCompositeOperation='source-over'}
@@ -344,15 +361,22 @@ let dragAng=0,dragging=false,ptr=null,lastTap=0,keyAng=0,listening=false,askPerm
 function oAngle(){return((((screen.orientation&&screen.orientation.angle)||window.orientation||0)%360)+360)%360}
 function onOri(e){if(e.beta==null||e.gamma==null)return;const b=e.beta*Math.PI/180,gm=e.gamma*Math.PI/180,dx=Math.cos(b)*Math.sin(gm),dy=-Math.sin(b);let sx=dx,sy=-dy;const a=oAngle();if(a===90){sx=-dy;sy=-dx}else if(a===180){sx=-dx;sy=dy}else if(a===270){sx=dy;sy=dx}
  const now=performance.now();sensor.sx=fX(sx,now);sensor.sy=fY(sy,now);if(!sensor.on){sensor.on=true;updHint()}
- if(sensor.armed&&sy<-.55){if(!sensor.upT)sensor.upT=now;else if(now-sensor.upT>180){sensor.armed=false;sensor.upT=0;flip()}}else if(sy>-.3)sensor.upT=0;
- if(!sensor.armed&&sy>.35)sensor.armed=true}
+ // held upside down: keep the time and buttons readable (the glass itself stays put, like a real one)
+ if(!inv&&sensor.sy<-.55){inv=true;document.body.classList.add('inv')}else if(inv&&sensor.sy>.25){inv=false;document.body.classList.remove('inv')}}
+let inv=false;
 function onMot(e){const a=e.acceleration;if(!a||a.x==null)return;const m=Math.hypot(a.x,a.y||0,a.z||0),now=performance.now();if(m>15&&now-sensor.lastShake>1000){sensor.lastShake=now;th.stir&&th.stir()}}
 function attach(){if(listening)return;listening=true;addEventListener('deviceorientation',onOri);addEventListener('devicemotion',onMot);setTimeout(updHint,1500)}
 function onceTip(key,msg){try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1')}catch(_){}toast(msg,'')}
 function updHint(){const D=window.DeviceOrientationEvent,b=$('motionBtn');b.hidden=!(!sensor.on&&D&&typeof D.requestPermission==='function'&&!askPerm);
- if(sensor.on)onceTip('zmb.tip.gyro','Turn the phone over to flip');else if(listening&&b.hidden)onceTip('zmb.tip.drag','Drag to tilt · swipe to flip')}
+ if(sensor.on)onceTip('zmb.tip.gyro2','Turn your phone over to flip the glass');else if(listening&&b.hidden)onceTip('zmb.tip.drag','Drag to tilt · swipe to flip')}
+/* iPhone: ask for motion access on the first tap anywhere, so turning the phone works without hunting for a button */
+(()=>{const D=window.DeviceOrientationEvent;if(!(D&&typeof D.requestPermission==='function'))return;const ask=()=>{document.removeEventListener('touchend',ask,true);document.removeEventListener('click',ask,true);if(sensor.on||askPerm)return;$('motionBtn').click()};document.addEventListener('touchend',ask,true);document.addEventListener('click',ask,true)})();
 $('motionBtn').onclick=()=>{const D=window.DeviceOrientationEvent,M=window.DeviceMotionEvent;askPerm=true;if(D&&D.requestPermission)D.requestPermission().then(r=>{if(r==='granted')attach();updHint()}).catch(updHint);if(M&&typeof M.requestPermission==='function')M.requestPermission().catch(()=>{})};
-function targetGrav(){let x,y;if(dragging||!sensor.on||Math.abs(keyAng)>.5){const a=(dragAng+keyAng)*Math.PI/180;x=Math.sin(a);y=Math.cos(a)}else{x=sensor.sx;y=sensor.sy;const m=Math.hypot(x,y),k=Math.min(1,m/.45);x*=k;y=y*k+(1-k)}y=Math.max(y,.3);const n=Math.hypot(x,y)||1;return{x:x/n,y:y/n}}
+/* real gravity in screen terms, any direction. Lying flat, it keeps pouring the way it last pointed. */
+let lastDir={x:0,y:1},gAng=Math.PI/2;
+function targetGrav(){let x,y;if(dragging||!sensor.on||Math.abs(keyAng)>.5){const a=(dragAng+keyAng)*Math.PI/180;x=Math.sin(a);y=Math.cos(a)}
+ else{x=sensor.sx;y=sensor.sy;const m=Math.hypot(x,y);if(m>.5)lastDir={x:x/m,y:y/m};else{const k=.5-m;x+=lastDir.x*k;y+=lastDir.y*k}}
+ const n=Math.hypot(x,y)||1;return{x:x/n,y:y/n}}
 const gl=$('glass');
 /* the glass area (and the full-screen pad in focus mode) take the same gestures: drag sideways to tilt, swipe to flip, double-tap to stir */
 function bindPad(el){
@@ -364,8 +388,9 @@ bindPad(gl);bindPad($('pad'));
 document.addEventListener('keydown',e=>{if(focus&&e.key==='Escape'){setFocus(false);e.preventDefault();return}if(!$('sheet').hidden){if(e.key==='Escape')closeCodex();return}if(e.target&&e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;if(e.key==='ArrowLeft'){keyAng=Math.max(-70,keyAng-14);sess.disturbed=true}else if(e.key==='ArrowRight'){keyAng=Math.min(70,keyAng+14);sess.disturbed=true}else if(e.key==='ArrowUp'||e.key==='f'){flip()}else return;e.preventDefault()});
 
 function flip(){if(flipT>=0)return;flipT=0;try{navigator.vibrate&&navigator.vibrate(16)}catch(_){}}
-function onFlipped(){rotate180();
- if(finished&&cnt[0]>0){finished=false;S.running=true;if(chainWin>0){chain++;db.bestChain=Math.max(db.bestChain,chain);if(chain>=3)grantSeal('chain3');saveDb();toast('Chain ×'+chain,'· essence +'+Math.min(4,chain)*25+'%')}else chain=0;chainWin=0;sess=newSess();syncCtrl()}saveState()}
+function onFlipped(){rotate180();if(finished&&cnt[srcSide()]>0)resumeFlip();saveState()}
+/* an emptied glass turned over starts again; within six seconds it extends the chain */
+function resumeFlip(){finished=false;S.running=true;if(chainWin>0){chain++;db.bestChain=Math.max(db.bestChain,chain);if(chain>=3)grantSeal('chain3');saveDb();toast('Chain ×'+chain,'· essence +'+Math.min(4,chain)*25+'%')}else chain=0;chainWin=0;sess=newSess();syncCtrl();saveState()}
 
 /* ============ layout ============ */
 /* two layers: a soft backdrop at low resolution, the hourglass at full sharpness */
@@ -380,9 +405,10 @@ function layout(){dpr=Math.min(2,window.devicePixelRatio||1);bdpr=Math.min(1.25,
 let focus=false,zoomT=1,zoomA=null,fAmt=0,revealT=0;
 function zoomTf(x){if(zoomT>=1||!zoomA)return;const e=ease(zoomT),s=(zoomA.cs/S.cs)*(1-e)+e,ax=zoomA.gx+CX*zoomA.cs,ay=zoomA.gy+MID*zoomA.cs,bx=S.gx+CX*S.cs,by=S.gy+MID*S.cs;x.translate(ax+(bx-ax)*e,ay+(by-ay)*e);x.scale(s,s);x.translate(-bx,-by)}
 function setFocus(on){if(on===focus)return;const A={cs:S.cs,gx:S.gx,gy:S.gy};focus=on;document.body.classList.toggle('focus',on);$('pad').hidden=!on;
- if(on){wake();if(!$('sheet').hidden)closeCodex();try{const d=document.documentElement;if(d.requestFullscreen&&!document.fullscreenElement)d.requestFullscreen({navigationUI:'hide'}).catch(()=>{})}catch(_){}}
+ if(on){wake();if(!$('sheet').hidden)closeCodex();try{const d=document.documentElement;if(d.requestFullscreen&&!document.fullscreenElement)d.requestFullscreen({navigationUI:'hide'}).then(lockPortrait).catch(()=>{});else lockPortrait()}catch(_){}}
  else{document.body.classList.remove('reveal');clearTimeout(revealT);try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{})}catch(_){}$('focusBtn').focus()}
  layout();zoomA=A;zoomT=0}
+function lockPortrait(){try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait-primary').catch(()=>{})}catch(_){}}
 function reveal(){document.body.classList.add('reveal');clearTimeout(revealT);revealT=setTimeout(()=>document.body.classList.remove('reveal'),3200)}
 $('focusBtn').onclick=()=>setFocus(true);$('exitFocus').onclick=()=>setFocus(false);
 function cacheGrads(){const x=ctx,w=S.w,h=S.h;
@@ -482,7 +508,7 @@ function syncCtrl(){[...tabs.children].forEach((b,i)=>b.setAttribute('aria-press
  const run=S.running&&!finished;$('playIc').innerHTML=run?PAUSE:PLAY;$('playBtn').setAttribute('aria-label',finished?'Start again':run?'Pause':'Resume')}
 function renderMeta(){$('codexBtn').setAttribute('aria-label',`Open the Codex, ${Object.values(db.ess).reduce((a,b)=>a+b,0)} essence`)}
 let lt='',ls='',lp=-1;
-function updateUI(){const rem=cnt[0]/rate,t=fmt(rem);if(t!==lt){$('time').textContent=t;$('ftime').textContent=t;lt=t;gl.setAttribute('aria-label',`${th.name} hourglass, ${t} left`)}
+function updateUI(){const rem=cnt[srcSide()]/rate,t=fmt(rem);if(t!==lt){$('time').textContent=t;$('ftime').textContent=t;lt=t;gl.setAttribute('aria-label',`${th.name} hourglass, ${t} left`)}
  const s=finished?(chainWin>0?'Flip to chain · '+Math.ceil(chainWin):'Complete'):(!S.running?'Paused':'');
  if(s!==ls){$('status').textContent=s;ls=s}
  const off=216.8*(1-progress());if(Math.abs(off-lp)>.3){$('prog').setAttribute('stroke-dashoffset',off.toFixed(1));lp=off}
@@ -493,7 +519,7 @@ function setEl(i,first){
  const p=first?0:progress(),wasRun=S.running,wasFin=finished,cw=chainWin;
  if(!first&&cv.width>2){snap.width=cv.width;snap.height=cv.height;const sx=snap.getContext('2d');sx.drawImage(bgc,0,0,cv.width,cv.height);sx.drawImage(cv,0,0);snapT=1}
  thIdx=i;th=ELS[i];db.el=i;saveDb();for(let k=0;k<256;k++){pr[k]=pg[k]=pb[k]=0;mats[k]=th.mat}th.pal();th.mat.slideP=th.id==='mons'?.3:th.mat.slideP;buildGlass();
- S.amb=Array.from({length:th.amb.n},()=>th.amb.mk());const g0=targetGrav();S.grav.x=g0.x;S.grav.y=g0.y;
+ S.amb=Array.from({length:th.amb.n},()=>th.amb.mk());const g0=targetGrav();S.grav.x=g0.x;S.grav.y=g0.y;gAng=Math.atan2(g0.y,g0.x);
  if(first){fill(0,false);S.running=true;bgFade=0}else{fill(p,true);S.running=wasRun;finished=wasFin;chainWin=cw}
  document.documentElement.style.setProperty('--accent',th.accent);layout();renderMeta();syncCtrl();saveState()}
 $('playBtn').onclick=()=>{if(finished){fill(0);S.running=true}else{S.running=!S.running;if(!S.running)sess.disturbed=true;else wake()}syncCtrl();saveState()};
@@ -521,7 +547,8 @@ function loop(now){let raw=(now-last)/1000;last=now;
  if(raw>.3&&S.running&&!finished&&flipT<0){fastForward(raw);raw=.016}
  const dt=Math.min(.05,Math.max(0,raw));S.dt=dt;S.T+=dt;
  if(!dragging&&Math.abs(dragAng)>.05)dragAng*=Math.pow(.015,dt);
- const tg=targetGrav();const kk=1-Math.exp(-dt/.07);S.grav.x+=(tg.x-S.grav.x)*kk;S.grav.y+=(tg.y-S.grav.y)*kk;const gn=Math.hypot(S.grav.x,S.grav.y)||1;S.grav.x/=gn;S.grav.y/=gn;
+ // gravity turns by angle (never by averaging vectors, which stalls when the phone is turned straight over)
+ const tg=targetGrav();const kk=1-Math.exp(-dt/.07);let da=Math.atan2(tg.y,tg.x)-gAng;da=Math.atan2(Math.sin(da),Math.cos(da));gAng+=da*kk;S.grav.x=Math.cos(gAng);S.grav.y=Math.sin(gAng);
  if(zoomT<1)zoomT=Math.min(1,zoomT+dt/(reduce?.2:.7));fAmt+=((focus?1:0)-fAmt)*(1-Math.exp(-dt/.18));
  if(flipT>=0){flipT+=dt/(reduce?.35:.95);if(flipT>=1){flipT=-1;onFlipped()}}
  else{if(S.running&&!finished){tokens=Math.min(tokens+rate*dt,Math.max(2,rate*.3));sess.run+=dt;sess.by[th.id]=(sess.by[th.id]||0)+dt}
@@ -530,7 +557,9 @@ function loop(now){let raw=(now-last)/1000;last=now;
   if(th.age&&(++ageTick%3===0))for(let y=Y0;y<=Y1;y++){const e=y*W+rowR[y];for(let i=y*W+rowL[y];i<=e;i++)if(g[i]===1)th.age(i)}}
  th.every&&th.every();
  if(chainWin>0){chainWin-=dt;if(chainWin<=0){chainWin=0;chain=0}}
- if(S.running&&!finished&&flipT<0&&cnt[0]===0){finished=true;S.running=false;S.flashA=reduce?0:.12;award();chainWin=6;burst(30,[th.accent,'#ffffff']);try{navigator.vibrate&&navigator.vibrate([24,60,24])}catch(_){}syncCtrl();saveState()}
+ const sNow=srcSide();if(sNow!==lastSrcS){lastSrcS=sNow;if(sensor.on){try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}}}
+ if(finished&&flipT<0&&Math.abs(S.grav.y)>.35&&cnt[sNow]>0)resumeFlip();
+ if(S.running&&!finished&&flipT<0&&Math.abs(S.grav.y)>.2&&cnt[sNow]===0){finished=true;S.running=false;S.flashA=reduce?0:.12;award();chainWin=6;burst(30,[th.accent,'#ffffff']);try{navigator.vibrate&&navigator.vibrate([24,60,24])}catch(_){}syncCtrl();saveState()}
  saveT+=dt;if(saveT>1){saveT=0;saveState()}
  draw();updateUI();requestAnimationFrame(loop)}
 
