@@ -34,37 +34,41 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 button:focus-visible{outline:1px solid var(--accent);outline-offset:3px;border-radius:6px}
 .top{display:flex;align-items:center;justify-content:space-between;min-height:40px}
 .mark{font-family:var(--f-display);font-weight:600;font-size:14px;letter-spacing:.46em;color:var(--ink)}
-.codexBtn{display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.codexBtn svg{width:18px;height:18px;color:var(--accent)}
-.codexBtn b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:.04em}
-.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:2px}
-.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 10px;position:relative;color:var(--faint);transition:color .4s}
-.tab .la{font-family:var(--f-display);font-style:italic;font-weight:500;font-size:22px;line-height:1}
-.tab .en{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase}
-.tab::after{content:"";position:absolute;bottom:2px;left:50%;width:0;height:1px;background:var(--accent);transform:translateX(-50%);transition:width .5s}
-.tab[aria-pressed="true"]{color:var(--ink)}
-.tab[aria-pressed="true"]::after{width:22px}
+.tools{display:flex;gap:2px;margin-right:-10px}
+.ico{width:44px;height:44px;display:grid;place-items:center;color:var(--muted);border-radius:50%;transition:color .3s}
+.ico:hover{color:var(--ink)}
+.ico svg{width:20px;height:20px}
+.tabs{display:flex;justify-content:center;gap:18px;margin-top:4px}
+.tab{width:48px;height:48px;display:grid;place-items:center;position:relative;color:var(--faint);transition:color .4s}
+.tab svg{width:22px;height:22px}
+.tab::after{content:"";position:absolute;bottom:3px;left:50%;width:0;height:1px;background:var(--accent);transform:translateX(-50%);transition:width .5s}
+.tab[aria-pressed="true"]{color:var(--accent)}
+.tab[aria-pressed="true"]::after{width:16px}
+/* focus mode: only the hourglass remains */
+.app>*{transition:opacity .5s ease}
+body.focus .app>*{opacity:0;pointer-events:none}
+.pad{position:fixed;inset:0;z-index:2;touch-action:none;cursor:grab}
+.fexit{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px;padding:5px 5px 5px 16px;border:1px solid var(--line);border-radius:999px;background:rgba(10,9,8,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .4s}
+body.focus.reveal .fexit{opacity:1;pointer-events:auto}
+.fexit span{font-weight:300;font-size:15px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.fexit button{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--ink)}
+.fexit svg{width:18px;height:18px}
 #glass{flex:1 1 auto;min-height:220px;position:relative;touch-action:none;cursor:grab}
 .badge{position:absolute;left:50%;top:6px;transform:translateX(-50%);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);white-space:nowrap;pointer-events:none;transition:opacity .4s}
 .readout{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
 .time{font-weight:200;font-size:clamp(50px,15vw,66px);line-height:.95;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--ink)}
-.status{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
-.mastery{font-family:var(--f-display);font-style:italic;font-size:16px;color:var(--muted)}
-.mastery em{font-style:normal;color:var(--accent)}
+.status{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums;min-height:14px}
 .durs{display:flex;justify-content:center;align-items:center;gap:2px;margin-top:10px}
 .dur{min-width:44px;height:36px;font-size:14px;font-weight:400;color:var(--faint);font-variant-numeric:tabular-nums;position:relative}
 .dur[aria-pressed="true"]{color:var(--ink)}
 .dur[aria-pressed="true"]::after{content:"";position:absolute;left:50%;bottom:4px;width:3px;height:3px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
-.durs span{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);margin-left:6px}
-.ctrls{display:flex;justify-content:center;align-items:center;gap:30px;margin-top:6px}
+.ctrls{display:flex;justify-content:center;align-items:center;gap:30px;margin-top:6px;padding-bottom:6px}
 .ring{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink);transition:border-color .3s}
 .ring:hover{border-color:rgba(236,230,220,.35)}
 .ring svg{width:19px;height:19px}
 .play{width:72px;height:72px;position:relative;display:grid;place-items:center;color:var(--ink)}
 .play svg.pr{position:absolute;inset:0;width:72px;height:72px;transform:rotate(-90deg)}
 .play svg.ic{width:22px;height:22px}
-.hint{text-align:center;font-size:11px;letter-spacing:.06em;color:var(--faint);margin-top:8px;min-height:16px}
-.hint button{color:var(--accent);text-decoration:underline;text-underline-offset:3px;margin-left:6px}
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);transform:translate(-50%,-8px);z-index:5;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-size:13px;color:var(--ink);opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast i{font-style:normal;color:var(--accent);margin-right:8px}
@@ -100,7 +104,7 @@ button:focus-visible{outline:1px solid var(--accent);outline-offset:3px;border-r
 .seal b{font-weight:500;font-size:11.5px;line-height:1.25}
 .seal span{font-size:10px;line-height:1.35;color:var(--faint)}
 .seal.off{opacity:.4}
-@media (max-height:690px){.mastery{display:none}.hint{display:none}.tab{padding:6px 0 8px}}
+@media (max-height:640px){.durs{margin-top:4px}.tab{height:42px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -109,14 +113,17 @@ button:focus-visible{outline:1px solid var(--accent);outline-offset:3px;border-r
 <div class="app">
   <header class="top">
     <span class="mark">ZAMBAARA</span>
-    <button class="codexBtn" id="codexBtn" type="button" aria-label="Open the Codex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 6.5h7M8.5 17.5h7M9.3 6.5c0 3 5.4 3.6 5.4 5.5s-5.4 2.5-5.4 5.5M14.7 6.5c0 3-5.4 3.6-5.4 5.5s5.4 2.5 5.4 5.5"/></svg>Codex <b id="essTotal">0</b></button>
+    <div class="tools">
+      <button class="ico" id="motionBtn" type="button" aria-label="Allow motion sensors" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8a7 7 0 0 0 0 8M19.5 8a7 7 0 0 1 0 8"/></svg></button>
+      <button class="ico" id="codexBtn" type="button" aria-label="Open the Codex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 6.5h7M8.5 17.5h7M9.3 6.5c0 3 5.4 3.6 5.4 5.5s-5.4 2.5-5.4 5.5M14.7 6.5c0 3-5.4 3.6-5.4 5.5s5.4 2.5 5.4 5.5"/></svg></button>
+      <button class="ico" id="focusBtn" type="button" aria-label="Focus mode: show only the hourglass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+    </div>
   </header>
   <nav class="tabs" id="tabs" aria-label="Element"></nav>
   <div id="glass" role="img" aria-label="Hourglass"><div class="badge" id="badge"></div></div>
   <section class="readout">
     <div class="time" id="time" aria-live="off">01:00</div>
-    <div class="status" id="status" aria-live="polite">Flowing</div>
-    <div class="mastery" id="mastery"></div>
+    <div class="status" id="status" aria-live="polite"></div>
   </section>
   <div class="durs" id="durs" role="group" aria-label="Length"></div>
   <div class="ctrls">
@@ -127,8 +134,9 @@ button:focus-visible{outline:1px solid var(--accent);outline-offset:3px;border-r
     </button>
     <button class="ring" id="flipBtn" type="button" aria-label="Flip the glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V5"/><path d="M3.5 8.5 7 5l3.5 3.5"/><path d="M17 4v15"/><path d="M13.5 15.5 17 19l3.5-3.5"/></svg></button>
   </div>
-  <div class="hint" id="hint">Drag to tilt · swipe up to flip</div>
 </div>
+<div class="pad" id="pad" hidden></div>
+<div class="fexit" id="fexit"><span id="ftime">00:00</span><button type="button" id="exitFocus" aria-label="Leave focus mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button></div>
 <div class="toast" id="toast"></div>
 <div class="sheet" id="sheet" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="codexTitle">
@@ -340,16 +348,20 @@ function onOri(e){if(e.beta==null||e.gamma==null)return;const b=e.beta*Math.PI/1
  if(!sensor.armed&&sy>.35)sensor.armed=true}
 function onMot(e){const a=e.acceleration;if(!a||a.x==null)return;const m=Math.hypot(a.x,a.y||0,a.z||0),now=performance.now();if(m>15&&now-sensor.lastShake>1000){sensor.lastShake=now;th.stir&&th.stir()}}
 function attach(){if(listening)return;listening=true;addEventListener('deviceorientation',onOri);addEventListener('devicemotion',onMot);setTimeout(updHint,1500)}
-function updHint(){const h=$('hint');if(sensor.on){h.textContent='Turn the phone upside down to flip · tilt to pour';return}
- const D=window.DeviceOrientationEvent;if(D&&typeof D.requestPermission==='function'&&!askPerm){h.innerHTML='Drag to tilt · swipe up to flip<button type="button" id="permBtn">Use motion</button>';$('permBtn').onclick=()=>{askPerm=true;D.requestPermission().then(r=>{if(r==='granted')attach();updHint()}).catch(updHint);const M=window.DeviceMotionEvent;if(M&&typeof M.requestPermission==='function')M.requestPermission().catch(()=>{})}}
- else h.textContent='Drag to tilt · swipe up to flip · double-tap to stir'}
+function onceTip(key,msg){try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1')}catch(_){}toast(msg,'')}
+function updHint(){const D=window.DeviceOrientationEvent,b=$('motionBtn');b.hidden=!(!sensor.on&&D&&typeof D.requestPermission==='function'&&!askPerm);
+ if(sensor.on)onceTip('zmb.tip.gyro','Turn the phone over to flip');else if(listening&&b.hidden)onceTip('zmb.tip.drag','Drag to tilt · swipe to flip')}
+$('motionBtn').onclick=()=>{const D=window.DeviceOrientationEvent,M=window.DeviceMotionEvent;askPerm=true;if(D&&D.requestPermission)D.requestPermission().then(r=>{if(r==='granted')attach();updHint()}).catch(updHint);if(M&&typeof M.requestPermission==='function')M.requestPermission().catch(()=>{})};
 function targetGrav(){let x,y;if(dragging||!sensor.on||Math.abs(keyAng)>.5){const a=(dragAng+keyAng)*Math.PI/180;x=Math.sin(a);y=Math.cos(a)}else{x=sensor.sx;y=sensor.sy;const m=Math.hypot(x,y),k=Math.min(1,m/.45);x*=k;y=y*k+(1-k)}y=Math.max(y,.3);const n=Math.hypot(x,y)||1;return{x:x/n,y:y/n}}
 const gl=$('glass');
-gl.addEventListener('pointerdown',e=>{ptr={x:e.clientX,y:e.clientY,t:performance.now(),a:dragAng,mode:null};try{gl.setPointerCapture(e.pointerId)}catch(_){}const now=performance.now();if(now-lastTap<300){th.stir&&th.stir();sess.disturbed=true;lastTap=0}else lastTap=now});
-gl.addEventListener('pointermove',e=>{if(!ptr)return;const dx=e.clientX-ptr.x,dy=e.clientY-ptr.y;if(!ptr.mode&&Math.hypot(dx,dy)>8)ptr.mode=Math.abs(dx)>Math.abs(dy)?'tilt':'swipe';if(ptr.mode==='tilt'){dragging=true;sess.disturbed=true;dragAng=Math.max(-70,Math.min(70,ptr.a+dx/Math.max(220,S.w)*130))}});
-const up=e=>{if(!ptr)return;const dy=e.clientY-ptr.y,dt=performance.now()-ptr.t;if(ptr.mode==='swipe'&&Math.abs(dy)>60&&dt<600)flip();ptr=null;dragging=false};
-gl.addEventListener('pointerup',up);gl.addEventListener('pointercancel',()=>{ptr=null;dragging=false});
-document.addEventListener('keydown',e=>{if(!$('sheet').hidden){if(e.key==='Escape')closeCodex();return}if(e.target&&e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;if(e.key==='ArrowLeft'){keyAng=Math.max(-70,keyAng-14);sess.disturbed=true}else if(e.key==='ArrowRight'){keyAng=Math.min(70,keyAng+14);sess.disturbed=true}else if(e.key==='ArrowUp'||e.key==='f'){flip()}else return;e.preventDefault()});
+/* the glass area (and the full-screen pad in focus mode) take the same gestures: drag sideways to tilt, swipe to flip, double-tap to stir */
+function bindPad(el){
+ el.addEventListener('pointerdown',e=>{ptr={x:e.clientX,y:e.clientY,t:performance.now(),a:dragAng,mode:null};try{el.setPointerCapture(e.pointerId)}catch(_){}const now=performance.now();if(now-lastTap<300){th.stir&&th.stir();sess.disturbed=true;lastTap=0}else lastTap=now});
+ el.addEventListener('pointermove',e=>{if(!ptr)return;const dx=e.clientX-ptr.x,dy=e.clientY-ptr.y;if(!ptr.mode&&Math.hypot(dx,dy)>8)ptr.mode=Math.abs(dx)>Math.abs(dy)?'tilt':'swipe';if(ptr.mode==='tilt'){dragging=true;sess.disturbed=true;dragAng=Math.max(-70,Math.min(70,ptr.a+dx/Math.max(220,S.w)*130))}});
+ el.addEventListener('pointerup',e=>{if(!ptr)return;const dy=e.clientY-ptr.y,dt=performance.now()-ptr.t;if(ptr.mode==='swipe'&&Math.abs(dy)>60&&dt<600)flip();else if(!ptr.mode&&dt<350&&focus)reveal();ptr=null;dragging=false});
+ el.addEventListener('pointercancel',()=>{ptr=null;dragging=false})}
+bindPad(gl);bindPad($('pad'));
+document.addEventListener('keydown',e=>{if(focus&&e.key==='Escape'){setFocus(false);e.preventDefault();return}if(!$('sheet').hidden){if(e.key==='Escape')closeCodex();return}if(e.target&&e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;if(e.key==='ArrowLeft'){keyAng=Math.max(-70,keyAng-14);sess.disturbed=true}else if(e.key==='ArrowRight'){keyAng=Math.min(70,keyAng+14);sess.disturbed=true}else if(e.key==='ArrowUp'||e.key==='f'){flip()}else return;e.preventDefault()});
 
 function flip(){if(flipT>=0)return;flipT=0;try{navigator.vibrate&&navigator.vibrate(16)}catch(_){}}
 function onFlipped(){rotate180();
@@ -361,9 +373,18 @@ let dpr=1,bdpr=1;const cv=$('cv'),ctx=cv.getContext('2d'),bgc=$('bgc'),bctx=bgc.
 const snap=mk(2,2);let snapT=0;const GR={};
 function layout(){dpr=Math.min(2,window.devicePixelRatio||1);bdpr=Math.min(1.25,dpr);S.w=innerWidth;S.h=innerHeight;const cw=Math.round(S.w*dpr),ch=Math.round(S.h*dpr);if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch}
  const bw=Math.round(S.w*bdpr),bh=Math.round(S.h*bdpr);if(bgc.width!==bw||bgc.height!==bh){bgc.width=bw;bgc.height=bh}
- const r=gl.getBoundingClientRect(),capW=th.capW,plateCells=9;
- S.cs=Math.max(.8,Math.min(r.width*.86/(2*(capW+3)),(r.height-22)/(H+2*plateCells)));
+ const r=focus?{left:0,top:30,width:S.w,height:S.h-60}:gl.getBoundingClientRect(),capW=th.capW,plateCells=9;
+ S.cs=Math.max(.8,Math.min(r.width*(focus?.9:.86)/(2*(capW+3)),(r.height-22)/(H+2*plateCells)));
  S.gx=r.left+r.width/2-CX*S.cs;S.gy=r.top+12+((r.height-22)-H*S.cs)/2;buildLayers();cacheGrads()}
+/* focus mode: everything but the hourglass fades away and the glass grows to fill the screen */
+let focus=false,zoomT=1,zoomA=null,fAmt=0,revealT=0;
+function zoomTf(x){if(zoomT>=1||!zoomA)return;const e=ease(zoomT),s=(zoomA.cs/S.cs)*(1-e)+e,ax=zoomA.gx+CX*zoomA.cs,ay=zoomA.gy+MID*zoomA.cs,bx=S.gx+CX*S.cs,by=S.gy+MID*S.cs;x.translate(ax+(bx-ax)*e,ay+(by-ay)*e);x.scale(s,s);x.translate(-bx,-by)}
+function setFocus(on){if(on===focus)return;const A={cs:S.cs,gx:S.gx,gy:S.gy};focus=on;document.body.classList.toggle('focus',on);$('pad').hidden=!on;
+ if(on){wake();if(!$('sheet').hidden)closeCodex();try{const d=document.documentElement;if(d.requestFullscreen&&!document.fullscreenElement)d.requestFullscreen({navigationUI:'hide'}).catch(()=>{})}catch(_){}}
+ else{document.body.classList.remove('reveal');clearTimeout(revealT);try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{})}catch(_){}$('focusBtn').focus()}
+ layout();zoomA=A;zoomT=0}
+function reveal(){document.body.classList.add('reveal');clearTimeout(revealT);revealT=setTimeout(()=>document.body.classList.remove('reveal'),3200)}
+$('focusBtn').onclick=()=>setFocus(true);$('exitFocus').onclick=()=>setFocus(false);
 function cacheGrads(){const x=ctx,w=S.w,h=S.h;
  const t=bctx.createLinearGradient(0,0,0,180);t.addColorStop(0,'rgba(5,4,4,.7)');t.addColorStop(1,'rgba(5,4,4,0)');GR.top=t;
  const b=bctx.createLinearGradient(0,h-380,0,h);b.addColorStop(0,'rgba(5,4,4,0)');b.addColorStop(.55,'rgba(5,4,4,.55)');b.addColorStop(1,'rgba(5,4,4,.82)');GR.bot=b;
@@ -421,7 +442,7 @@ function drawBg(x){const im=bgImgs[th.id],w=S.w,h=S.h;x.fillStyle='#070606';x.fi
  if(im.complete&&im.naturalWidth){const s=Math.max(w/im.naturalWidth,h/im.naturalHeight)*1.06,iw=im.naturalWidth*s,ih=im.naturalHeight*s;x.globalAlpha=Math.min(1,bgFade);x.drawImage(im,(w-iw)/2+bgShift,(h-ih)/2,iw,ih);x.globalAlpha=1}
  if(th.amb.mist&&mist.complete&&mist.naturalWidth){const mw=w*1.6,mh=mw*mist.naturalHeight/mist.naturalWidth;for(const[yy,sp,a]of[[.62,.012,.28],[.78,.02,.2]]){const ox=((S.T*sp*w)%mw)+bgShift*1.4;x.globalAlpha=a;x.drawImage(mist,ox-mw,h*yy-mh/2,mw,mh);x.drawImage(mist,ox,h*yy-mh/2,mw,mh)}x.globalAlpha=1}
  if(th.amb.add)x.globalCompositeOperation='lighter';for(const p of S.amb)th.amb.draw(x,p);x.globalCompositeOperation='source-over';
- x.fillStyle=GR.top;x.fillRect(0,0,w,180);x.fillStyle=GR.bot;x.fillRect(0,h-380,w,380)}
+ x.globalAlpha=1-.7*fAmt;x.fillStyle=GR.top;x.fillRect(0,0,w,180);x.fillStyle=GR.bot;x.fillRect(0,h-380,w,380);x.globalAlpha=1}
 
 /* ============ render ============ */
 function paintSand(){const up=S.grav.y>=0?-W:W,rimB=th.rim,sh=th.shade,ta=th.tone,tb=1-ta/2,tk=ta/255;
@@ -434,12 +455,14 @@ function draw(){bgFade=Math.min(1,bgFade+S.dt*1.8);paintSand();
  const flipTf=x=>{if(flipT>=0){const e=ease(Math.min(1,flipT)),sc=1-.05*Math.sin(Math.PI*e);x.translate(cx,cy);x.rotate(Math.PI*e);x.scale(sc,sc);x.translate(-cx,-cy)}};
  // soft layer: backdrop, floor shadow, ember light and the sand's bloom
  const b=bctx;b.setTransform(bdpr,0,0,bdpr,0,0);drawBg(b);
+ b.save();zoomTf(b);
  b.save();b.translate(0,botY+6);b.scale(1,.12);b.translate(0,-(botY+6));b.fillStyle=GR.sh;b.fillRect(cx-sw,botY+6-sw,sw*2,sw*2);b.restore();
  if(th.id==='ignis'){b.globalAlpha=.16+.04*Math.sin(S.T*2);b.fillStyle=GR.lava;b.fillRect(cx-sw*1.2,botY-sw*1.2,sw*2.4,sw*2.4);b.globalAlpha=1}
  if(th.glow){g1.clearRect(0,0,38,65);g1.drawImage(off,0,0,38,65);g2.clearRect(0,0,19,33);g2.drawImage(gl1,0,0,19,33);b.save();flipTf(b);b.globalCompositeOperation='lighter';b.imageSmoothingEnabled=true;b.globalAlpha=th.glow*.8;b.drawImage(gl1,S.gx-S.cs*3,S.gy-S.cs*3,GW+S.cs*6,GH+S.cs*6);b.globalAlpha=th.glow*.6;b.drawImage(gl2,S.gx-S.cs*10,S.gy-S.cs*10,GW+S.cs*20,GH+S.cs*20);b.restore()}
+ b.restore();
  // sharp layer: the hourglass
  const x=ctx;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.setTransform(dpr,0,0,dpr,0,0);
- x.save();flipTf(x);
+ x.save();zoomTf(x);flipTf(x);
  x.drawImage(backC,box.x,box.y,box.w,box.h);
  x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(off,S.gx,S.gy,GW,GH);
  drawFx(x);
@@ -451,19 +474,17 @@ function draw(){bgFade=Math.min(1,bgFade+S.dt*1.8);paintSand();
 /* ============ UI ============ */
 const DURS=[1,5,10,25,45];
 const tabs=$('tabs'),durs=$('durs');
-ELS.forEach((e,i)=>{const b=document.createElement('button');b.type='button';b.className='tab';b.innerHTML=`<span class="la">${e.latin}</span><span class="en">${e.name}</span>`;b.onclick=()=>{if(i!==thIdx)setEl(i)};tabs.appendChild(b)});
+ELS.forEach((e,i)=>{const b=document.createElement('button');b.type='button';b.className='tab';b.setAttribute('aria-label',`${e.latin}, ${e.name}`);b.title=e.latin;b.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GLYPH[e.id]}</svg>`;b.onclick=()=>{if(i!==thIdx)setEl(i)};tabs.appendChild(b)});
 DURS.forEach(m=>{const b=document.createElement('button');b.type='button';b.className='dur';b.textContent=m;b.dataset.s=m*60;b.setAttribute('aria-label',m+' minute'+(m>1?'s':''));b.onclick=()=>{dur=m*60;db.dur=dur;saveDb();fill(0);S.running=true;syncCtrl();saveState()};durs.appendChild(b)});
-const unit=document.createElement('span');unit.textContent='min';durs.appendChild(unit);
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 const PAUSE='<rect x="7" y="5" width="3" height="14" rx=".8"/><rect x="14" y="5" width="3" height="14" rx=".8"/>',PLAY='<path d="M8 5.5v13l10.5-6.5z"/>';
 function syncCtrl(){[...tabs.children].forEach((b,i)=>b.setAttribute('aria-pressed',i===thIdx));[...durs.querySelectorAll('.dur')].forEach(b=>b.setAttribute('aria-pressed',+b.dataset.s===dur));
  const run=S.running&&!finished;$('playIc').innerHTML=run?PAUSE:PLAY;$('playBtn').setAttribute('aria-label',finished?'Start again':run?'Pause':'Resume')}
-function renderMeta(){const l=level(th.id),nx=TH[l+1];$('mastery').innerHTML=`Mastery <em>${ROMAN[l]}</em> · ${FINISH[finishOf(th.id)][0]} · ${db.ess[th.id]}${nx?' / '+nx:''} essence`;
- $('essTotal').textContent=Object.values(db.ess).reduce((a,b)=>a+b,0)}
+function renderMeta(){$('codexBtn').setAttribute('aria-label',`Open the Codex, ${Object.values(db.ess).reduce((a,b)=>a+b,0)} essence`)}
 let lt='',ls='',lp=-1;
-function updateUI(){const rem=cnt[0]/rate,t=fmt(rem);if(t!==lt){$('time').textContent=t;lt=t;gl.setAttribute('aria-label',`${th.name} hourglass, ${t} left`)}
- let s;if(finished)s=chainWin>0?'Empty · flip to chain '+Math.ceil(chainWin):'The glass is empty';else if(!S.running)s='Paused';else s=th.id==='pluvia'?'Flowing':'Pouring';
- const p=Math.round(progress()*100);if(!finished)s+=' · '+p+'%';if(s!==ls){$('status').textContent=s;ls=s}
+function updateUI(){const rem=cnt[0]/rate,t=fmt(rem);if(t!==lt){$('time').textContent=t;$('ftime').textContent=t;lt=t;gl.setAttribute('aria-label',`${th.name} hourglass, ${t} left`)}
+ const s=finished?(chainWin>0?'Flip to chain · '+Math.ceil(chainWin):'Complete'):(!S.running?'Paused':'');
+ if(s!==ls){$('status').textContent=s;ls=s}
  const off=216.8*(1-progress());if(Math.abs(off-lp)>.3){$('prog').setAttribute('stroke-dashoffset',off.toFixed(1));lp=off}
  const bt=chain>0?'Chain ×'+chain:'';if(bt!==lb){$('badge').textContent=bt;lb=bt}}
 let lb='';
@@ -501,6 +522,7 @@ function loop(now){let raw=(now-last)/1000;last=now;
  const dt=Math.min(.05,Math.max(0,raw));S.dt=dt;S.T+=dt;
  if(!dragging&&Math.abs(dragAng)>.05)dragAng*=Math.pow(.015,dt);
  const tg=targetGrav();const kk=1-Math.exp(-dt/.07);S.grav.x+=(tg.x-S.grav.x)*kk;S.grav.y+=(tg.y-S.grav.y)*kk;const gn=Math.hypot(S.grav.x,S.grav.y)||1;S.grav.x/=gn;S.grav.y/=gn;
+ if(zoomT<1)zoomT=Math.min(1,zoomT+dt/(reduce?.2:.7));fAmt+=((focus?1:0)-fAmt)*(1-Math.exp(-dt/.18));
  if(flipT>=0){flipT+=dt/(reduce?.35:.95);if(flipT>=1){flipT=-1;onFlipped()}}
  else{if(S.running&&!finished){tokens=Math.min(tokens+rate*dt,Math.max(2,rate*.3));sess.run+=dt;sess.by[th.id]=(sess.by[th.id]||0)+dt}
   let a=Math.atan2(S.grav.y,S.grav.x)/(Math.PI/4);if(a<0)a+=8;const base=Math.floor(a),frac=a-base;
